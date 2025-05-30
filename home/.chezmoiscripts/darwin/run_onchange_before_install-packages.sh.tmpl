@@ -1,0 +1,85 @@
+#!/bin/bash
+
+set -eufo pipefail
+
+{{ $taps := list
+    "hitblast/tap"
+-}}
+{{ $brews := list
+     "chezmoi"
+     "cutler"
+     "mas"
+-}}
+{{ $casks := list
+     "canva"
+     "via"
+     "vial"
+-}}
+{{ $mas := dict
+    "Home Assistant" 1099568401
+    "iMovie" 408981434
+    "Okta Verify" 490179405
+    "Parcel" 639968404
+    "Perplexity" 6714467650
+    "Reeder" 1529448980
+    "Tot" 1491071483
+-}}
+
+installed_taps=$(brew tap 2>/dev/null || true)
+installed_brews=$(brew list --formula 2>/dev/null || true)
+installed_casks=$(brew list --cask 2>/dev/null || true)
+installed_mas=$(mas list | awk '{print $1}' 2>/dev/null || true)
+
+wanted_taps=({{ range ($taps | sortAlpha | uniq) }}"{{ . }}" {{ end }})
+wanted_brews=({{ range ($brews | sortAlpha | uniq) }}"{{ . }}" {{ end }})
+wanted_casks=({{ range ($casks | sortAlpha | uniq) }}"{{ . }}" {{ end }})
+wanted_mas=({{ range $mas }}"{{ . }}" {{ end }})
+
+contains() {
+    local item="$1"
+    shift
+    local arr=("$@")
+    for element in "${arr[@]}"; do
+        [[ "$element" == "$item" ]] && return 0
+    done
+    return 1
+}
+
+for tap in $installed_taps; do
+    if ! contains "$tap" "${wanted_taps[@]:-}"; then
+        brew untap "$tap" 2>/dev/null || true
+    fi
+done
+
+for formula in $installed_brews; do
+    if ! contains "$formula" "${wanted_brews[@]:-}"; then
+        brew uninstall "$formula" 2>/dev/null || true
+    fi
+done
+
+for cask in $installed_casks; do
+    if ! contains "$cask" "${wanted_casks[@]:-}"; then
+        brew uninstall --cask "$cask" 2>/dev/null || true
+    fi
+done
+
+for mas_id in $installed_mas; do
+    if ! contains "$mas_id" "${wanted_mas[@]:-}"; then
+        sudo mas uninstall "$mas_id" 2>/dev/null || true
+    fi
+done
+
+brew bundle --file=/dev/stdin <<EOF
+{{ range ($taps | sortAlpha | uniq) -}}
+tap "{{ . }}"
+{{ end -}}
+{{ range ($brews | sortAlpha | uniq) -}}
+brew "{{ . }}"
+{{ end -}}
+{{ range ($casks | sortAlpha | uniq) -}}
+cask "{{ . }}"
+{{ end -}}
+{{ range $name, $id := $mas -}}
+mas "{{ $name }}", id: {{ $id }}
+{{ end -}}
+EOF
