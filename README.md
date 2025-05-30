@@ -1,4 +1,4 @@
-# Dededecine's Dotfiles
+# Dededecline's Dotfiles
 
 A comprehensive macOS dotfiles repository managed with [chezmoi](https://chezmoi.io). Features include automated system configuration, package management, and personalized settings.
 
