@@ -8,8 +8,10 @@ script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 # macOS Setup
 # Installs homebrew, xcode developer tools, and rosetta 2
 if [ "$(uname)" = "Darwin" ]; then
+  if ! xcode-select -p >/dev/null 2>&1; then
+    xcode-select --install
+  fi
   if [ ! "$(command -v brew)" ]; then
-    # This should also install xcode developer tools if not done already
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
   if ! pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1; then
