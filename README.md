@@ -57,7 +57,7 @@ A comprehensive macOS dotfiles repository managed with [chezmoi](https://chezmoi
    ```bash
    mkdir -p ~/.local/share/ && cd "$_"
    curl -L https://github.com/dededecline/dotfiles/archive/refs/heads/main.zip -o repo.zip
-   unzip -q repo.zip && mv dotfiles-main chezmoi && cd "$_"
+   unzip -q repo.zip && mv dotfiles-main chezmoi && rm -rf repo.zip && cd "$_"
    ./bootstrap.sh
    ```
 
