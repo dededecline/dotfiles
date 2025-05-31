@@ -101,7 +101,7 @@ hostname = "athena"
 run = "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to true'"
 
 [commands.dns]
-run = "networksetup -setdnsservers 'Wi-Fi' '94.140.14.14' '94.140.15.15' && networksetup -setdnsservers 'Thunderbolt Ethernet Slot 1' '94.140.14.14' '94.140.15.15'"
+run = "for service in $(networksetup -listallnetworkservices | grep -E '(Wi-Fi|Ethernet)'); do networksetup -setdnsservers \"$service\" '94.140.14.14' '94.140.15.15'; done"
 
 [commands.hostname]
 run = "scutil --set ComputerName $hostname && scutil --set HostName $hostname && scutil --set LocalHostName $hostname"
