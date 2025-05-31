@@ -51,41 +51,12 @@ A comprehensive macOS dotfiles repository managed with [chezmoi](https://chezmoi
 
 ## Setup Instructions
 
-### Quick Setup (Recommended)
-
-1. **Clone and Bootstrap**:
+**Clone and Bootstrap**:
    ```bash
    mkdir -p ~/.local/share/ && cd "$_"
    curl -L https://github.com/dededecline/dotfiles/archive/refs/heads/main.zip -o repo.zip
    unzip -q repo.zip && mv dotfiles-main chezmoi && rm -f repo.zip && cd chezmoi
    ./bootstrap.sh
-   ```
-
-### Manual Setup
-
-1. **Install Xcode Command Line Tools**:
-   ```bash
-   xcode-select --install
-   ```
-
-2. **Install Homebrew**:
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-3. **Install Rosetta 2** (for Apple Silicon Macs):
-   ```bash
-   softwareupdate --install-rosetta --agree-to-license
-   ```
-
-4. **Install chezmoi**:
-   ```bash
-   brew install chezmoi
-   ```
-
-5. **Initialize dotfiles**:
-   ```bash
-   chezmoi init --apply https://github.com/dededecline/dotfiles.git
    ```
 
 ## Usage Guide
