@@ -26,4 +26,4 @@ if [ "$(uname)" = "Darwin" ]; then
 fi
 
 # exec: replace current process with chezmoi init
-exec chezmoi init --apply "--source=$script_dir"
+exec /opt/homebrew/bin/chezmoi init --apply "--source=$script_dir"
