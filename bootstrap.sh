@@ -34,6 +34,5 @@ fi
 
 echo "export PATH=/opt/homebrew/bin:$PATH" >> ~/.zshrc && source ~/.zshrc
 
-# exec: replace current process with chezmoi init
-exec /opt/homebrew/bin/chezmoi init --apply "--source=$script_dir"
-exec /opt/homebrew/bin/cutler apply
+/opt/homebrew/bin/chezmoi init --apply "--source=$script_dir"
+/opt/homebrew/bin/cutler apply
