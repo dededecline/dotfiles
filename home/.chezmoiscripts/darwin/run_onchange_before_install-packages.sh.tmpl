@@ -6,14 +6,78 @@ set -eufo pipefail
     "hitblast/tap"
 -}}
 {{ $brews := list
-     "chezmoi"
-     "cutler"
-     "mas"
+    "act"
+    "atuin"
+    "awscli"
+    "bat"
+    "black"
+    "btop"
+    "chezmoi"
+    "coreutils"
+    "cutler"
+    "difftastic"
+    "direnv"
+    "docker"
+    "docker-compose"
+    "dust"
+    "fastfetch"
+    "fd"
+    "ffmpeg"
+    "fish"
+    "fzf"
+    "jpegoptim"
+    "gcc"
+    "gh"
+    "git"
+    "go"
+    "gopls"
+    "grep"
+    "homeassistant-cli"
+    "iftop"
+    "jq"
+    "lsd"
+    "mas"
+    "neovim"
+    "node"
+    "openssh"
+    "opentofu"
+    "pngquant"
+    "prettier"
+    "python@3.13"
+    "sqlite"
+    "syncthing"
+    "tflint"
+    "tmux"
+    "tree"
+    "unzip"
+    "uv"
+    "virtualenv"
+    "wget"
+    "wireshark"
+    "zip"
 -}}
 {{ $casks := list
-     "canva"
-     "via"
-     "vial"
+    "1password"
+    "1password-cli"
+    "canva"
+    "discord"
+    "font-mononoki-nerd-font"
+    "git-credential-manager"
+    "google-cloud-sdk"
+    "home-assistant"
+    "kitty"
+    "protonvpn"
+    "proton-drive"
+    "proton-mail"
+    "proton-mail-bridge"
+    "signal"
+    "slack"
+    "steam"
+    "utm"
+    "via"
+    "vial"
+    "zen"
+    "zoom"
 -}}
 {{ $mas := dict
     "Home Assistant" 1099568401
@@ -53,13 +117,13 @@ done
 
 for formula in $installed_brews; do
     if ! contains "$formula" "${wanted_brews[@]:-}"; then
-        brew uninstall "$formula" 2>/dev/null || true
+        brew uninstall --zap "$formula" 2>/dev/null || true
     fi
 done
 
 for cask in $installed_casks; do
     if ! contains "$cask" "${wanted_casks[@]:-}"; then
-        brew uninstall --cask "$cask" 2>/dev/null || true
+        brew uninstall --cask "$cask" --zap 2>/dev/null || true
     fi
 done
 
@@ -83,3 +147,7 @@ cask "{{ . }}"
 mas "{{ $name }}", id: {{ $id }}
 {{ end -}}
 EOF
+
+# TODO: configure stdout/stderr options
+# TODO: configure zap vs uninstall
+# TODO: multithreading
