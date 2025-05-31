@@ -85,7 +85,7 @@ A comprehensive macOS dotfiles repository managed with [chezmoi](https://chezmoi
 
 5. **Initialize dotfiles**:
    ```bash
-   chezmoi init --apply https://github.com/dededecine/dotfiles.git
+   chezmoi init --apply https://github.com/dededecline/dotfiles.git
    ```
 
 ## Usage Guide
