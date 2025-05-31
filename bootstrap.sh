@@ -8,17 +8,15 @@ script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 # macOS Setup
 # Installs homebrew, xcode developer tools, and rosetta 2
 if [ "$(uname)" = "Darwin" ]; then
-  if ! xcode-select -p >/dev/null 2>&1; then
-    xcode-select --install
-  fi
   if [ ! "$(command -v brew)" ]; then
+    # This will also install xcode developer tools if not already installed
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
   if ! pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1; then
     softwareupdate --install-rosetta --agree-to-license
   fi
   if [ ! "$(command -v chezmoi)" ]; then
-    brew install chezmoi
+    /opt/homebrew/bin/brew install chezmoi
     template_file="$script_dir/home/.chezmoiscripts/darwin/run_onchange_before_install-packages.sh.tmpl"
     if ! grep -q '"chezmoi"' "$template_file"; then
       sed -i '' '/{{ \$brews := list/a\
