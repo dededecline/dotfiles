@@ -12,7 +12,7 @@ if [ "$(uname)" = "Darwin" ]; then
     xcode-select --install
   fi
   if [ ! "$(command -v brew)" ]; then
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
   if ! pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1; then
     softwareupdate --install-rosetta --agree-to-license
