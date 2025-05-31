@@ -37,9 +37,6 @@ ShowPathbar = true
 [set.HIToolBox]
 AppleFnUsageType = 0
 
-[set.LaunchServices]
-LSQuarantine = false
-
 [set.menuextra.clock]
 FlashDateSeparators = false
 DateFormat = "\"EEE d MMM HH:mm\""
@@ -109,6 +106,9 @@ run = "networksetup -setdnsservers 'Wi-Fi' '94.140.14.14' '94.140.15.15' && netw
 [commands.hostname]
 run = "scutil --set ComputerName $hostname && scutil --set HostName $hostname && scutil --set LocalHostName $hostname"
 sudo = true
+
+[commands.quarantine]
+run = "defaults write com.apple.LaunchServices LSQuarantine -bool NO
 
 [commands.screenshot]
 run = "defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 31 \"{enabled = 0; value = { parameters = (119, 13, 1310720); type = 'standard'; }; }\" && defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 31 \"{enabled = 1; value = { parameters = (119, 13, 1310720); type = 'standard'; }; }\""
