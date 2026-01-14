@@ -49,7 +49,6 @@ abbr -a gpop "git stash pop"
 alias ls="lsd"
 alias find="fd"
 alias ping="gping"
-alias vim="nvim"
 
 # Utility commands
 alias search="grep -rnw . -e"

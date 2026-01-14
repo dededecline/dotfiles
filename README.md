@@ -1,19 +1,6 @@
-# Dotfiles
+# Dededecline's Dotfiles
 
 Personal dotfiles managed as a git repository in `~/.config`.
-
-Modeled after [driesvints/dotfiles](https://github.com/driesvints/dotfiles).
-
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [What Gets Installed](#what-gets-installed)
-- [Structure](#structure)
-- [Shell Configuration](#shell-configuration)
-- [Secrets Management](#secrets-management)
-- [macOS Preferences](#macos-preferences)
-- [Manual Steps](#manual-steps)
-- [Customization](#customization)
 
 ## Quick Start
 
@@ -106,57 +93,6 @@ The setup script is fully idempotent - run it anytime to ensure everything is co
 └── themes/                  # Shared Catppuccin theme files
 ```
 
-## Shell Configuration
-
-### Fish Shell
-
-Fish is the primary shell with modular configuration:
-
-- **config.fish** - Environment variables, tool integrations (starship, fzf, atuin)
-- **conf.d/path.fish** - PATH configuration (Homebrew, Go, Cargo, etc.)
-- **conf.d/aliases.fish** - Modern CLI aliases and abbreviations
-
-### Key Aliases
-
-```fish
-# Modern replacements (automatic)
-ls → lsd          cat → bat         find → fd
-diff → difft      top → btop        du → dust
-
-# Abbreviations (expand as you type)
-k → kubectl       tf → tofu         vim → nvim
-gs → git status   gd → git diff     gp → git push
-
-# Utilities
-reload            # Reload fish config
-dotfiles          # cd to ~/.config
-fishconfig        # Edit fish config in nvim
-kctx              # Show current kubectl context
-```
-
-### Custom Functions
-
-| Function | Description |
-|----------|-------------|
-| `secrets` | Inject secrets from 1Password |
-| `secrets check` | Check which secrets are configured |
-| `gitdone` | Switch to default branch and pull |
-| `clone <repo>` | Clone work repos with archive detection |
-| `empty` | Create empty commit with CI identity (for triggering pipelines) |
-| `z <dir>` | Zoxide directory jumping |
-| `awsall <cmd>` | Run AWS CLI command across all regions |
-
-### Starship Prompt
-
-Two-line prompt with Catppuccin Frappe theme showing:
-- Directory (truncated to repo root)
-- Git branch and status
-- Command duration (if > 2s)
-- Kubernetes context (in k8s directories)
-- Terraform workspace (in tf directories)
-- AWS profile/region
-- Time
-
 ## Secrets Management
 
 Secrets are managed using 1Password CLI with template injection:
@@ -171,18 +107,6 @@ secrets check            # Check which secrets are configured
 1. **Templates** (`templates/*.tpl`) contain `{{ op://Vault/Item/Field }}` references
 2. **secrets.sh** processes templates via `op inject`
 3. **Output** goes to `sensitive/` (gitignored)
-
-### Managed Secrets
-
-| Secret | Purpose |
-|--------|---------|
-| Git identity | Name and email for commits |
-| CI identity | Bot identity for `empty` function |
-| Work Brewfile | Work-specific Homebrew packages |
-| Clone function | Work GitHub org configuration |
-| Atuin sync | Shell history sync credentials |
-
-See [templates/README.md](templates/README.md) for 1Password item setup.
 
 ### Work Tools
 
@@ -199,19 +123,7 @@ Files that expect `~/.<file>` locations are symlinked:
 
 ## macOS Preferences
 
-The `.macos` script configures system preferences via `defaults write`:
-
-**UI**: Dark mode, auto-hide menu bar, expanded save panels, small sidebar icons
-
-**Input**: Key repeat enabled, smart punctuation disabled, auto-correct disabled
-
-**Finder**: POSIX path in title, hidden files visible, no desktop icons, search current folder
-
-**Screenshots**: PNG format, no shadow, saves to clipboard
-
-**Security**: Touch ID for sudo authentication
-
-**Trackpad**: Tap to click disabled
+The `.macos` script configures system preferences via `defaults write`.
 
 Run standalone with `./setup.sh --macos`. Some changes require logout/restart.
 
