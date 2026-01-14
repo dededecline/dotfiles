@@ -339,6 +339,48 @@ setup_aerospace_swipe() {
     print_status "aerospace-swipe: installed"
 }
 
+setup_sketchybar() {
+    if ! command -v sketchybar &>/dev/null; then
+        print_warning "Sketchybar not installed - skipping"
+        return 0
+    fi
+
+    # Make sure scripts are executable
+    if [[ -d "$DOTFILES/sketchybar" ]]; then
+        chmod +x "$DOTFILES/sketchybar/sketchybarrc" 2>/dev/null || true
+        chmod +x "$DOTFILES/sketchybar/plugins/"*.sh 2>/dev/null || true
+        chmod +x "$DOTFILES/sketchybar/items/"*.sh 2>/dev/null || true
+    fi
+
+    local plist="$HOME/Library/LaunchAgents/com.felixkratz.sketchybar.plist"
+
+    # Load the LaunchAgent (symlink created by symlinks.sh)
+    if [[ -f "$plist" ]]; then
+        # Unload first if already loaded, then reload
+        launchctl unload "$plist" 2>/dev/null || true
+        launchctl load "$plist"
+        print_status "Sketchybar: loaded (starts at login)"
+    else
+        print_warning "Sketchybar plist not found - run symlinks first"
+    fi
+}
+
+setup_wallpaper() {
+    local wallpaper_dir="$DOTFILES/themes/wallpapers"
+    local wallpaper="$wallpaper_dir/comfy-home.png"
+
+    if [[ ! -f "$wallpaper" ]]; then
+        print_info "Downloading wallpaper..."
+        mkdir -p "$wallpaper_dir"
+        curl -fsSL "https://raw.githubusercontent.com/dededecline/nix-config/main/theming/wallpapers/comfy-home.png" \
+            -o "$wallpaper"
+    fi
+
+    print_info "Setting wallpaper..."
+    osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$wallpaper\""
+    print_status "Wallpaper: applied to all desktops"
+}
+
 apply_macos_defaults() {
     if [[ ! -f "$DOTFILES/.macos" ]]; then
         print_error "macOS preferences file not found: $DOTFILES/.macos"
@@ -376,9 +418,13 @@ run_setup() {
     setup_fisher
     setup_tmux_plugins
     setup_aerospace_swipe
+    setup_sketchybar
 
     # Apply macOS preferences
     apply_macos_defaults
+
+    # Set wallpaper
+    setup_wallpaper
 
     # Show completion message
     print_header "Setup Complete!"

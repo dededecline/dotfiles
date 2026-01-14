@@ -67,4 +67,8 @@ process_template "$TEMPLATES_DIR/glow.yml.tpl" "$DOTFILES/glow/glow.yml"
 mkdir -p "$HOME/Library/Preferences/glow"
 create_symlink "$DOTFILES/glow/glow.yml" "$HOME/Library/Preferences/glow/glow.yml"
 
+# LaunchAgents (services that start at login)
+mkdir -p "$HOME/Library/LaunchAgents"
+create_symlink "$DOTFILES/sketchybar/com.felixkratz.sketchybar.plist" "$HOME/Library/LaunchAgents/com.felixkratz.sketchybar.plist"
+
 echo "Symlinks complete!"

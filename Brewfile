@@ -99,7 +99,8 @@ cask "yubico-authenticator"     # YubiKey manager
 
 # Window Management & System
 cask "nikitabobko/tap/aerospace" # Tiling window manager
-cask "bettertouchtool"          # Input customization
+brew "sketchybar"                # Custom macOS menu bar
+cask "sf-symbols"                # Apple SF Symbols for icons
 cask "pearcleaner"              # App uninstaller
 
 # Terminals & Editors
@@ -181,4 +182,7 @@ mas "Reeder Classic", id: 1529448980    # RSS reader
 # =============================================================================
 cask "font-agave-nerd-font"            # Alternative coding font
 cask "font-fira-code-nerd-font"        # Coding font
+cask "font-hack-nerd-font"             # Coding font with icons (for sketchybar)
+cask "font-sf-pro"                     # Apple SF Pro font
+cask "font-sketchybar-app-font"        # App icons for sketchybar workspaces
 cask "font-symbols-only-nerd-font"     # Nerd Font symbols (for kitty symbol_map)

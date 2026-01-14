@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# Load colors
+source "$CONFIG_DIR/colors.sh"
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
+
+# Fonts
+FONT="SF Pro"
+NERD_FONT="Hack Nerd Font"
+
+##### Bar Appearance #####
+bar=(
+  position=top
+  height=40
+  blur_radius=0
+  color=0x00000000
+  shadow=off
+  sticky=on
+  padding_left=10
+  padding_right=10
+  notch_width=188
+  topmost=window
+)
+sketchybar --bar "${bar[@]}"
+
+##### Changing Defaults #####
+default=(
+  padding_left=5
+  padding_right=5
+  icon.font="$NERD_FONT:Bold:16.0"
+  label.font="$FONT:Semibold:14.0"
+  icon.color=$ICON_COLOR
+  label.color=$LABEL_COLOR
+  icon.padding_left=4
+  icon.padding_right=4
+  label.padding_left=4
+  label.padding_right=4
+  background.height=26
+  background.corner_radius=5
+  updates=on
+)
+sketchybar --default "${default[@]}"
+
+##### Adding Aerospace Workspaces #####
+
+# Add the aerospace_workspace_change event
+sketchybar --add event aerospace_workspace_change
+
+# Source workspace items
+source "$ITEM_DIR/spaces.sh"
+
+# Front app (current focused application)
+source "$ITEM_DIR/front_app.sh"
+
+##### Adding Right Items #####
+
+# Clock
+sketchybar --add item clock right \
+  --set clock \
+    update_freq=10 \
+    icon= \
+    icon.color=$LAVENDER \
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=5 \
+    background.height=26 \
+    background.drawing=on \
+    script="$PLUGIN_DIR/clock.sh"
+
+# Battery
+sketchybar --add item battery right \
+  --set battery \
+    update_freq=120 \
+    icon.color=$GREEN \
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=5 \
+    background.height=26 \
+    background.drawing=on \
+    script="$PLUGIN_DIR/battery.sh" \
+  --subscribe battery system_woke power_source_change
+
+# Volume
+sketchybar --add item volume right \
+  --set volume \
+    icon.color=$BLUE \
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=5 \
+    background.height=26 \
+    background.drawing=on \
+    script="$PLUGIN_DIR/volume.sh" \
+  --subscribe volume volume_change
+
+# WiFi
+sketchybar --add item wifi right \
+  --set wifi \
+    icon=󰖩 \
+    icon.color=$SKY \
+    label.drawing=off \
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=5 \
+    background.height=26 \
+    background.drawing=on \
+    script="$PLUGIN_DIR/wifi.sh" \
+  --subscribe wifi wifi_change
+
+# CPU
+sketchybar --add item cpu right \
+  --set cpu \
+    icon=󰻠 \
+    icon.color=$PEACH \
+    update_freq=5 \
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=5 \
+    background.height=26 \
+    background.drawing=on \
+    script="$PLUGIN_DIR/cpu.sh"
+
+##### Separator (center) #####
+sketchybar --add item separator center \
+  --set separator \
+    icon= \
+    icon.color=$OVERLAY0 \
+    label.drawing=off \
+    background.drawing=off \
+    padding_left=0 \
+    padding_right=0
+
+##### Force all scripts to run the first time #####
+sketchybar --update
