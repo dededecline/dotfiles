@@ -18,8 +18,7 @@ abbr -a vim nvim
 abbr -a pip pip3
 abbr -a python python3
 
-# Modern CLI replacements
-abbr -a cat bat
+# Modern CLI replacements (cat is a function that uses glow for markdown)
 abbr -a diff difft
 abbr -a du dust
 abbr -a fetch fastfetch

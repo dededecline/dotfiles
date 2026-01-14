@@ -43,4 +43,8 @@ create_symlink "$DOTFILES/git/config" "$HOME/.gitconfig"
 # Sensitive files (if they exist)
 create_symlink "$DOTFILES/sensitive/.npmrc" "$HOME/.npmrc"
 
+# macOS app configs (these apps don't respect XDG_CONFIG_HOME)
+mkdir -p "$HOME/Library/Preferences/glow"
+create_symlink "$DOTFILES/glow/glow.yml" "$HOME/Library/Preferences/glow/glow.yml"
+
 echo "Symlinks complete!"

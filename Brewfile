@@ -29,6 +29,7 @@ brew "dust"                     # du replacement
 brew "fastfetch"                # System info
 brew "fd"                       # find replacement
 brew "fzf"                      # Fuzzy finder
+brew "glow"                     # Markdown renderer
 brew "gping"                    # ping replacement
 brew "jq"                       # JSON processor
 brew "lsd"                      # ls replacement
