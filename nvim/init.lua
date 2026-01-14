@@ -42,6 +42,21 @@ vim.keymap.set('n', '<S-F8>', vim.diagnostic.goto_prev, { desc = 'Go to previous
 vim.keymap.set('n', '<F8>', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic' })
 vim.keymap.set('n', '<C-S-m>', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
+-- Window splitting (VSCode-style)
+vim.keymap.set('n', '<C-\\>', '<cmd>vsplit<cr>', { desc = 'Split editor right' })
+vim.keymap.set('n', '<C-S-\\>', '<cmd>split<cr>', { desc = 'Split editor down' })
+vim.keymap.set('n', '<C-w><C-\\>', '<cmd>split<cr>', { desc = 'Split editor down' })
+
+-- Window navigation (VSCode-style with Ctrl+arrow)
+vim.keymap.set('n', '<C-Left>', '<C-w>h', { desc = 'Focus left split' })
+vim.keymap.set('n', '<C-Down>', '<C-w>j', { desc = 'Focus below split' })
+vim.keymap.set('n', '<C-Up>', '<C-w>k', { desc = 'Focus above split' })
+vim.keymap.set('n', '<C-Right>', '<C-w>l', { desc = 'Focus right split' })
+
+-- Window management
+vim.keymap.set('n', '<C-w>=', '<C-w>=', { desc = 'Equal split sizes' })
+vim.keymap.set('n', '<C-w>m', '<C-w>_<C-w>|', { desc = 'Maximize current split' })
+
 -- Bootstrap lazy.nvim plugin manager
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then

@@ -94,6 +94,28 @@
 | Next/prev item | `Tab/Shift+Tab` or `Ctrl+N/P` |
 | Confirm selection | `Enter` |
 
+**Window Splitting (VSCode-style):**
+| Action | Shortcut |
+|--------|----------|
+| Split editor right | `Ctrl+\` |
+| Split editor down | `Ctrl+Shift+\` or `Ctrl+W Ctrl+\` |
+| Focus left/down/up/right split | `Ctrl+Arrow` |
+| Close current split | `Ctrl+W C` |
+| Close all other splits | `Ctrl+W O` |
+| Equal split sizes | `Ctrl+W =` |
+| Maximize current split | `Ctrl+W M` |
+
+**Window Splitting (Vim-native):**
+| Action | Shortcut |
+|--------|----------|
+| Split right (vertical) | `Ctrl+W V` or `:vsplit` |
+| Split down (horizontal) | `Ctrl+W S` or `:split` |
+| Focus left/down/up/right | `Ctrl+W H/J/K/L` |
+| Move split left/down/up/right | `Ctrl+W Shift+H/J/K/L` |
+| Increase/decrease width | `Ctrl+W >/<` |
+| Increase/decrease height | `Ctrl+W +/-` |
+| Rotate splits | `Ctrl+W R` |
+
 ## Tmux
 
 Prefix: `Ctrl+B`
