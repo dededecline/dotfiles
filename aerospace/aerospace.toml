@@ -140,6 +140,12 @@ if.app-id = "com.apple.MobileSMS"
 run = "move-node-to-workspace 1"
 
 # Workspace 2: Mail, Calendar, Slack
+# Compose windows (New Message, Reply, Forward) float on current workspace
+[[on-window-detected]]
+if.app-id = "com.apple.mail"
+if.window-title-regex-substring = "New Message"
+run = "layout floating"
+
 [[on-window-detected]]
 if.app-id = "com.apple.mail"
 run = "move-node-to-workspace 2"
