@@ -23,51 +23,47 @@ outer.bottom = 6
 outer.top = 40
 outer.right = 6
 
+# Hyper = ctrl-alt-cmd
 [mode.main.binding]
-alt-i = "focus up"
-alt-j = "focus left"
-alt-k = "focus down"
-alt-l = "focus right"
+ctrl-alt-cmd-i = "focus up"
+ctrl-alt-cmd-j = "focus left"
+ctrl-alt-cmd-k = "focus down"
+ctrl-alt-cmd-l = "focus right"
 
-alt-ctrl-shift-f = "fullscreen"
-alt-ctrl-f = "layout floating tiling"
+ctrl-alt-cmd-shift-f = "fullscreen"
+ctrl-alt-cmd-f = "layout floating tiling"
 
-alt-ctrl-shift-i = "join-with up"
-alt-ctrl-shift-j = "join-with left"
-alt-ctrl-shift-k = "join-with down"
-alt-ctrl-shift-l = "join-with right"
+ctrl-alt-cmd-slash = "layout tiles horizontal vertical"
+ctrl-alt-cmd-comma = "layout accordion horizontal vertical"
 
-alt-slash = "layout tiles horizontal vertical"
-alt-comma = "layout accordion horizontal vertical"
+ctrl-alt-cmd-shift-i = "move up"
+ctrl-alt-cmd-shift-j = "move left"
+ctrl-alt-cmd-shift-k = "move down"
+ctrl-alt-cmd-shift-l = "move right"
 
-alt-shift-i = "move up"
-alt-shift-j = "move left"
-alt-shift-k = "move down"
-alt-shift-l = "move right"
+ctrl-alt-cmd-shift-minus = "resize smart -50"
+ctrl-alt-cmd-shift-equal = "resize smart +50"
 
-alt-shift-minus = "resize smart -50"
-alt-shift-equal = "resize smart +50"
+ctrl-alt-cmd-q = "workspace 1"
+ctrl-alt-cmd-w = "workspace 2"
+ctrl-alt-cmd-e = "workspace 3"
+ctrl-alt-cmd-r = "workspace 4"
+ctrl-alt-cmd-t = "workspace 5"
+ctrl-alt-cmd-y = "workspace 6"
+ctrl-alt-cmd-u = "workspace 7"
 
-alt-q = "workspace 1"
-alt-w = "workspace 2"
-alt-e = "workspace 3"
-alt-r = "workspace 4"
-alt-t = "workspace 5"
-alt-y = "workspace 6"
-alt-u = "workspace 7"
+ctrl-alt-cmd-shift-q = "move-node-to-workspace 1 --focus-follows-window"
+ctrl-alt-cmd-shift-w = "move-node-to-workspace 2 --focus-follows-window"
+ctrl-alt-cmd-shift-e = "move-node-to-workspace 3 --focus-follows-window"
+ctrl-alt-cmd-shift-r = "move-node-to-workspace 4 --focus-follows-window"
+ctrl-alt-cmd-shift-t = "move-node-to-workspace 5 --focus-follows-window"
+ctrl-alt-cmd-shift-y = "move-node-to-workspace 6 --focus-follows-window"
+ctrl-alt-cmd-shift-u = "move-node-to-workspace 7 --focus-follows-window"
 
-alt-shift-q = "move-node-to-workspace 1 --focus-follows-window"
-alt-shift-w = "move-node-to-workspace 2 --focus-follows-window"
-alt-shift-e = "move-node-to-workspace 3 --focus-follows-window"
-alt-shift-r = "move-node-to-workspace 4 --focus-follows-window"
-alt-shift-t = "move-node-to-workspace 5 --focus-follows-window"
-alt-shift-y = "move-node-to-workspace 6 --focus-follows-window"
-alt-shift-u = "move-node-to-workspace 7 --focus-follows-window"
+ctrl-alt-cmd-tab = "workspace-back-and-forth"
+ctrl-alt-cmd-shift-tab = "move-workspace-to-monitor --wrap-around next"
 
-alt-tab = "workspace-back-and-forth"
-alt-shift-tab = "move-workspace-to-monitor --wrap-around next"
-
-alt-shift-semicolon = "mode service"
+ctrl-alt-cmd-shift-semicolon = "mode service"
 
 [workspace-to-monitor-force-assignment]
 1 = "main"
@@ -83,6 +79,11 @@ esc = ["reload-config", "mode main"]
 r = ["flatten-workspace-tree", "mode main"]
 f = ["layout floating tiling", "mode main"]
 backspace = ["close-all-windows-but-current", "mode main"]
+
+i = ["join-with up", "mode main"]
+j = ["join-with left", "mode main"]
+k = ["join-with down", "mode main"]
+l = ["join-with right", "mode main"]
 
 # Floating apps
 [[on-window-detected]]
