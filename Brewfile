@@ -79,6 +79,7 @@ brew "actionlint"               # GitHub Actions linter
 brew "certbot"                  # Let's Encrypt client
 brew "displayplacer"            # Display configuration tool
 brew "httrack"                  # Website copier
+brew "imagemagick"              # Image manipulation
 brew "mas"                      # Mac App Store CLI
 brew "reviewdog/tap/reviewdog"  # Code review automation
 brew "tesseract-lang"           # OCR language data

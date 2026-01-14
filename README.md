@@ -2,6 +2,9 @@
 
 Personal dotfiles managed as a git repository in `~/.config`.
 
+![Kitty Terminal](assets/terminal.jpg)
+![Empty Screen](assets/empty-screen.jpg)
+
 ## Quick Start
 
 ### Fresh Install (New Machine)
