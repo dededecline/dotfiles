@@ -4,9 +4,10 @@ sensitive/*
 *.local.fish
 config.local.fish
 
-# 1Password injected files (generated from templates/*.tpl)
+# Generated from templates/*.tpl (1Password or envsubst)
 git/config
 fish/functions/clone.fish
+glow/glow.yml
 .brewfile.combined
 
 # System files

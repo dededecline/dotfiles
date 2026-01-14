@@ -4,6 +4,22 @@
 #
 
 DOTFILES="$HOME/.config"
+TEMPLATES_DIR="$DOTFILES/templates"
+
+# Function to process a template with environment variable substitution
+process_template() {
+    local template="$1"
+    local output="$2"
+
+    if [[ ! -f "$template" ]]; then
+        echo "  Skipped: $template (not found)"
+        return 1
+    fi
+
+    mkdir -p "$(dirname "$output")"
+    envsubst < "$template" > "$output"
+    echo "  Generated: $output"
+}
 
 # Function to create symlink safely
 create_symlink() {
@@ -42,6 +58,10 @@ create_symlink "$DOTFILES/git/config" "$HOME/.gitconfig"
 
 # Sensitive files (if they exist)
 create_symlink "$DOTFILES/sensitive/.npmrc" "$HOME/.npmrc"
+
+# Process templates (non-secret configs that need $HOME expansion)
+echo "Processing templates..."
+process_template "$TEMPLATES_DIR/glow.yml.tpl" "$DOTFILES/glow/glow.yml"
 
 # macOS app configs (these apps don't respect XDG_CONFIG_HOME)
 mkdir -p "$HOME/Library/Preferences/glow"
