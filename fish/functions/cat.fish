@@ -21,11 +21,11 @@ function cat --wraps=bat --description "View files with glow for markdown, bat f
 
     # Render other files with bat
     if test (count $other_files) -gt 0
-        bat $flags $other_files
+        bat --paging=never $flags $other_files
     end
 
     # If no files provided, pass through to bat (for piped input)
     if test (count $md_files) -eq 0 -a (count $other_files) -eq 0
-        bat $flags
+        bat --paging=never $flags
     end
 end

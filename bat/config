@@ -5,5 +5,5 @@
 # Run `bat cache --build` after changes
 --theme="Catppuccin Frappe"
 
-# Pager
---pager="less -FR"
+# Disable pager - output full file directly
+--paging=never
