@@ -1,0 +1,17 @@
+# LSD Configuration
+# Converted from nix-config: https://github.com/dededecline/nix-config
+
+# Color theme (use custom theme file)
+color:
+  theme: custom
+
+# Icons
+icons:
+  theme: fancy
+  separator: " "
+
+# Show column headers
+header: true
+
+# Enable hyperlinks
+hyperlink: always

@@ -1,0 +1,9 @@
+# Bat Configuration
+# Converted from nix-config: https://github.com/dededecline/nix-config
+
+# Theme - symlinked from ~/.config/themes/catppuccin-frappe/bat.tmTheme
+# Run `bat cache --build` after changes
+--theme="Catppuccin Frappe"
+
+# Pager
+--pager="less -FR"

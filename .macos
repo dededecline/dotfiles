@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+# macOS configuration script
+# Based on dededecline/nix-config settings (excluding Dock configurations)
+# Run: chmod +x .macos && ./.macos
+
+# Close any open System Settings panes to prevent overriding changes
+osascript -e 'tell application "System Settings" to quit'
+
+# Ask for administrator password upfront
+sudo -v
+
+# Keep-alive: update existing sudo timestamp until script finishes
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+###############################################################################
+# General UI/UX                                                               #
+###############################################################################
+
+# Set interface style to Dark mode
+defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
+
+# Auto-hide menu bar
+defaults write NSGlobalDomain _HIHideMenuBar -bool true
+
+# Expand save panel by default
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+
+# Set sidebar icon size to small
+defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
+
+# Disable automatic termination of inactive apps
+defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
+
+###############################################################################
+# Input: Keyboard & Text                                                      #
+###############################################################################
+
+# Disable press-and-hold for keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Disable automatic capitalization
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
+# Disable smart dashes
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+
+# Disable automatic period substitution
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
+# Disable smart quotes
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+# Disable auto-correct
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+###############################################################################
+# Sound                                                                       #
+###############################################################################
+
+# Disable system UI sound effects
+defaults write NSGlobalDomain com.apple.sound.beep.volume -float 0.0
+
+# Disable feedback sound when changing volume
+defaults write NSGlobalDomain com.apple.sound.beep.feedback -bool false
+
+###############################################################################
+# Trackpad                                                                    #
+###############################################################################
+
+# Disable tap to click
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool false
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool false
+
+# Disable three-finger drag
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool false
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool false
+
+# Enable three-finger horizontal swipe (spaces/fullscreen)
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+
+# Enable four-finger horizontal swipe (spaces/fullscreen)
+defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int 2
+
+# Enable swipe between pages
+defaults write NSGlobalDomain AppleEnableSwipeNavigateWithScrolls -bool true
+
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+
+# Show POSIX path in window title
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# Disable desktop icons
+defaults write com.apple.finder CreateDesktop -bool false
+
+# Disable warning when changing file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Set default search scope to current folder
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Show quit menu item for Finder
+defaults write com.apple.finder QuitMenuItem -bool true
+
+# Show hidden files
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
+###############################################################################
+# Control Center                                                              #
+###############################################################################
+
+# Show battery percentage
+defaults write com.apple.controlcenter BatteryShowPercentage -bool true
+
+# Show Bluetooth in menu bar
+defaults write com.apple.controlcenter Bluetooth -int 2
+
+###############################################################################
+# Screenshots                                                                 #
+###############################################################################
+
+# Disable shadow in screenshots
+defaults write com.apple.screencapture disable-shadow -bool true
+
+# Disable thumbnail preview
+defaults write com.apple.screencapture show-thumbnail -bool false
+
+# Save screenshots to clipboard
+defaults write com.apple.screencapture target -string "clipboard"
+
+# Save screenshots in PNG format
+defaults write com.apple.screencapture type -string "png"
+
+###############################################################################
+# Launch Services                                                             #
+###############################################################################
+
+# Disable quarantine dialog for downloaded applications
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+###############################################################################
+# Touch ID for sudo                                                           #
+###############################################################################
+
+# Enable Touch ID for sudo authentication (survives macOS updates)
+SUDO_LOCAL="/etc/pam.d/sudo_local"
+if ! grep -q "pam_tid.so" "$SUDO_LOCAL" 2>/dev/null; then
+	echo "auth       sufficient     pam_tid.so" | sudo tee "$SUDO_LOCAL" > /dev/null
+	echo "Touch ID for sudo enabled."
+else
+	echo "Touch ID for sudo already configured."
+fi
+
+###############################################################################
+# Kill affected applications                                                  #
+###############################################################################
+
+for app in "ControlCenter" \
+	"Finder" \
+	"SystemUIServer"; do
+	killall "${app}" &> /dev/null
+done
+
+echo "Done. Note that some of these changes require a logout/restart to take effect."

@@ -1,0 +1,43 @@
+# LSD Colors - Catppuccin Frappe
+# Palette source: ~/.config/themes/catppuccin-frappe/palette.toml
+# LSD doesn't support imports, so colors are duplicated here
+# Original: https://github.com/catppuccin/lsd
+
+user: 181926
+group: 181926
+permission:
+  read: a6d189
+  write: e78284
+  exec: 8caaee
+  exec-sticky: ef9f76
+  no-access: 949cbb
+  octal: 949cbb
+  acl: ca9ee6
+  context: ca9ee6
+date:
+  hour-old: a6d189
+  day-old: a6d189
+  older: 949cbb
+size:
+  none: 949cbb
+  small: a6d189
+  medium: e5c890
+  large: ef9f76
+inode:
+  valid: ca9ee6
+  invalid: 949cbb
+links:
+  valid: ca9ee6
+  invalid: 949cbb
+tree-edge: 626880
+git-status:
+  default: 949cbb
+  unmodified: 949cbb
+  ignored: 949cbb
+  new-in-index: a6d189
+  new-in-workdir: a6d189
+  typechange: e5c890
+  deleted: e78284
+  renamed: a6d189
+  modified: ef9f76
+  conflicted: e78284

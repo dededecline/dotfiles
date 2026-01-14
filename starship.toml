@@ -1,0 +1,134 @@
+# Catppuccin Frappe theme
+# Palette source: ~/.config/themes/catppuccin-frappe/palette.toml
+# Starship requires inline palette definition
+
+palette = "catppuccin_frappe"
+
+# Match p10k lean 2-line style with left frame
+format = """
+[╭─](surface1) $os$directory$git_branch$git_status$fill$cmd_duration$jobs$python$kubernetes$terraform$aws$gcloud$time
+[╰─](surface1) $character"""
+
+right_format = ""
+
+[palettes.catppuccin_frappe]
+rosewater = "#f2d5cf"
+flamingo = "#eebebe"
+pink = "#f4b8e4"
+mauve = "#ca9ee6"
+red = "#e78284"
+maroon = "#ea999c"
+peach = "#ef9f76"
+yellow = "#e5c890"
+green = "#a6d189"
+teal = "#81c8be"
+sky = "#99d1db"
+sapphire = "#85c1dc"
+blue = "#8caaee"
+lavender = "#babbf1"
+text = "#c6d0f5"
+subtext1 = "#b5bfe2"
+subtext0 = "#a5adce"
+overlay2 = "#949cbb"
+overlay1 = "#838ba7"
+overlay0 = "#737994"
+surface2 = "#626880"
+surface1 = "#51576d"
+surface0 = "#414559"
+base = "#303446"
+mantle = "#292c3c"
+crust = "#232634"
+
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+style = "bold lavender"
+
+[os.symbols]
+Macos = " "
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold sapphire"
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = " "
+style = "bold mauve"
+
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = "bold red"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+[cmd_duration]
+min_time = 2000
+format = "[$duration]($style) "
+style = "yellow"
+show_milliseconds = false
+
+[jobs]
+symbol = "✦"
+style = "bold blue"
+format = "[$symbol$number]($style) "
+
+[python]
+format = '[${symbol}(${version} )(\($virtualenv\) )]($style)'
+symbol = " "
+style = "yellow"
+detect_extensions = ["py"]
+detect_files = ["requirements.txt", ".python-version", "pyproject.toml", "Pipfile", "setup.py", "tox.ini"]
+detect_folders = [".venv", "venv", ".virtualenv"]
+
+[kubernetes]
+disabled = false
+format = '[$symbol$context( \($namespace\))]($style) '
+symbol = "☸ "
+style = "bold blue"
+detect_env_vars = []  # Override default KUBECONFIG detection
+detect_extensions = []
+detect_files = ["Chart.yaml", "Chart.yml", "helmfile.yaml", "helmfile.yml", "kustomization.yaml", "kustomization.yml", "skaffold.yaml"]
+detect_folders = ["k8s", "kubernetes", "kustomize", "helm", "charts", "manifests"]
+
+[terraform]
+format = '[$symbol$workspace]($style) '
+symbol = "󱁢 "
+style = "bold mauve"
+detect_extensions = ["tf", "tfvars", "hcl", "tofu"]
+detect_files = [".terraform-version", ".opentofu-version", "terraform.tfstate", ".terraformrc", ".tofurc"]
+detect_folders = [".terraform", ".opentofu"]
+
+[aws]
+format = '[$symbol($profile )(\($region\))]($style) '
+symbol = " "
+style = "bold peach"
+force_display = false
+
+[gcloud]
+format = '[$symbol$account(@$domain)(\($project\))]($style) '
+symbol = " "
+style = "bold blue"
+detect_env_vars = ["CLOUDSDK_ACTIVE_CONFIG_NAME", "GOOGLE_APPLICATION_CREDENTIALS"]
+
+[time]
+disabled = false
+format = '[$time]($style)'
+style = "bold text"
+time_format = "%H:%M"

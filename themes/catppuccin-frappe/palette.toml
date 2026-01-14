@@ -1,0 +1,77 @@
+# Catppuccin Frappe Palette
+# https://github.com/catppuccin/catppuccin
+#
+# This is the central color reference for all Catppuccin Frappe theming.
+# Individual tool configs should reference or copy these values.
+
+[colors]
+rosewater = "#f2d5cf"
+flamingo = "#eebebe"
+pink = "#f4b8e4"
+mauve = "#ca9ee6"
+red = "#e78284"
+maroon = "#ea999c"
+peach = "#ef9f76"
+yellow = "#e5c890"
+green = "#a6d189"
+teal = "#81c8be"
+sky = "#99d1db"
+sapphire = "#85c1dc"
+blue = "#8caaee"
+lavender = "#babbf1"
+text = "#c6d0f5"
+subtext1 = "#b5bfe2"
+subtext0 = "#a5adce"
+overlay2 = "#949cbb"
+overlay1 = "#838ba7"
+overlay0 = "#737994"
+surface2 = "#626880"
+surface1 = "#51576d"
+surface0 = "#414559"
+base = "#303446"
+mantle = "#292c3c"
+crust = "#232634"
+
+# Terminal ANSI colors (16-color palette)
+[terminal]
+# black
+color0 = "#51576d"
+color8 = "#626880"
+
+# red
+color1 = "#e78284"
+color9 = "#e78284"
+
+# green
+color2 = "#a6d189"
+color10 = "#a6d189"
+
+# yellow
+color3 = "#e5c890"
+color11 = "#e5c890"
+
+# blue
+color4 = "#8caaee"
+color12 = "#8caaee"
+
+# magenta
+color5 = "#f4b8e4"
+color13 = "#f4b8e4"
+
+# cyan
+color6 = "#81c8be"
+color14 = "#81c8be"
+
+# white
+color7 = "#b5bfe2"
+color15 = "#a5adce"
+
+[semantic]
+foreground = "#c6d0f5"
+background = "#303446"
+accent = "#babbf1"  # lavender - used for cursor, selection, active elements
+cursor = "#babbf1"
+cursor_text = "#303446"
+selection_foreground = "#303446"
+selection_background = "#babbf1"
+url = "#babbf1"

@@ -1,0 +1,64 @@
+# Sensitive files - NEVER commit these
+sensitive/*
+!sensitive/.gitkeep
+*.local.fish
+config.local.fish
+
+# 1Password injected files (generated from templates/*.tpl)
+git/config
+fish/functions/clone.fish
+.brewfile.combined
+
+# System files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Fish auto-generated files
+fish/fish_variables
+fish/fish_history
+
+# Neovim lock file (regenerated automatically)
+nvim/lazy-lock.json
+
+# GitHub CLI credentials
+gh/hosts.yml
+
+# 1Password CLI (contains session data)
+op/
+
+# Atuin (allow config, ignore database and key)
+atuin/history.db
+atuin/history.db-*
+atuin/key
+
+# Cache directories
+.cache/
+
+# Local overrides pattern
+*.local
+*.local.*
+
+# Secrets and credentials (safety net)
+.npmrc
+.env
+*.pem
+*.key
+credentials.json
+secrets.json
+
+
+# Application data that shouldn't be tracked
+github-copilot/
+raycast/
+wireshark/
+
+# Zed editor state
+zed/
+
+# ArgoCD (may contain cluster info)
+argocd/
+
+# Yarn global packages (regenerated)
+yarn/
