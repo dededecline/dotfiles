@@ -94,15 +94,6 @@
 | Next/prev item | `Tab/Shift+Tab` or `Ctrl+N/P` |
 | Confirm selection | `Enter` |
 
-**Claude Code:**
-| Action | Shortcut |
-|--------|----------|
-| Toggle Claude | `Ctrl+;` |
-| Focus Claude | `Ctrl+Shift+;` |
-| Send selection | `Ctrl+Shift+A` (visual) |
-| Accept diff | `Ctrl+Enter` |
-| Deny diff | `Ctrl+Backspace` |
-
 ## Tmux
 
 Prefix: `Ctrl+B`

@@ -129,7 +129,7 @@ cask "mongodb-compass"          # MongoDB GUI
 cask "pieces"                   # Code snippets manager
 cask "pieces-os"                # Pieces backend
 cask "powershell"               # PowerShell
-cask "wireshark"                # Network analyzer
+cask "wireshark-app"            # Network analyzer
 
 # Cloud Storage
 cask "google-drive"             # Google Drive sync
@@ -145,7 +145,7 @@ cask "microsoft-teams"          # Team collaboration
 cask "microsoft-word"           # Word processor
 
 # Media
-cask "handbrake"                # Video encoder
+cask "handbrake-app"            # Video encoder
 cask "obs"                      # Streaming/recording
 cask "spotify"                  # Music streaming
 cask "vlc"                      # Media player

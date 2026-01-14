@@ -121,6 +121,18 @@ op item create --category=login --title="brew-incident-mgmt" --vault="Private" \
   tap="<tap>" formula="<formula>"
 ```
 
+### Claude Code Instructions (`config-instructions.tpl`)
+- **Vault:** Private
+- **Item name:** config-instructions
+- **Field:** notesPlain (Secure Note content)
+
+This stores project-specific instructions for Claude Code without committing them publicly.
+
+To create:
+1. Create a Secure Note in 1Password named "config-instructions" in Private vault
+2. Paste your CLAUDE.md content into the note body
+3. Run `secrets` to inject it
+
 ## Adding New Secrets
 
 1. Create a new `.tpl` file in this directory

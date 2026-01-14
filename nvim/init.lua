@@ -261,10 +261,8 @@ require('lazy').setup({
     opts = {},
   },
 
-  -- Snacks.nvim (required for Claude Code)
   { 'folke/snacks.nvim', opts = {} },
 
-  -- Claude Code integration
   {
     'coder/claudecode.nvim',
     dependencies = { 'folke/snacks.nvim' },

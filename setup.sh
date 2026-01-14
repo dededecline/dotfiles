@@ -35,40 +35,17 @@ get_repo_url() {
 
 REPO_URL=$(get_repo_url)
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-# =============================================================================
-# Utility Functions
-# =============================================================================
-
-print_header() {
-    echo ""
-    echo -e "${BLUE}===========================================================${NC}"
-    echo -e "${BLUE}  $1${NC}"
-    echo -e "${BLUE}===========================================================${NC}"
-    echo ""
-}
-
-print_status() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}✗${NC} $1"
-}
-
-print_info() {
-    echo -e "  $1"
-}
+# Source output utilities (compact fallback for curl installs where lib doesn't exist yet)
+if [[ -f "$DOTFILES/setup/lib/output.sh" ]]; then
+    source "$DOTFILES/setup/lib/output.sh"
+else
+    RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'; BLUE='\033[0;34m'; NC='\033[0m'
+    print_header() { echo -e "\n${BLUE}===========================================================${NC}\n${BLUE}  $1${NC}\n${BLUE}===========================================================${NC}\n"; }
+    print_status() { echo -e "${GREEN}✓${NC} $1"; }
+    print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
+    print_error() { echo -e "${RED}✗${NC} $1"; }
+    print_info() { echo -e "  $1"; }
+fi
 
 # Detect Homebrew prefix based on architecture
 detect_homebrew_prefix() {

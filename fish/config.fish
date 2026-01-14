@@ -38,6 +38,13 @@ if type -q atuin
 end
 
 # =============================================================================
+# Fastfetch on startup (interactive shells only)
+# =============================================================================
+if status is-interactive; and type -q fastfetch
+    fastfetch
+end
+
+# =============================================================================
 # Local overrides (not tracked in git)
 # =============================================================================
 if test -f ~/.config/fish/config.local.fish

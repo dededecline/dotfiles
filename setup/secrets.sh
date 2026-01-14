@@ -20,23 +20,8 @@ DOTFILES="${DOTFILES:-$HOME/.config}"
 TEMPLATES_DIR="$DOTFILES/templates"
 SENSITIVE_DIR="$DOTFILES/sensitive"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
-
-print_status() {
-    echo -e "${GREEN}✓${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}⚠${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}✗${NC} $1"
-}
+# Source shared output utilities
+source "$DOTFILES/setup/lib/output.sh"
 
 # Check if 1Password CLI is installed and authenticated
 check_op() {
@@ -170,6 +155,14 @@ check_secrets() {
         all_configured=false
     fi
 
+    # Check Claude Code instructions
+    if [[ -f "$DOTFILES/CLAUDE.md" ]]; then
+        print_status "Claude Code instructions: configured"
+    else
+        print_warning "Claude Code instructions: not configured"
+        all_configured=false
+    fi
+
     # Check Atuin sync status
     if command -v atuin &>/dev/null; then
         if atuin status 2>/dev/null | grep -q "Sync enabled"; then
@@ -233,6 +226,11 @@ inject_secrets() {
     # Inject clone.fish with work org
     if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function"
+    fi
+
+    # Inject Claude Code instructions
+    if [[ -f "$TEMPLATES_DIR/config-instructions.tpl" ]]; then
+        inject_template "$TEMPLATES_DIR/config-instructions.tpl" "$DOTFILES/CLAUDE.md" "Claude Code instructions"
     fi
 
     # Login to Atuin sync
