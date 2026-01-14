@@ -39,6 +39,7 @@ brew "yq"                       # YAML processor
 # =============================================================================
 # Development Tools
 # =============================================================================
+brew "luarocks"                 # Lua package manager (for nvim image.nvim)
 brew "angular-cli"              # Angular CLI
 brew "go"                       # Go language
 brew "jsonlint"                 # JSON linter

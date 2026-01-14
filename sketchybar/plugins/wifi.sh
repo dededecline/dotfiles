@@ -2,9 +2,8 @@
 
 source "$CONFIG_DIR/colors.sh"
 
-# Get WiFi info
-WIFI=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I)
-SSID=$(echo "$WIFI" | grep -o "SSID: .*" | sed 's/^SSID: //')
+# Get WiFi SSID (airport command is deprecated on modern macOS)
+SSID=$(ipconfig getsummary en0 2>/dev/null | awk -F ' : ' '/SSID/ && !/BSSID/ {print $2}')
 
 if [ "$SSID" = "" ]; then
   sketchybar --set "$NAME" icon=󰖪 icon.color=$RED label=""
