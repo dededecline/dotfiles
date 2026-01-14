@@ -114,3 +114,11 @@ Modern CLI replacements (in `fish/conf.d/aliases.fish`):
 
 Untracked files for machine-specific config:
 - `~/.config/fish/config.local.fish`
+
+### Development Instructions
+
+* Always protect the user's name, email address, place of work, and other sensitive data behind templates and 1Password
+* Always check if CLAUDE.md, README.md, and/or Commands.md need updating after making changes/updates
+* Always make package/application changes programatically via homebrew (ideally) or mas (if necessary)
+* ALways develop idempotently
+* Always attempt the simplest possible coding output solutions to a problem
