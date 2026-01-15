@@ -121,17 +121,34 @@ op item create --category=login --title="brew-incident-mgmt" --vault="Private" \
   tap="<tap>" formula="<formula>"
 ```
 
-### Claude Code Instructions (`config-instructions.tpl`)
+### Code Instructions (`config-instructions.tpl`)
 - **Vault:** Private
 - **Item name:** config-instructions
 - **Field:** notesPlain (Secure Note content)
 
-This stores project-specific instructions for Claude Code without committing them publicly.
+This stores project-specific instructions without committing them publicly.
 
 To create:
 1. Create a Secure Note in 1Password named "config-instructions" in Private vault
 2. Paste your CLAUDE.md content into the note body
 3. Run `secrets` to inject it
+
+### Display Monitor (`display-monitor.plist.tpl`)
+- **Vault:** Private
+- **Item name:** git-identity
+- **Field:** name (your username for the home path)
+
+This LaunchAgent monitors display connection changes and automatically reloads
+aerospace and sketchybar configurations when displays are connected/disconnected.
+
+The `git-identity` item is already used for git config, so no additional setup needed.
+If you don't have it yet:
+```bash
+op item create --category=login --title="git-identity" --vault="Private" \
+  name="your-username" email="your@email.com"
+```
+
+The display monitor runs every 3 seconds and logs to `~/.config/logs/display-monitor.log`.
 
 ## Adding New Secrets
 

@@ -175,11 +175,19 @@ check_secrets() {
         all_configured=false
     fi
 
-    # Check Claude Code instructions
+    # Check Code instructions
     if [[ -f "$DOTFILES/CLAUDE.md" ]]; then
-        print_status "Claude Code instructions: configured"
+        print_status "Code instructions: configured"
     else
-        print_warning "Claude Code instructions: not configured"
+        print_warning "Code instructions: not configured"
+        all_configured=false
+    fi
+
+    # Check display monitor LaunchAgent
+    if [[ -f "$HOME/Library/LaunchAgents/com.user.display-monitor.plist" ]]; then
+        print_status "Display monitor LaunchAgent: configured"
+    else
+        print_warning "Display monitor LaunchAgent: not configured"
         all_configured=false
     fi
 
@@ -254,9 +262,14 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/git-config.tpl" "$DOTFILES/git/config" "Git identity"
     fi
 
-    # Inject Claude Code instructions
+    # Inject instructions
     if [[ -f "$TEMPLATES_DIR/config-instructions.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/config-instructions.tpl" "$DOTFILES/CLAUDE.md" "Claude Code instructions"
+        inject_template "$TEMPLATES_DIR/config-instructions.tpl" "$DOTFILES/CLAUDE.md" "Code instructions"
+    fi
+
+    # Inject display monitor LaunchAgent
+    if [[ -f "$TEMPLATES_DIR/display-monitor.plist.tpl" ]]; then
+        inject_template "$TEMPLATES_DIR/display-monitor.plist.tpl" "$HOME/Library/LaunchAgents/com.user.display-monitor.plist" "Display monitor LaunchAgent"
     fi
 
     # Login to Atuin sync (both profiles)

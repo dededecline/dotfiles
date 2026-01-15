@@ -68,6 +68,8 @@ cask "some-personal-app"    # Personal-only
 │   ├── symlinks.sh          # Symlink creation
 │   ├── secrets.sh           # 1Password secrets injection
 │   ├── ssh.sh               # SSH key generation
+│   ├── monitor-watcher.sh   # Display monitor detection
+│   ├── reload-display-config.sh  # Reload aerospace/sketchybar on display change
 │   └── lib/
 │       ├── output.sh        # Shared output utilities
 │       └── profiles.sh      # Multi-machine profile mapping
@@ -117,9 +119,55 @@ Work-specific items are only installed on the work profile:
 
 On personal profile, these are skipped automatically.
 
+## Process Management
+
+Reload configured processes after making config changes:
+
+```bash
+refresh                  # Reload all configured processes (fish, aerospace, sketchybar, tmux)
+refresh fish             # Reload Fish shell config only
+refresh aerospace        # Reload Aerospace window manager only
+refresh sketchybar       # Reload Sketchybar status bar only
+refresh tmux             # Reload Tmux config only (if in tmux session)
+```
+
+The `refresh` command is useful after editing dotfiles to apply changes immediately without restarting applications.
+
+## Homebrew Management
+
+Homebrew packages are managed declaratively through `Brewfile`:
+
+```bash
+./setup.sh --brew    # Sync Homebrew packages (declarative with --cleanup)
+```
+
+### Features
+
+- **Declarative sync**: Installs packages from Brewfile and removes unlisted packages
+- **Profile-specific packages**: Uses `@profile:work` and `@profile:personal` markers
+- **Automatic tap cleanup**: Removes broken taps (deleted remotes) and undeclared taps
+- **Work package injection**: Combines `Brewfile` with `templates/Brewfile.tpl` (work profile only)
+
+The script automatically:
+1. Detects and removes broken taps (with deleted/missing remotes)
+2. Removes taps not declared in Brewfile
+3. Updates Homebrew
+4. Syncs packages with `brew bundle --cleanup`
+
+This prevents errors like "fatal: couldn't find remote ref" when taps are manually added or left behind after packages are removed.
+
 ## macOS Preferences
 
-The `.macos` script configures system preferences via `defaults write`.
+The `.macos` script configures system preferences via `defaults write`:
+
+- **UI**: Dark mode, auto-hide menu bar, expanded save panels
+- **Input**: Key repeat enabled, smart punctuation disabled, auto-correct disabled
+- **Finder**: POSIX path in title, hidden files visible, no desktop icons
+- **Screenshots**: PNG format, no shadow, saves to clipboard
+- **Sound**: System beep disabled
+- **Trackpad**: Tap to click disabled
+- **Raycast**: Disables conflicting Spotlight, Input Sources, and Siri keyboard shortcuts
+- **Security**: Touch ID for sudo authentication
 
 Run standalone with `./setup.sh --macos`. Some changes require logout/restart.
 

@@ -6,12 +6,12 @@
         "separator": "  "
     },
 
-    // Logo configuration - Custom ASCII art with Catppuccin Frappe Rosewater
+    // Logo configuration - Custom ASCII art with Catppuccin Frappe Maroon
     "logo": {
         "type": "file",
         "source": "~/.config/fastfetch/logo.txt",
         "color": {
-            "1": "38;2;242;213;207"
+            "1": "38;2;234;153;156"
         },
         "padding": {
             "top": 1,

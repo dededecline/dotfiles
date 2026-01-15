@@ -101,7 +101,7 @@ cask "yubico-authenticator"     # YubiKey manager
 
 # Window Management & System
 cask "nikitabobko/tap/aerospace" # Tiling window manager
-brew "sketchybar"                # Custom macOS menu bar
+brew "felixkratz/formulae/sketchybar" # Custom macOS menu bar
 cask "sf-symbols"                # Apple SF Symbols for icons
 cask "pearcleaner"              # App uninstaller
 
@@ -130,8 +130,6 @@ cask "linear-linear"            # Project management
 # Development
 cask "docker-desktop"           # Docker Desktop
 cask "lens"                     # Kubernetes IDE
-cask "pieces"                   # Code snippets manager
-cask "pieces-os"                # Pieces backend
 cask "powershell"               # PowerShell
 cask "wireshark-app"            # Network analyzer
 

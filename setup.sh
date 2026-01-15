@@ -283,6 +283,90 @@ prepare_brewfile() {
     echo "$combined"
 }
 
+# Check for and remove broken taps (taps with missing/deleted remotes)
+# This prevents "fatal: couldn't find remote ref" errors during brew update
+check_and_remove_broken_taps() {
+    print_info "Checking for broken taps..."
+
+    local broken_taps=()
+
+    # Get list of all taps
+    while IFS= read -r tap; do
+        [[ -z "$tap" ]] && continue
+
+        # Try to update the tap to see if it's broken
+        if ! git -C "$(brew --repository "$tap")" fetch --dry-run origin 2>&1 | grep -q "fatal: couldn't find remote ref"; then
+            continue
+        fi
+
+        print_warning "Found broken tap: $tap"
+        broken_taps+=("$tap")
+    done < <(brew tap)
+
+    # Remove broken taps
+    if [[ ${#broken_taps[@]} -gt 0 ]]; then
+        for tap in "${broken_taps[@]}"; do
+            print_info "Removing broken tap: $tap"
+            brew untap "$tap" 2>/dev/null || true
+        done
+        print_status "Removed ${#broken_taps[@]} broken tap(s)"
+    else
+        print_status "No broken taps found"
+    fi
+}
+
+# Remove taps not declared in Brewfile
+# This cleans up manually added taps that are no longer needed
+cleanup_undeclared_taps() {
+    local brewfile="$1"
+
+    if [[ ! -f "$brewfile" ]]; then
+        return 0
+    fi
+
+    print_info "Checking for undeclared taps..."
+
+    # Extract taps from Brewfile
+    local declared_taps=()
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^tap[[:space:]]+\"([^\"]+)\" ]]; then
+            declared_taps+=("${BASH_REMATCH[1]}")
+        fi
+    done < "$brewfile"
+
+    # Check installed taps against declared taps
+    local removed_count=0
+    while IFS= read -r installed_tap; do
+        [[ -z "$installed_tap" ]] && continue
+
+        # Skip homebrew core taps
+        if [[ "$installed_tap" =~ ^homebrew/(core|cask|bundle)$ ]]; then
+            continue
+        fi
+
+        # Check if tap is declared
+        local is_declared=false
+        for declared_tap in "${declared_taps[@]}"; do
+            if [[ "$installed_tap" == "$declared_tap" ]]; then
+                is_declared=true
+                break
+            fi
+        done
+
+        # Remove undeclared tap
+        if [[ "$is_declared" == "false" ]]; then
+            print_info "Removing undeclared tap: $installed_tap"
+            brew untap "$installed_tap" 2>/dev/null && ((removed_count++)) || true
+        fi
+    done < <(brew tap)
+
+    if [[ $removed_count -gt 0 ]]; then
+        print_status "Removed $removed_count undeclared tap(s)"
+    else
+        print_status "All taps are declared in Brewfile"
+    fi
+}
+
 run_brew_sync() {
     print_header "Syncing Homebrew Packages ($DOTFILES_PROFILE profile)"
 
@@ -308,6 +392,10 @@ run_brew_sync() {
     # Prepare combined Brewfile
     local brewfile
     brewfile=$(prepare_brewfile)
+
+    # Clean up broken and undeclared taps before updating
+    check_and_remove_broken_taps
+    cleanup_undeclared_taps "$brewfile"
 
     # Show warning about cleanup
     echo ""
@@ -441,6 +529,32 @@ setup_sketchybar() {
     fi
 }
 
+setup_display_monitor() {
+    if ! command -v aerospace &>/dev/null || ! command -v sketchybar &>/dev/null; then
+        print_warning "Aerospace or Sketchybar not installed - skipping display monitor"
+        return 0
+    fi
+
+    # Make scripts executable
+    chmod +x "$DOTFILES/setup/monitor-watcher.sh" 2>/dev/null || true
+    chmod +x "$DOTFILES/setup/reload-display-config.sh" 2>/dev/null || true
+
+    # Create log directory
+    mkdir -p "$HOME/.config/logs"
+
+    local plist="$HOME/Library/LaunchAgents/com.user.display-monitor.plist"
+
+    # Load the LaunchAgent (created by secrets.sh)
+    if [[ -f "$plist" ]]; then
+        # Unload first if already loaded, then reload
+        launchctl unload "$plist" 2>/dev/null || true
+        launchctl load "$plist"
+        print_status "Display monitor: loaded (starts at login)"
+    else
+        print_warning "Display monitor plist not found - run 'secrets' first"
+    fi
+}
+
 setup_wallpaper() {
     local wallpaper_dir="$DOTFILES/themes/wallpapers"
     local wallpaper="$wallpaper_dir/comfy-home.png"
@@ -485,6 +599,10 @@ run_setup() {
 
     cd "$DOTFILES"
 
+    # Apply macOS preferences first (includes Full Disk Access check for terminal)
+    # This must run before Homebrew sync to ensure terminal has required permissions
+    apply_macos_defaults
+
     # Inject secrets (needed for Brewfile.work) - profile-aware
     inject_secrets
 
@@ -498,9 +616,7 @@ run_setup() {
     setup_tmux_plugins
     setup_aerospace_swipe
     setup_sketchybar
-
-    # Apply macOS preferences
-    apply_macos_defaults
+    setup_display_monitor
 
     # Set wallpaper
     setup_wallpaper

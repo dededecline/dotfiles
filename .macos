@@ -156,6 +156,29 @@ defaults write com.apple.screencapture type -string "png"
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 ###############################################################################
+# Raycast Configuration                                                       #
+###############################################################################
+
+# Disable Spotlight keyboard shortcuts to avoid conflicts with Raycast (⌥Space)
+# Spotlight: Cmd+Space (64)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "{enabled = 0; value = { parameters = (65535, 49, 1048576); type = 'standard'; }; }"
+
+# Spotlight: Cmd+Opt+Space (65)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 "{enabled = 0; value = { parameters = (65535, 49, 1572864); type = 'standard'; }; }"
+
+# Disable Input Sources keyboard shortcuts that may conflict
+# Select previous input source: Cmd+Space (60)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 "{enabled = 0; value = { parameters = (32, 49, 1048576); type = 'standard'; }; }"
+
+# Select next input source: Cmd+Opt+Space (61)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 61 "{enabled = 0; value = { parameters = (32, 49, 1572864); type = 'standard'; }; }"
+
+# Disable Siri keyboard shortcut to avoid conflicts
+# Siri: Cmd+Space (varies by macOS version)
+defaults write com.apple.Siri StatusMenuVisible -bool false
+defaults write com.apple.Siri UserHasDeclinedEnable -bool true
+
+###############################################################################
 # Touch ID for sudo                                                           #
 ###############################################################################
 
@@ -169,12 +192,69 @@ else
 fi
 
 ###############################################################################
+# Full Disk Access for Terminal                                               #
+###############################################################################
+
+# Check if Kitty has Full Disk Access by trying to access a protected directory
+check_full_disk_access() {
+	local terminal_app="/Applications/kitty.app"
+
+	if [[ ! -d "$terminal_app" ]]; then
+		echo "Kitty not found at $terminal_app - skipping Full Disk Access check"
+		return 0
+	fi
+
+	# Try to access a protected directory (Library/Safari exists on all macOS systems)
+	if ls ~/Library/Safari &>/dev/null; then
+		echo "Full Disk Access: already granted to Kitty"
+		return 0
+	else
+		echo ""
+		echo "==================================================================================="
+		echo "  Full Disk Access Required"
+		echo "==================================================================================="
+		echo ""
+		echo "Kitty terminal needs Full Disk Access to install Parallels and other apps."
+		echo ""
+		echo "Please follow these steps:"
+		echo "  1. System Settings will open to Privacy & Security > Full Disk Access"
+		echo "  2. Click the lock icon and authenticate"
+		echo "  3. Click the '+' button and add: /Applications/kitty.app"
+		echo "  4. Restart Kitty terminal"
+		echo "  5. Re-run this setup script"
+		echo ""
+		echo "==================================================================================="
+		echo ""
+
+		# Open System Settings to Full Disk Access pane
+		open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
+
+		# Wait for user to grant access
+		read -p "Press Enter after granting Full Disk Access and restarting Kitty..."
+
+		# Check again
+		if ls ~/Library/Safari &>/dev/null; then
+			echo "Full Disk Access: confirmed"
+			return 0
+		else
+			echo "Full Disk Access: not detected (you may need to restart Kitty)"
+			echo "Please restart Kitty and re-run this setup script."
+			return 1
+		fi
+	fi
+}
+
+# Run the check
+check_full_disk_access
+
+###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
 
 for app in "ControlCenter" \
 	"Finder" \
-	"SystemUIServer"; do
+	"SystemUIServer" \
+	"cfprefsd"; do
 	killall "${app}" &> /dev/null
 done
 

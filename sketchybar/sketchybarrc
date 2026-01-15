@@ -60,7 +60,7 @@ source "$ITEM_DIR/front_app.sh"
 sketchybar --add item clock right \
   --set clock \
     update_freq=10 \
-    icon= \
+    icon=󰥔 \
     icon.color=$LAVENDER \
     background.color=$ITEM_BG_COLOR \
     background.corner_radius=5 \
@@ -72,6 +72,7 @@ sketchybar --add item clock right \
 sketchybar --add item battery right \
   --set battery \
     update_freq=120 \
+    icon=󰂎 \
     icon.color=$GREEN \
     background.color=$ITEM_BG_COLOR \
     background.corner_radius=5 \

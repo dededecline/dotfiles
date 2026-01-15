@@ -62,7 +62,6 @@ alias spacelogin="spacectl profile login && terraform login spacelift.io"
 
 # Dotfiles management
 alias dotfiles="cd ~/.config"
-alias reload="source ~/.config/fish/config.fish"
 
 # Kubernetes quick context check
 alias kctx="kubectl config current-context"

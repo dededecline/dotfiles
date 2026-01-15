@@ -3,6 +3,9 @@
 # Aerospace workspace configuration for sketchybar
 # Creates workspace items that show open applications as icons
 
+# Detect number of connected displays
+display_count=$(system_profiler SPDisplaysDataType | grep -c "Resolution:")
+
 # Get all workspaces across all monitors, then sort numerically for proper ordering
 all_workspaces=$(for monitor in $(aerospace list-monitors --format "%{monitor-appkit-nsscreen-screens-id}"); do
   aerospace list-workspaces --monitor "$monitor"
@@ -10,13 +13,16 @@ done | sort -n | uniq)
 
 for sid in $all_workspaces; do
   # Determine which display this workspace should be shown on
-  # Match aerospace.toml workspace-to-monitor-force-assignment:
-  # 1, 2, 4, 7 = main (display 1)
-  # 3, 5, 6, 8 = secondary, fallback to main (display 2)
+  # If only one display, show all workspaces on display 1
+  # If multiple displays:
+  #   1, 2, 4, 7 = main (display 1)
+  #   3, 5, 6, 8 = secondary (display 2)
   display_id="1"
-  case "$sid" in
-    3|5|6|8) display_id="2" ;;
-  esac
+  if [ "$display_count" -ge "2" ]; then
+    case "$sid" in
+      3|5|6|8) display_id="2" ;;
+    esac
+  fi
 
   sketchybar --add item space.$sid left \
     --set space.$sid \

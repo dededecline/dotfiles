@@ -73,10 +73,10 @@
 |--------|----------|
 | Quick open (files) | `Ctrl+P` |
 | Recent files | `Ctrl+E` |
-| Search in files | `Ctrl+Shift+F` |
+| Search in files | `Space+F` |
 | Find in buffer | `Ctrl+F` |
-| Go to symbol | `Ctrl+Shift+O` |
-| Command palette | `Ctrl+Shift+P` |
+| Go to symbol | `Space+O` |
+| Command palette | `Space+P` |
 | Git files | `Ctrl+G` |
 | Help | `F1` |
 
@@ -85,7 +85,7 @@
 |--------|----------|
 | Next diagnostic | `F8` |
 | Previous diagnostic | `Shift+F8` |
-| Diagnostics list | `Ctrl+Shift+M` |
+| Diagnostics list | `Space+M` |
 
 **Completion:**
 | Action | Shortcut |
@@ -116,6 +116,7 @@
 | Increase/decrease height | `Ctrl+W +/-` |
 | Rotate splits | `Ctrl+W R` |
 
+
 ## Tmux
 
 Prefix: `Ctrl+B`
@@ -142,3 +143,16 @@ Prefix: `Ctrl+B`
 | Emoji picker | `Cmd+.` |
 | Calculator | type math in Raycast |
 | File search | `Cmd+Space` then filename |
+
+## Dotfiles Management
+
+| Command | Description |
+|---------|-------------|
+| `refresh` | Reload all configured processes (fish, aerospace, sketchybar, tmux) |
+| `refresh fish` | Reload Fish shell config only |
+| `refresh aerospace` | Reload Aerospace window manager config only |
+| `refresh sketchybar` | Reload Sketchybar status bar config only |
+| `refresh tmux` | Reload Tmux config only (if in tmux session) |
+| `secrets` | Inject secrets from 1Password |
+| `secrets check` | Check which secrets are configured |
+| `dotfiles` | Navigate to ~/.config directory |

@@ -39,6 +39,9 @@ atuin/key
 # Cache directories
 .cache/
 
+# Runtime logs
+logs/
+
 # Local overrides pattern
 *.local
 *.local.*
