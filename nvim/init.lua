@@ -57,6 +57,68 @@ vim.keymap.set('n', '<C-Right>', '<C-w>l', { desc = 'Focus right split' })
 vim.keymap.set('n', '<C-w>=', '<C-w>=', { desc = 'Equal split sizes' })
 vim.keymap.set('n', '<C-w>m', '<C-w>_<C-w>|', { desc = 'Maximize current split' })
 
+-- Tab navigation (VSCode-style workspaces)
+vim.keymap.set('n', '<C-Tab>', '<cmd>tabnext<cr>', { desc = 'Next tab' })
+vim.keymap.set('n', '<C-S-Tab>', '<cmd>tabprevious<cr>', { desc = 'Previous tab' })
+vim.keymap.set('n', '<C-w>t', '<cmd>tabnew<cr>', { desc = 'New tab' })
+vim.keymap.set('n', '<C-w>q', '<cmd>tabclose<cr>', { desc = 'Close tab' })
+for i = 1, 9 do
+  vim.keymap.set('n', '<M-' .. i .. '>', '<cmd>tabnext ' .. i .. '<cr>', { desc = 'Go to tab ' .. i })
+end
+
+-- Multi-directory workspace support (like VSCode's `code dir1 dir2 dir3`)
+-- Opens each directory in its own tab with tab-local working directory
+local function setup_multi_directory_workspace()
+  local args = vim.fn.argv()
+  if #args <= 1 then
+    return false -- Let normal single-directory handling take over
+  end
+
+  -- Check if all args are directories
+  local dirs = {}
+  for _, arg in ipairs(args) do
+    local path = vim.fn.fnamemodify(arg, ':p')
+    if vim.fn.isdirectory(path) == 1 then
+      table.insert(dirs, path)
+    end
+  end
+
+  if #dirs < 2 then
+    return false -- Not enough directories for multi-workspace mode
+  end
+
+  -- Clear the argument list to prevent default buffer creation
+  vim.cmd('argdelete *')
+
+  -- Create a tab for each directory
+  for i, dir in ipairs(dirs) do
+    if i == 1 then
+      -- Use the first tab (already exists)
+      vim.cmd('tcd ' .. vim.fn.fnameescape(dir))
+    else
+      -- Create new tab for subsequent directories
+      vim.cmd('tabnew')
+      vim.cmd('tcd ' .. vim.fn.fnameescape(dir))
+    end
+  end
+
+  -- Go back to first tab
+  vim.cmd('tabfirst')
+  return true
+end
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    if setup_multi_directory_workspace() then
+      -- Open nvim-tree for first workspace after short delay
+      vim.defer_fn(function()
+        require('nvim-tree.api').tree.open()
+      end, 10)
+    end
+  end,
+  once = true,
+})
+
 -- Bootstrap lazy.nvim plugin manager
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
@@ -76,7 +138,12 @@ require('lazy').setup({
     name = 'catppuccin',
     priority = 1000,
     config = function()
-      require('catppuccin').setup({ flavour = 'frappe' })
+      require('catppuccin').setup({
+        flavour = 'frappe',
+        integrations = {
+          bufferline = true,
+        },
+      })
       vim.cmd.colorscheme 'catppuccin'
     end,
   },
@@ -107,6 +174,28 @@ require('lazy').setup({
     },
   },
 
+  -- Tabline for workspaces (shows directory name per tab)
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = { 'nvim-tree/nvim-web-devicons', 'catppuccin/nvim' },
+    opts = {
+      options = {
+        mode = 'tabs', -- Show tabs, not buffers
+        separator_style = 'slant',
+        show_buffer_close_icons = false,
+        show_close_icon = false,
+        always_show_bufferline = false, -- Only show when multiple tabs
+        name_formatter = function(tab)
+          -- Show the tab-local working directory name
+          local tabnr = tab.tabnr
+          local cwd = vim.fn.getcwd(-1, tabnr)
+          return vim.fn.fnamemodify(cwd, ':t')
+        end,
+      },
+    },
+  },
+
   -- Comment toggling
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -124,16 +213,34 @@ require('lazy').setup({
       { '<C-b>', '<cmd>NvimTreeToggle<cr>', desc = 'Toggle file explorer' },
     },
     init = function()
+      -- Single directory: open nvim-tree on startup
       vim.api.nvim_create_autocmd('VimEnter', {
         callback = function()
+          -- Skip if multi-workspace mode handled it (argc > 1)
+          if vim.fn.argc() > 1 then
+            return
+          end
           local arg = vim.fn.argv(0)
           if arg ~= '' and vim.fn.isdirectory(arg) == 1 then
             require('nvim-tree.api').tree.open({ path = arg })
           end
         end,
       })
+      -- Update nvim-tree root when switching tabs (for multi-workspace support)
+      vim.api.nvim_create_autocmd('TabEnter', {
+        callback = function()
+          local api = require('nvim-tree.api')
+          local cwd = vim.fn.getcwd()
+          -- Change tree root to current tab's directory
+          if api.tree.is_visible() then
+            api.tree.change_root(cwd)
+          end
+        end,
+      })
     end,
     opts = {
+      sync_root_with_cwd = true,
+      respect_buf_cwd = true,
       actions = {
         open_file = {
           quit_on_open = false,
@@ -149,7 +256,7 @@ require('lazy').setup({
       },
       update_focused_file = {
         enable = true,
-        update_root = false,
+        update_root = true,
       },
       renderer = {
         highlight_git = true,
