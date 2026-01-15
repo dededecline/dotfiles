@@ -12,10 +12,10 @@ for sid in $all_workspaces; do
   # Determine which display this workspace should be shown on
   # Match aerospace.toml workspace-to-monitor-force-assignment:
   # 1, 2, 4, 7 = main (display 1)
-  # 3, 5, 6 = secondary, fallback to main (display 2)
+  # 3, 5, 6, 8 = secondary, fallback to main (display 2)
   display_id="1"
   case "$sid" in
-    3|5|6) display_id="2" ;;
+    3|5|6|8) display_id="2" ;;
   esac
 
   sketchybar --add item space.$sid left \

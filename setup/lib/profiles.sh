@@ -11,11 +11,15 @@
 # Profile Mapping
 # =============================================================================
 
-# Hostname to profile mapping
-declare -A HOSTNAME_TO_PROFILE=(
-    ["hera"]="work"
-    ["athena"]="personal"
-)
+# Get profile for a hostname
+# Usage: get_profile_for_hostname <hostname>
+get_profile_for_hostname() {
+    case "$1" in
+        hera)   echo "work" ;;
+        athena) echo "personal" ;;
+        *)      echo "" ;;
+    esac
+}
 
 # =============================================================================
 # Profile Detection
@@ -23,27 +27,16 @@ declare -A HOSTNAME_TO_PROFILE=(
 
 # Detect profile from hostname or use override
 # Usage: detect_profile [hostname_override]
-# Returns: profile name (work/personal) or exits with error
+# Returns: profile name (work/personal) or empty string if unknown
 detect_profile() {
-    local hostname_override="$1"
+    local hostname_override="${1:-}"
     local hostname="${hostname_override:-$(hostname -s)}"
-    local profile="${HOSTNAME_TO_PROFILE[$hostname]:-}"
-
-    if [[ -z "$profile" ]]; then
-        return 1
-    fi
-
-    echo "$profile"
+    get_profile_for_hostname "$hostname"
 }
 
 # Get list of known hostnames for error messages
 get_known_hosts() {
-    local hosts=""
-    for host in "${!HOSTNAME_TO_PROFILE[@]}"; do
-        hosts+="$host (${HOSTNAME_TO_PROFILE[$host]}), "
-    done
-    # Remove trailing comma and space
-    echo "${hosts%, }"
+    echo "hera (work), athena (personal)"
 }
 
 # Check if profile is work

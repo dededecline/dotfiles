@@ -57,10 +57,13 @@ if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
     source "$DOTFILES/setup/lib/profiles.sh"
 else
     # Minimal fallback for fresh installs - define profile mapping inline
-    declare -A HOSTNAME_TO_PROFILE=(["hera"]="work" ["athena"]="personal")
     detect_profile() {
         local hostname="${1:-$(hostname -s)}"
-        echo "${HOSTNAME_TO_PROFILE[$hostname]:-}"
+        case "$hostname" in
+            hera)   echo "work" ;;
+            athena) echo "personal" ;;
+            *)      echo "" ;;
+        esac
     }
     get_known_hosts() { echo "hera (work), athena (personal)"; }
     is_work_profile() { [[ "${DOTFILES_PROFILE:-}" == "work" ]]; }
@@ -501,6 +504,16 @@ run_setup() {
 
     # Set wallpaper
     setup_wallpaper
+
+    # Reload window manager configs
+    if command -v aerospace &>/dev/null; then
+        aerospace reload-config 2>/dev/null || true
+        print_status "Aerospace: config reloaded"
+    fi
+    if command -v sketchybar &>/dev/null; then
+        sketchybar --reload 2>/dev/null || true
+        print_status "Sketchybar: reloaded"
+    fi
 
     # Show completion message
     print_header "Setup Complete!"
