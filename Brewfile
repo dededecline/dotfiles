@@ -24,11 +24,11 @@ brew "starship"                 # Cross-shell prompt
 brew "atuin"                    # Shell history
 brew "bat"                      # cat replacement
 brew "btop"                     # top replacement
-brew "difftastic"               # Structural diff tool
 brew "dust"                     # du replacement
 brew "fastfetch"                # System info
 brew "fd"                       # find replacement
 brew "fzf"                      # Fuzzy finder
+brew "git-delta"                # Syntax-highlighting pager for git/diff
 brew "glow"                     # Markdown renderer
 brew "gping"                    # ping replacement
 brew "jq"                       # JSON processor
