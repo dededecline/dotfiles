@@ -92,7 +92,7 @@ sketchybar --add item volume right \
     script="$PLUGIN_DIR/volume.sh" \
   --subscribe volume volume_change
 
-# WiFi
+# WiFi/Network
 sketchybar --add item wifi right \
   --set wifi \
     icon=󰖩 \
@@ -102,8 +102,9 @@ sketchybar --add item wifi right \
     background.corner_radius=5 \
     background.height=26 \
     background.drawing=on \
+    update_freq=30 \
     script="$PLUGIN_DIR/wifi.sh" \
-  --subscribe wifi wifi_change
+  --subscribe wifi wifi_change system_woke
 
 # Disk I/O
 sketchybar --add item disk right \

@@ -247,6 +247,9 @@ function icon_map() {
   "Grammarly Editor")
     icon_result=":grammarly:"
     ;;
+  "Granola")
+    icon_result=":notes:"
+    ;;
   "Home Assistant")
     icon_result=":home_assistant:"
     ;;
@@ -594,6 +597,9 @@ function icon_map() {
     ;;
   "superProductivity")
     icon_result=":superproductivity:"
+    ;;
+  "Sunsama")
+    icon_result=":sun:"
     ;;
   "Tana")
     icon_result=":tana:"
