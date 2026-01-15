@@ -118,20 +118,26 @@ cask "slack"                    # Team communication
 cask "zoom"                     # Video conferencing
 
 # Productivity
-cask "granola"                  # Meeting notes
-cask "linear-linear"            # Project management
 cask "notion"                   # Notes & docs
 cask "raycast"                  # Launcher
 cask "sunsama"                  # Daily planner
 
+# @profile:work
+cask "granola"                  # Meeting notes
+cask "linear-linear"            # Project management
+# @end:work
+
 # Development
 cask "docker-desktop"           # Docker Desktop
 cask "lens"                     # Kubernetes IDE
-cask "mongodb-compass"          # MongoDB GUI
 cask "pieces"                   # Code snippets manager
 cask "pieces-os"                # Pieces backend
 cask "powershell"               # PowerShell
 cask "wireshark-app"            # Network analyzer
+
+# @profile:work
+cask "mongodb-compass"          # MongoDB GUI
+# @end:work
 
 # Cloud Storage
 cask "google-drive"             # Google Drive sync
@@ -143,8 +149,11 @@ cask "protonvpn"                # VPN
 
 # Microsoft Office
 cask "microsoft-excel"          # Spreadsheets
-cask "microsoft-teams"          # Team collaboration
 cask "microsoft-word"           # Word processor
+
+# @profile:work
+cask "microsoft-teams"          # Team collaboration
+# @end:work
 
 # Media
 cask "handbrake-app"            # Video encoder

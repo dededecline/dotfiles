@@ -3,10 +3,15 @@
 # setup.sh - Unified dotfiles setup script (idempotent)
 #
 # Usage:
-#   ./setup.sh              # Run full setup
-#   ./setup.sh --brew       # Sync Homebrew packages only
-#   ./setup.sh --macos      # Apply macOS preferences only
-#   ./setup.sh --help       # Show usage
+#   ./setup.sh                      # Run full setup (auto-detect profile from hostname)
+#   ./setup.sh --profile work       # Override profile (work or personal)
+#   ./setup.sh --brew               # Sync Homebrew packages only
+#   ./setup.sh --macos              # Apply macOS preferences only
+#   ./setup.sh --help               # Show usage
+#
+# Supported machines:
+#   hera   -> work profile (includes work tools and secrets)
+#   athena -> personal profile (skips work-specific items)
 #
 # For fresh installs from a new machine:
 #   curl -fsSL https://raw.githubusercontent.com/dededecline/dotfiles/main/setup.sh | bash
@@ -47,6 +52,26 @@ else
     print_info() { echo -e "  $1"; }
 fi
 
+# Source profile utilities (with fallback for fresh installs)
+if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
+    source "$DOTFILES/setup/lib/profiles.sh"
+else
+    # Minimal fallback for fresh installs - define profile mapping inline
+    declare -A HOSTNAME_TO_PROFILE=(["hera"]="work" ["athena"]="personal")
+    detect_profile() {
+        local hostname="${1:-$(hostname -s)}"
+        echo "${HOSTNAME_TO_PROFILE[$hostname]:-}"
+    }
+    get_known_hosts() { echo "hera (work), athena (personal)"; }
+    is_work_profile() { [[ "${DOTFILES_PROFILE:-}" == "work" ]]; }
+    is_personal_profile() { [[ "${DOTFILES_PROFILE:-}" == "personal" ]]; }
+fi
+
+# Profile configuration (set by argument parsing or auto-detection)
+PROFILE_OVERRIDE=""
+DOTFILES_PROFILE=""
+MACHINE_HOSTNAME=""
+
 # Detect Homebrew prefix based on architecture
 detect_homebrew_prefix() {
     if [[ -d "/opt/homebrew" ]]; then
@@ -58,6 +83,70 @@ detect_homebrew_prefix() {
 
 get_fish_path() {
     echo "$(detect_homebrew_prefix)/bin/fish"
+}
+
+# =============================================================================
+# Profile Detection
+# =============================================================================
+
+# Detect and validate profile from hostname or override
+# Sets global DOTFILES_PROFILE and MACHINE_HOSTNAME variables
+detect_and_validate_profile() {
+    # Determine hostname
+    if [[ -n "$PROFILE_OVERRIDE" ]]; then
+        # Profile override provided - validate it
+        if [[ "$PROFILE_OVERRIDE" != "work" && "$PROFILE_OVERRIDE" != "personal" ]]; then
+            print_error "Invalid profile: $PROFILE_OVERRIDE"
+            print_info "Valid profiles: work, personal"
+            exit 1
+        fi
+        DOTFILES_PROFILE="$PROFILE_OVERRIDE"
+        MACHINE_HOSTNAME=$(hostname -s)
+        print_status "Profile: $DOTFILES_PROFILE (overridden, hostname: $MACHINE_HOSTNAME)"
+    else
+        # Auto-detect from hostname
+        MACHINE_HOSTNAME=$(hostname -s)
+        DOTFILES_PROFILE=$(detect_profile "$MACHINE_HOSTNAME")
+
+        if [[ -z "$DOTFILES_PROFILE" ]]; then
+            print_error "Unknown hostname: $MACHINE_HOSTNAME"
+            print_info "Known hosts: $(get_known_hosts)"
+            print_info "Override with: ./setup.sh --profile <work|personal>"
+            exit 1
+        fi
+        print_status "Profile: $DOTFILES_PROFILE (detected from hostname: $MACHINE_HOSTNAME)"
+    fi
+
+    # Export for child scripts
+    export DOTFILES_PROFILE
+    export MACHINE_HOSTNAME
+}
+
+# Preprocess Brewfile to filter profile-specific packages
+# Usage: preprocess_brewfile <input_file> <output_file>
+# Markers:
+#   # @profile:work ... # @end:work       - work-only packages
+#   # @profile:personal ... # @end:personal - personal-only packages
+preprocess_brewfile() {
+    local input="$1"
+    local output="$2"
+    local profile="$DOTFILES_PROFILE"
+
+    if [[ "$profile" == "work" ]]; then
+        # Work profile: strip personal-only sections, keep work sections
+        awk '
+            /^# @profile:personal/ { skip=1; next }
+            /^# @end:personal/ { skip=0; next }
+            !skip { print }
+        ' "$input" > "$output"
+    else
+        # Personal profile: strip work-only sections, keep personal sections
+        awk '
+            /^# @profile:work/ { skip=1; next }
+            /^# @end:work/ { skip=0; next }
+            !skip { print }
+        ' "$input" > "$output"
+    fi
 }
 
 # =============================================================================
@@ -172,12 +261,17 @@ inject_secrets() {
 
 prepare_brewfile() {
     local combined="$DOTFILES/.brewfile.combined"
+    local preprocessed="$DOTFILES/.brewfile.preprocessed"
 
-    # Start with base Brewfile
-    cat "$DOTFILES/Brewfile" > "$combined"
+    # Preprocess base Brewfile to filter profile-specific packages
+    preprocess_brewfile "$DOTFILES/Brewfile" "$preprocessed"
 
-    # Append work Brewfile if it exists
-    if [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
+    # Start with preprocessed Brewfile
+    cat "$preprocessed" > "$combined"
+    rm -f "$preprocessed"
+
+    # Append work Brewfile if it exists (only for work profile)
+    if is_work_profile && [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
         echo "" >> "$combined"
         echo "# Work additions (from 1Password)" >> "$combined"
         cat "$DOTFILES/sensitive/Brewfile.work" >> "$combined"
@@ -187,10 +281,10 @@ prepare_brewfile() {
 }
 
 run_brew_sync() {
-    print_header "Syncing Homebrew Packages"
+    print_header "Syncing Homebrew Packages ($DOTFILES_PROFILE profile)"
 
-    # Inject Brewfile.work and set GitHub token from 1Password if authenticated
-    if command -v op &>/dev/null && op account list &>/dev/null 2>&1; then
+    # Inject Brewfile.work and set GitHub token from 1Password if authenticated (work profile only)
+    if is_work_profile && command -v op &>/dev/null && op account list &>/dev/null 2>&1; then
         if [[ -f "$DOTFILES/templates/Brewfile.tpl" ]]; then
             print_info "Injecting work Brewfile from 1Password..."
             mkdir -p "$DOTFILES/sensitive"
@@ -204,6 +298,8 @@ run_brew_sync() {
             export HOMEBREW_GITHUB_API_TOKEN="$gh_token"
             print_status "GitHub API token configured for Homebrew"
         fi
+    elif is_personal_profile; then
+        print_info "Personal profile: skipping work-specific Homebrew packages"
     fi
 
     # Prepare combined Brewfile
@@ -376,6 +472,9 @@ apply_macos_defaults() {
 run_setup() {
     print_header "Dotfiles Setup"
 
+    # Detect profile first
+    detect_and_validate_profile
+
     # Prerequisites
     ensure_xcode_clt
     ensure_homebrew
@@ -383,7 +482,7 @@ run_setup() {
 
     cd "$DOTFILES"
 
-    # Inject secrets (needed for Brewfile.work)
+    # Inject secrets (needed for Brewfile.work) - profile-aware
     inject_secrets
 
     # Declarative Homebrew sync
@@ -419,10 +518,13 @@ run_setup() {
 run_brew() {
     print_header "Homebrew Sync"
 
+    # Detect profile first
+    detect_and_validate_profile
+
     cd "$DOTFILES"
 
-    # Try to inject Brewfile.work if 1Password is available
-    if command -v op &>/dev/null; then
+    # Try to inject Brewfile.work if 1Password is available (work profile only)
+    if is_work_profile && command -v op &>/dev/null; then
         if ! op account list &>/dev/null 2>&1; then
             # Skip prompt in non-interactive mode
             if [[ -t 0 ]]; then
@@ -444,6 +546,9 @@ run_brew() {
 run_macos() {
     print_header "macOS Preferences"
 
+    # Detect profile first (needed for hostname)
+    detect_and_validate_profile
+
     cd "$DOTFILES"
 
     apply_macos_defaults
@@ -455,19 +560,27 @@ run_macos() {
 
 show_help() {
     cat << EOF
-Dotfiles Setup Script (Idempotent)
+Dotfiles Setup Script (Idempotent, Multi-Machine)
 
 Usage:
-  ./setup.sh              Run full setup
-  ./setup.sh --brew       Sync Homebrew packages only
-  ./setup.sh --macos      Apply macOS preferences only
-  ./setup.sh --help       Show this help message
+  ./setup.sh                      Run full setup (auto-detect profile)
+  ./setup.sh --profile <profile>  Override profile (work or personal)
+  ./setup.sh --brew               Sync Homebrew packages only
+  ./setup.sh --macos              Apply macOS preferences only
+  ./setup.sh --help               Show this help message
+
+Profiles:
+  Profile is auto-detected from hostname:
+    hera   -> work (includes work tools and secrets)
+    athena -> personal (skips work-specific items)
+
+  Use --profile to override: ./setup.sh --profile personal
 
 Full Setup:
   Runs all setup tasks idempotently:
   - Installs Xcode CLT and Homebrew (if missing)
   - Clones dotfiles repository (if missing)
-  - Injects secrets from 1Password (if authenticated)
+  - Injects secrets from 1Password (work profile only)
   - Syncs Homebrew packages (declarative with --cleanup)
   - Creates symlinks
   - Configures Fish shell as default
@@ -476,11 +589,13 @@ Full Setup:
 
 Homebrew Sync (--brew):
   Installs packages from Brewfile and removes packages not in Brewfile.
+  Work-only packages (marked with @profile:work) are skipped on personal profile.
 
 macOS Preferences (--macos):
   Applies system preferences: UI, input, sound, Finder, screenshots, etc.
+  Hostname is set based on detected or overridden profile.
 
-1Password Integration:
+1Password Integration (work profile only):
   Work tools from templates/Brewfile.tpl require 1Password authentication.
   The script will prompt to sign in if needed, or you can skip and run
   'secrets' later.
@@ -498,6 +613,14 @@ main() {
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --profile|-p)
+                shift
+                if [[ $# -eq 0 ]]; then
+                    print_error "--profile requires a value (work or personal)"
+                    exit 1
+                fi
+                PROFILE_OVERRIDE="$1"
+                ;;
             --brew|-b)
                 mode="brew"
                 ;;

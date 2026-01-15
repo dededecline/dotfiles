@@ -18,10 +18,12 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 ###############################################################################
 
 # Set computer name (as shown in System Preferences > Sharing)
-sudo scutil --set ComputerName "hera"
-sudo scutil --set HostName "hera"
-sudo scutil --set LocalHostName "hera"
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "hera"
+# Uses MACHINE_HOSTNAME from setup.sh or falls back to current hostname
+HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
+sudo scutil --set ComputerName "$HOSTNAME"
+sudo scutil --set HostName "$HOSTNAME"
+sudo scutil --set LocalHostName "$HOSTNAME"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$HOSTNAME"
 
 ###############################################################################
 # General UI/UX                                                               #

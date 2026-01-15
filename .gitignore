@@ -9,6 +9,7 @@ git/config
 fish/functions/clone.fish
 glow/glow.yml
 .brewfile.combined
+.brewfile.preprocessed
 CLAUDE.md
 
 # System files

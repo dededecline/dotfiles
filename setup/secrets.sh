@@ -23,6 +23,12 @@ SENSITIVE_DIR="$DOTFILES/sensitive"
 # Source shared output utilities
 source "$DOTFILES/setup/lib/output.sh"
 
+# Source profile utilities
+source "$DOTFILES/setup/lib/profiles.sh"
+
+# Use profile from environment or default to work (for backwards compatibility)
+DOTFILES_PROFILE="${DOTFILES_PROFILE:-work}"
+
 # Check if 1Password CLI is installed and authenticated
 check_op() {
     if ! command -v op &>/dev/null; then
@@ -111,7 +117,7 @@ inject_atuin() {
 # Check which secrets are configured
 check_secrets() {
     echo ""
-    echo "Checking secrets configuration..."
+    echo "Checking secrets configuration ($DOTFILES_PROFILE profile)..."
     echo ""
 
     local all_configured=true
@@ -123,35 +129,49 @@ check_secrets() {
         print_warning "GitHub CLI: not configured (run 'gh auth login')"
     fi
 
-    # Check ZLI command
-    if [[ -f "$SENSITIVE_DIR/zli-command" ]]; then
-        print_status "ZLI connect: configured"
+    # Work-only secrets
+    if is_work_profile; then
+        # Check ZLI command
+        if [[ -f "$SENSITIVE_DIR/zli-command" ]]; then
+            print_status "ZLI connect: configured"
+        else
+            print_warning "ZLI connect: not configured"
+            all_configured=false
+        fi
+
+        # Check CI identity
+        if [[ -f "$SENSITIVE_DIR/ci-identity" ]]; then
+            print_status "CI identity: configured"
+        else
+            print_warning "CI identity: not configured"
+            all_configured=false
+        fi
+
+        # Check Work CLI Brewfile
+        if [[ -f "$SENSITIVE_DIR/Brewfile.work" ]]; then
+            print_status "Work CLI Brewfile: configured"
+        else
+            print_warning "Work CLI Brewfile: not configured"
+            all_configured=false
+        fi
+
+        # Check clone function
+        if [[ -f "$DOTFILES/fish/functions/clone.fish" ]]; then
+            print_status "Clone function: configured"
+        else
+            print_warning "Clone function: not configured"
+            all_configured=false
+        fi
     else
-        print_warning "ZLI connect: not configured"
-        all_configured=false
+        print_info "Personal profile: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone)"
     fi
 
+    # Secrets for all profiles
     # Check Git identity
     if grep -q "email = ." "$DOTFILES/git/config" 2>/dev/null && ! grep -q "email = $" "$DOTFILES/git/config" 2>/dev/null; then
         print_status "Git identity: configured"
     else
         print_warning "Git identity: not configured"
-        all_configured=false
-    fi
-
-    # Check CI identity
-    if [[ -f "$SENSITIVE_DIR/ci-identity" ]]; then
-        print_status "CI identity: configured"
-    else
-        print_warning "CI identity: not configured"
-        all_configured=false
-    fi
-
-    # Check Work CLI Brewfile
-    if [[ -f "$SENSITIVE_DIR/Brewfile.work" ]]; then
-        print_status "Work CLI Brewfile: configured"
-    else
-        print_warning "Work CLI Brewfile: not configured"
         all_configured=false
     fi
 
@@ -187,7 +207,7 @@ check_secrets() {
 inject_secrets() {
     echo ""
     echo "=========================================="
-    echo "  1Password Secrets Injection"
+    echo "  1Password Secrets Injection ($DOTFILES_PROFILE profile)"
     echo "=========================================="
     echo ""
 
@@ -202,30 +222,36 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/gh-hosts.tpl" "$HOME/.config/gh/hosts.yml" "GitHub CLI credentials"
     fi
 
-    # Inject ZLI connect command
-    if [[ -f "$TEMPLATES_DIR/zli.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command"
+    # Work-only secrets
+    if is_work_profile; then
+        # Inject ZLI connect command
+        if [[ -f "$TEMPLATES_DIR/zli.tpl" ]]; then
+            inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command"
+        fi
+
+        # Inject CI identity for empty commits
+        if [[ -f "$TEMPLATES_DIR/ci-identity.tpl" ]]; then
+            inject_template "$TEMPLATES_DIR/ci-identity.tpl" "$SENSITIVE_DIR/ci-identity" "CI identity"
+        fi
+
+        # Inject Work CLI additions for Brewfile
+        if [[ -f "$TEMPLATES_DIR/Brewfile.tpl" ]]; then
+            inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile"
+            echo "  Note: Run 'brew bundle --file=$SENSITIVE_DIR/Brewfile.work' to install work tools"
+        fi
+
+        # Inject clone.fish with work org
+        if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
+            inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function"
+        fi
+    else
+        print_info "Personal profile: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone)"
     fi
 
+    # Secrets for all profiles
     # Inject git config with identity
     if [[ -f "$TEMPLATES_DIR/git-config.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/git-config.tpl" "$DOTFILES/git/config" "Git identity"
-    fi
-
-    # Inject CI identity for empty commits
-    if [[ -f "$TEMPLATES_DIR/ci-identity.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/ci-identity.tpl" "$SENSITIVE_DIR/ci-identity" "CI identity"
-    fi
-
-    # Inject Work CLI additions for Brewfile
-    if [[ -f "$TEMPLATES_DIR/Brewfile.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile"
-        echo "  Note: Run 'brew bundle --file=$SENSITIVE_DIR/Brewfile.work' to install work tools"
-    fi
-
-    # Inject clone.fish with work org
-    if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function"
     fi
 
     # Inject Claude Code instructions
@@ -233,7 +259,7 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/config-instructions.tpl" "$DOTFILES/CLAUDE.md" "Claude Code instructions"
     fi
 
-    # Login to Atuin sync
+    # Login to Atuin sync (both profiles)
     inject_atuin
 
     echo ""
