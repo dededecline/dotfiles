@@ -268,6 +268,9 @@ function icon_map() {
   "Adobe InDesign"* | "InDesign")
     icon_result=":indesign:"
     ;;
+  "Infuse" | "Infuse 7")
+    icon_result=":infuse:"
+    ;;
   "Inkdrop")
     icon_result=":inkdrop:"
     ;;
