@@ -78,6 +78,7 @@ brew "trivy"                    # Security scanner
 brew "act"                      # Run GitHub Actions locally
 brew "actionlint"               # GitHub Actions linter
 brew "certbot"                  # Let's Encrypt client
+brew "defaultbrowser"           # Set default browser via CLI
 brew "displayplacer"            # Display configuration tool
 brew "httrack"                  # Website copier
 brew "imagemagick"              # Image manipulation

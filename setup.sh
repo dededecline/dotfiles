@@ -572,6 +572,31 @@ setup_wallpaper() {
     print_status "Wallpaper: applied to all desktops"
 }
 
+setup_default_browser() {
+    # Only set default browser if Waterfox is installed (which happens during brew sync)
+    if [[ ! -d "/Applications/Waterfox.app" ]]; then
+        print_warning "Waterfox not installed - skipping default browser setup"
+        return 0
+    fi
+
+    # Check if defaultbrowser is available
+    if ! command -v defaultbrowser &>/dev/null; then
+        print_warning "defaultbrowser command not found - skipping default browser setup"
+        print_info "Run 'brew install defaultbrowser' and re-run setup"
+        return 0
+    fi
+
+    print_info "Setting Waterfox as default browser..."
+
+    # Set Waterfox as the default browser
+    if defaultbrowser waterfox 2>/dev/null; then
+        print_status "Waterfox set as default browser"
+    else
+        print_warning "Could not set Waterfox as default browser"
+        print_info "You can set it manually in System Settings > Desktop & Dock > Default web browser"
+    fi
+}
+
 apply_macos_defaults() {
     if [[ ! -f "$DOTFILES/.macos" ]]; then
         print_error "macOS preferences file not found: $DOTFILES/.macos"
@@ -609,6 +634,9 @@ run_setup() {
 
     # Declarative Homebrew sync
     run_brew_sync
+
+    # Set default browser (after Waterfox and defaultbrowser are installed via brew)
+    setup_default_browser
 
     # Shell and environment
     create_symlinks
@@ -669,6 +697,9 @@ run_brew() {
     fi
 
     run_brew_sync
+
+    # Set default browser after brew sync
+    setup_default_browser
 
     print_header "Homebrew Sync Complete!"
 }
