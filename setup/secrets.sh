@@ -114,6 +114,31 @@ inject_atuin() {
     fi
 }
 
+# Retrieve work-specific Claude skills from 1Password
+inject_claude_skills() {
+    local CLAUDE_SKILLS_OUTPUT="$SENSITIVE_DIR/claude-skills"
+
+    echo "  Retrieving work-specific Claude skills from 1Password..."
+
+    # Work skills: skill_name:doc_title pairs
+    local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro bastion_zero:claude-skill-bastion_zero lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe spacectl:claude-skill-spacectl"
+
+    for pair in $work_skills; do
+        local skill_name="${pair%%:*}"
+        local doc_title="${pair#*:}"
+        local output_dir="$CLAUDE_SKILLS_OUTPUT/$skill_name"
+        local output_file="$output_dir/SKILL.md"
+
+        mkdir -p "$output_dir"
+        if op document get "$doc_title" --output "$output_file" 2>/dev/null; then
+            chmod 600 "$output_file"
+            print_status "  $skill_name skill retrieved"
+        else
+            print_warning "  $skill_name skill not found in 1Password (document: $doc_title)"
+        fi
+    done
+}
+
 # Check which secrets are configured
 check_secrets() {
     echo ""
@@ -162,8 +187,19 @@ check_secrets() {
             print_warning "Clone function: not configured"
             all_configured=false
         fi
+
+        # Check work-specific Claude skills
+        local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "spacectl")
+        for skill in "${work_skills[@]}"; do
+            if [[ -d "$DOTFILES/claude/skills/$skill" ]]; then
+                print_status "Claude skill: $skill configured"
+            else
+                print_warning "Claude skill: $skill not configured"
+                all_configured=false
+            fi
+        done
     else
-        print_info "Personal profile: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone)"
+        print_info "Personal profile: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
 
     # Secrets for all profiles
@@ -172,14 +208,6 @@ check_secrets() {
         print_status "Git identity: configured"
     else
         print_warning "Git identity: not configured"
-        all_configured=false
-    fi
-
-    # Check Code instructions
-    if [[ -f "$DOTFILES/CLAUDE.md" ]]; then
-        print_status "Code instructions: configured"
-    else
-        print_warning "Code instructions: not configured"
         all_configured=false
     fi
 
@@ -252,19 +280,17 @@ inject_secrets() {
         if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
             inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function"
         fi
+
+        # Retrieve work-specific Claude skills from 1Password
+        inject_claude_skills
     else
-        print_info "Personal profile: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone)"
+        print_info "Personal profile: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
 
     # Secrets for all profiles
     # Inject git config with identity
     if [[ -f "$TEMPLATES_DIR/git-config.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/git-config.tpl" "$DOTFILES/git/config" "Git identity"
-    fi
-
-    # Inject instructions
-    if [[ -f "$TEMPLATES_DIR/config-instructions.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/config-instructions.tpl" "$DOTFILES/CLAUDE.md" "Code instructions"
     fi
 
     # Inject display monitor LaunchAgent

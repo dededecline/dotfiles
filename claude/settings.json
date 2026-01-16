@@ -1,0 +1,71 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(less:*)",
+      "Bash(more:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)",
+      "Bash(pwd:*)",
+      "Bash(which:*)",
+      "Bash(type:*)",
+      "Bash(echo:*)",
+      "Bash(env:*)",
+      "Bash(printenv:*)",
+      "Bash(whoami:*)",
+      "Bash(id:*)",
+      "Bash(hostname:*)",
+      "Bash(uname:*)",
+      "Bash(date:*)",
+      "Bash(df:*)",
+      "Bash(du:*)",
+      "Bash(ps:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git rev-parse:*)",
+      "Grep(pattern:*)",
+      "Ls(path:*)",
+      "Glob(**)",
+      "WebFetch(domain:*)",
+      "WebSearch"
+    ],
+    "deny": []
+  },
+  "model": "opus",
+  "enableAllProjectMcpServers": true,
+  "alwaysThinkingEnabled": true,
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/glass.aiff"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/assets/scripts/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

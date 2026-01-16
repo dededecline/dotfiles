@@ -121,18 +121,6 @@ op item create --category=login --title="brew-incident-mgmt" --vault="Private" \
   tap="<tap>" formula="<formula>"
 ```
 
-### Code Instructions (`config-instructions.tpl`)
-- **Vault:** Private
-- **Item name:** config-instructions
-- **Field:** notesPlain (Secure Note content)
-
-This stores project-specific instructions without committing them publicly.
-
-To create:
-1. Create a Secure Note in 1Password named "config-instructions" in Private vault
-2. Paste your CLAUDE.md content into the note body
-3. Run `secrets` to inject it
-
 ### Display Monitor (`display-monitor.plist.tpl`)
 - **Vault:** Private
 - **Item name:** git-identity
@@ -150,12 +138,52 @@ op item create --category=login --title="git-identity" --vault="Private" \
 
 The display monitor runs every 3 seconds and logs to `~/.config/logs/display-monitor.log`.
 
+### Work-Specific Claude Skills (1Password Documents)
+
+Work-specific Claude Code skills are stored as 1Password documents (not templates)
+because the tool names themselves are sensitive. These are retrieved using `op document get`
+and placed in `sensitive/claude-skills/`, then symlinked to `claude/skills/`.
+
+**Document names in 1Password Private vault:**
+- `claude-skill-argocd` - GitOps deployment tool skill
+- `claude-skill-astro` - Airflow management tool skill
+- `claude-skill-bastion_zero` - Zero-trust access tool skill
+- `claude-skill-lrl-cli` - Database connection tool skill
+- `claude-skill-observe` - Observability platform skill
+- `claude-skill-spacectl` - Infrastructure-as-code tool skill
+
+To update a skill:
+```bash
+# Download the current version
+op document get "claude-skill-<name>" --output skill.md
+
+# Edit the file
+vim skill.md
+
+# Upload the updated version
+op document edit "claude-skill-<name>" skill.md
+
+# Re-run secrets to update local copy
+secrets
+```
+
+These skills are only installed on work machines (hostname: hera).
+Personal machines will not have these skills available.
+
 ## Adding New Secrets
 
 1. Create a new `.tpl` file in this directory
 2. Use `{{ op://Vault/Item/Field }}` syntax for secret references
 3. Add injection logic to `setup/secrets.sh`
 4. Update this README with setup instructions
+
+### Adding New Claude Skills (Work-Specific)
+
+For work-specific Claude skills:
+1. Create the SKILL.md file locally
+2. Upload to 1Password: `op document create SKILL.md --title "claude-skill-<name>" --vault "Private"`
+3. Add the skill name mapping to `inject_claude_skills()` in `setup/secrets.sh`
+4. Add the skill to `.gitignore` under work-specific Claude skills
 
 ## Usage
 

@@ -10,7 +10,6 @@ fish/functions/clone.fish
 glow/glow.yml
 .brewfile.combined
 .brewfile.preprocessed
-CLAUDE.md
 
 # System files
 .DS_Store
@@ -64,7 +63,18 @@ wireshark/
 zed/
 
 # ArgoCD (may contain cluster info)
-argocd/
+/argocd/
+
+# Work-specific Claude skills (symlinks retrieved from 1Password)
+claude/skills/argocd
+claude/skills/astro
+claude/skills/bastion_zero
+claude/skills/lrl-cli
+claude/skills/observe
+claude/skills/spacectl
+
+# Generated Claude skills directory
+sensitive/claude-skills/
 
 # Yarn global packages (regenerated)
 yarn/
