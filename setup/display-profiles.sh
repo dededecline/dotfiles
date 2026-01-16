@@ -8,6 +8,7 @@
 #
 
 # Serial IDs for reliable monitor identification
+# Both hera and athena MacBooks have the same display serial
 MACBOOK_SERIAL="s4251086178"
 EXTERNAL_SERIAL="s21573"
 
@@ -22,11 +23,13 @@ check_displayplacer() {
 
 # Single display: MacBook only at native resolution
 apply_single_display() {
+    # Both hera and athena use the same configuration: native resolution without scaling
     displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:off origin:(0,0) degree:0"
 }
 
 # Dual display: MacBook + external monitor (external positioned above)
 apply_dual_display() {
+    # Both hera and athena use the same dual display configuration
     displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:off origin:(0,0) degree:0" \
                   "id:$EXTERNAL_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:off origin:(0,-1600) degree:0"
 }
