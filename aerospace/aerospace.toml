@@ -125,6 +125,10 @@ if.app-id = "com.valvesoftware.steam"
 run = "layout floating"
 
 [[on-window-detected]]
+if.app-id = "com.valvesoftware.steam.helper"
+run = "layout floating"
+
+[[on-window-detected]]
 if.app-id = "com.granola.app"
 run = "layout floating"
 
@@ -201,4 +205,8 @@ run = "move-node-to-workspace 8"
 
 [[on-window-detected]]
 if.app-id = "com.valvesoftware.steam"
+run = "move-node-to-workspace 8"
+
+[[on-window-detected]]
+if.app-id = "com.valvesoftware.steam.helper"
 run = "move-node-to-workspace 8"

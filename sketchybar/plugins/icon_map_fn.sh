@@ -592,7 +592,7 @@ function icon_map() {
   "Spotlight")
     icon_result=":spotlight:"
     ;;
-  "Steam")
+  "Steam" | "Steam Helper")
     icon_result=":steam:"
     ;;
   "Sublime Text")
