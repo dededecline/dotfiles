@@ -538,6 +538,7 @@ setup_display_monitor() {
     # Make scripts executable
     chmod +x "$DOTFILES/setup/monitor-watcher.sh" 2>/dev/null || true
     chmod +x "$DOTFILES/setup/reload-display-config.sh" 2>/dev/null || true
+    chmod +x "$DOTFILES/setup/display-profiles.sh" 2>/dev/null || true
 
     # Create log directory
     mkdir -p "$HOME/.config/logs"

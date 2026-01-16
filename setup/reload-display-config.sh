@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Reload Display Configuration
-# Reloads aerospace and sketchybar when display count changes
+# Applies display profiles and reloads aerospace/sketchybar when display count changes
 
 DISPLAY_COUNT="${1:-1}"
 LOG_FILE="$HOME/.config/logs/display-reload.log"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Set PATH to include Homebrew binaries
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
@@ -20,6 +21,17 @@ log_message "Display count changed to: $DISPLAY_COUNT"
 
 # Export display count for scripts to use
 export DISPLAY_COUNT
+
+# Apply display profile using displayplacer
+if [[ -f "$SCRIPT_DIR/display-profiles.sh" ]]; then
+    source "$SCRIPT_DIR/display-profiles.sh"
+    log_message "Applying display profile..."
+    apply_display_profile "$DISPLAY_COUNT" 2>&1 | while read line; do
+        log_message "  displayplacer: $line"
+    done
+    # Small delay for macOS to settle after display changes
+    sleep 0.5
+fi
 
 # Reload aerospace configuration
 log_message "Reloading aerospace..."

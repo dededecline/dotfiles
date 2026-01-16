@@ -58,7 +58,7 @@ alias fishconfig="nvim ~/.config/fish/config.fish"
 
 # Work-specific
 alias preview='spacectl stack preview --sha (git rev-parse HEAD 2>/dev/null)'
-alias spacelogin="spacectl profile login && terraform login spacelift.io"
+alias spacelogin="spacectl profile login && tofu login spacelift.io"
 
 # Dotfiles management
 alias dotfiles="cd ~/.config"
