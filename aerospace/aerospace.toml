@@ -136,13 +136,17 @@ run = "layout floating"
 if.app-id = "com.apple.Preview"
 run = "layout floating"
 
-# Workspace 1: Discord, Messages
+# Workspace 1: Discord, Messages, Signal
 [[on-window-detected]]
 if.app-id = "com.hnc.Discord"
 run = "move-node-to-workspace 1"
 
 [[on-window-detected]]
 if.app-id = "com.apple.MobileSMS"
+run = "move-node-to-workspace 1"
+
+[[on-window-detected]]
+if.app-id = "org.whispersystems.signal-desktop"
 run = "move-node-to-workspace 1"
 
 # Workspace 2: Mail, Calendar, Slack
@@ -190,4 +194,11 @@ run = "move-node-to-workspace 6"
 
 # Workspace 7: (empty)
 
-# Workspace 8: (secondary monitor)
+# Workspace 8: Davinci Resolve, Steam (secondary monitor)
+[[on-window-detected]]
+if.app-id = "com.blackmagic-design.DaVinciResolveLite"
+run = "move-node-to-workspace 8"
+
+[[on-window-detected]]
+if.app-id = "com.valvesoftware.steam"
+run = "move-node-to-workspace 8"
