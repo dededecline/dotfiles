@@ -182,6 +182,7 @@ cask "wifiman"                  # Network scanner
 # =============================================================================
 # Mac App Store
 # =============================================================================
+mas "DaVinci Resolve", id: 571213070    # Video editor
 mas "Infuse", id: 1136220934            # Media player
 mas "Parcel", id: 639968404             # Delivery tracking
 mas "Reeder Classic", id: 1529448980    # RSS reader
