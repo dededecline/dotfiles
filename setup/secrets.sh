@@ -115,6 +115,7 @@ inject_atuin() {
 }
 
 # Retrieve work-specific Claude skills from 1Password
+# Uses diff-based comparison to avoid unnecessary prompts
 inject_claude_skills() {
     local CLAUDE_SKILLS_OUTPUT="$SENSITIVE_DIR/claude-skills"
 
@@ -128,14 +129,63 @@ inject_claude_skills() {
         local doc_title="${pair#*:}"
         local output_dir="$CLAUDE_SKILLS_OUTPUT/$skill_name"
         local output_file="$output_dir/SKILL.md"
+        local temp_file
 
         mkdir -p "$output_dir"
-        if op document get "$doc_title" --output "$output_file" 2>/dev/null; then
-            chmod 600 "$output_file"
-            print_status "  $skill_name skill retrieved"
-        else
+        temp_file=$(mktemp)
+
+        # Download from 1Password to temp file (--force avoids op's built-in prompt)
+        if ! op document get "$doc_title" --output "$temp_file" --force 2>/dev/null; then
+            rm -f "$temp_file"
             print_warning "  $skill_name skill not found in 1Password (document: $doc_title)"
+            continue
         fi
+
+        # If local file doesn't exist, just move temp to output
+        if [[ ! -f "$output_file" ]]; then
+            mv "$temp_file" "$output_file"
+            chmod 600 "$output_file"
+            print_status "  $skill_name skill retrieved (new)"
+            continue
+        fi
+
+        # Compare files
+        if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
+            # Files are identical - skip
+            rm -f "$temp_file"
+            print_status "  $skill_name skill unchanged"
+            continue
+        fi
+
+        # Files differ - show diff and prompt
+        echo ""
+        echo -e "${YELLOW}$skill_name skill has changed:${NC}"
+        echo "─────────────────────────────────────────"
+        diff --color=auto -u "$output_file" "$temp_file" | head -50 || true
+        echo "─────────────────────────────────────────"
+        echo ""
+        echo "Choose action:"
+        echo "  [l] Keep local version"
+        echo "  [r] Use remote (1Password) version"
+        echo ""
+        read -rp "Action [l/r]: " choice
+
+        case "$choice" in
+            r|R)
+                mv "$temp_file" "$output_file"
+                chmod 600 "$output_file"
+                print_status "  $skill_name skill updated from 1Password"
+                ;;
+            l|L|*)
+                rm -f "$temp_file"
+                # Push local version back to 1Password
+                if op document edit "$doc_title" --file-path "$output_file" 2>/dev/null; then
+                    print_status "  $skill_name skill: local version pushed to 1Password"
+                else
+                    print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
+                fi
+                ;;
+        esac
     done
 }
 
