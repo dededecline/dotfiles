@@ -109,7 +109,7 @@ sketchybar --add item wifi right \
 # Memory
 sketchybar --add item memory right \
   --set memory \
-    icon=󰍛 \
+    icon=󰻠 \
     icon.color=$MAUVE \
     update_freq=5 \
     background.color=$ITEM_BG_COLOR \
@@ -121,7 +121,7 @@ sketchybar --add item memory right \
 # CPU
 sketchybar --add item cpu right \
   --set cpu \
-    icon=󰻠 \
+    icon=󰍛 \
     icon.color=$PEACH \
     update_freq=5 \
     background.color=$ITEM_BG_COLOR \
