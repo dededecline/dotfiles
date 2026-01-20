@@ -106,18 +106,6 @@ sketchybar --add item wifi right \
     script="$PLUGIN_DIR/wifi.sh" \
   --subscribe wifi wifi_change system_woke
 
-# Disk I/O
-sketchybar --add item disk right \
-  --set disk \
-    icon=󰋊 \
-    icon.color=$TEAL \
-    update_freq=5 \
-    background.color=$ITEM_BG_COLOR \
-    background.corner_radius=5 \
-    background.height=26 \
-    background.drawing=on \
-    script="$PLUGIN_DIR/disk.sh"
-
 # Memory
 sketchybar --add item memory right \
   --set memory \
