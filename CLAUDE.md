@@ -58,7 +58,7 @@
   • Syncs Homebrew packages (declarative with --cleanup)                      
   • Creates symlinks                                                          
   • Configures Fish shell as default                                          
-  • Installs Fisher, TPM, and aerospace-swipe                                 
+  • Installs Fisher and TPM                                 
   • Applies macOS system preferences                                          
                                                                               
   Use --brew or --macos flags to run only those specific tasks.               
