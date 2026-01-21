@@ -492,17 +492,6 @@ setup_tmux_plugins() {
     print_status "Tmux Plugin Manager: installed"
 }
 
-setup_aerospace_swipe() {
-    if [[ -f "$HOME/.local/bin/aerospace-swipe" ]]; then
-        print_status "aerospace-swipe: already installed"
-        return 0
-    fi
-
-    print_info "Installing aerospace-swipe..."
-    curl -sSL https://raw.githubusercontent.com/acsandmann/aerospace-swipe/main/install.sh | bash
-    print_status "aerospace-swipe: installed"
-}
-
 setup_sketchybar() {
     if ! command -v sketchybar &>/dev/null; then
         print_warning "Sketchybar not installed - skipping"
@@ -643,7 +632,6 @@ run_setup() {
     setup_fish_shell
     setup_fisher
     setup_tmux_plugins
-    setup_aerospace_swipe
     setup_sketchybar
     setup_display_monitor
 
@@ -745,7 +733,7 @@ Full Setup:
   - Syncs Homebrew packages (declarative with --cleanup)
   - Creates symlinks
   - Configures Fish shell as default
-  - Installs Fisher, TPM, and aerospace-swipe
+  - Installs Fisher and TPM
   - Applies macOS system preferences
 
 Homebrew Sync (--brew):

@@ -156,6 +156,17 @@ defaults write com.apple.screencapture type -string "png"
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 ###############################################################################
+# Apple Intelligence                                                          #
+###############################################################################
+
+# Disable Apple Intelligence on macOS Tahoe (26) and newer
+MACOS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
+if [[ "$MACOS_VERSION" -ge 26 ]]; then
+	defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "false"
+	echo "Apple Intelligence disabled."
+fi
+
+###############################################################################
 # Raycast Configuration                                                       #
 ###############################################################################
 
