@@ -67,6 +67,8 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
+# TODO: ensure Spotlight keyboard shortcuts are permanently disabled
+
 ###############################################################################
 # Sound                                                                       #
 ###############################################################################
@@ -159,12 +161,7 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 # Apple Intelligence                                                          #
 ###############################################################################
 
-# Disable Apple Intelligence on macOS Tahoe (26) and newer
-MACOS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
-if [[ "$MACOS_VERSION" -ge 26 ]]; then
-	defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "false"
-	echo "Apple Intelligence disabled."
-fi
+# TODO: Implement functioning Apple Intelligence disabling
 
 ###############################################################################
 # Raycast Configuration                                                       #
