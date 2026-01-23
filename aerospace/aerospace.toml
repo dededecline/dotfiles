@@ -144,6 +144,10 @@ run = "layout floating"
 if.app-id = "com.apple.DiskUtility"
 run = "layout floating"
 
+[[on-window-detected]]
+if.app-id = "com.alienator88.Pearcleaner"
+run = "layout floating"
+
 # Workspace 1: Discord, Messages, Signal
 [[on-window-detected]]
 if.app-id = "com.hnc.Discord"

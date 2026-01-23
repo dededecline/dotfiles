@@ -129,6 +129,7 @@ cask "linear-linear"            # Project management
 # @end:work
 
 # Development
+cask "claude-code"              # Code Assistant
 cask "docker-desktop"           # Docker Desktop
 cask "lens"                     # Kubernetes IDE
 cask "powershell"               # PowerShell
