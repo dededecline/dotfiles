@@ -409,6 +409,9 @@ function icon_map() {
   "Neovim" | "neovim" | "nvim")
     icon_result=":neovim:"
     ;;
+  "News")
+    icon_result=":news:"
+    ;;
   "网易云音乐")
     icon_result=":netease_music:"
     ;;

@@ -204,7 +204,10 @@ run = "move-node-to-workspace 5"
 if.app-id = "notion.id"
 run = "move-node-to-workspace 6"
 
-# Workspace 7: (empty)
+# Workspace 7: News
+[[on-window-detected]]
+if.app-id = 'com.apple.news'
+run = 'move-node-to-workspace 7'
 
 # Workspace 8: Davinci Resolve, Steam, Infuse (secondary monitor)
 [[on-window-detected]]
