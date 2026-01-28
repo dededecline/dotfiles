@@ -194,9 +194,13 @@ run = "move-node-to-workspace 3"
 if.app-id = "net.waterfox.waterfox"
 run = "move-node-to-workspace 4"
 
-# Workspace 5: kitty
+# Workspace 5: kitty, Zed
 [[on-window-detected]]
 if.app-id = "net.kovidgoyal.kitty"
+run = "move-node-to-workspace 5"
+
+[[on-window-detected]]
+if.app-id = "dev.zed.Zed"
 run = "move-node-to-workspace 5"
 
 # Workspace 6: Notion
