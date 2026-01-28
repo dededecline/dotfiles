@@ -59,8 +59,9 @@ github-copilot/
 raycast/
 wireshark/
 
-# Zed editor state
-zed/
+# Zed
+zed/conversations/
+zed/prompts/
 
 # ArgoCD (may contain cluster info)
 /argocd/

@@ -20,6 +20,6 @@ function clone --description "Clone a work repo with archive check"
     read -P "Would you like to open this repo? (y/n) " ans
     set ans (string lower $ans)
     if string match -qr '^(yes|y)$' $ans
-        nvim $repo
+        zed $repo
     end
 end

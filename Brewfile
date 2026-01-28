@@ -134,8 +134,8 @@ cask "claude-code"              # Code Assistant
 cask "docker-desktop"           # Docker Desktop
 cask "lens"                     # Kubernetes IDE
 cask "powershell"               # PowerShell
-cask "visual-studio-code"       # IDE
 cask "wireshark-app"            # Network analyzer
+cask "zed"                      # Code Editor
 
 # @profile:work
 cask "mongodb-compass"          # MongoDB GUI

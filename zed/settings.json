@@ -1,0 +1,47 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "window_decorations": "client",
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "title_bar": {
+    "show_branch_icon": true,
+  },
+  "prettier": {
+    "allowed": true,
+  },
+  "show_whitespaces": "all",
+  "which_key": {
+    "enabled": true,
+  },
+  "autosave": "on_focus_change",
+  "session": {
+    "trust_all_worktrees": true,
+  },
+  "on_last_window_closed": "quit_app",
+  "when_closing_with_no_tabs": "close_window",
+  "icon_theme": "Catppuccin Frappé",
+  "ui_font_size": 16,
+  "buffer_font_size": 12,
+  "buffer_font_weight": 500,
+  "buffer_line_height": "comfortable",
+  "terminal": {
+    "font_family": "JetBrainsMono Nerd Font",
+    "font_size": 12,
+    "font_weight": 500,
+    "line_height": "comfortable",
+  },
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Catppuccin Frappe (Blur)",
+  },
+  "search": {
+    "include_ignored": false,
+  },
+}
