@@ -115,6 +115,7 @@ cask "waterfox"                 # Firefox-based browser
 
 # Communication
 cask "discord"                  # Chat platform
+cask "signal"                   # E2EE Communication
 cask "slack"                    # Team communication
 cask "zoom"                     # Video conferencing
 
