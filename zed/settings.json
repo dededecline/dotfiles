@@ -12,9 +12,6 @@
   "title_bar": {
     "show_branch_icon": true,
   },
-  "prettier": {
-    "allowed": true,
-  },
   "show_whitespaces": "all",
   "which_key": {
     "enabled": true,
