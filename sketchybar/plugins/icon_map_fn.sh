@@ -475,6 +475,9 @@ function icon_map() {
   "Parallels Desktop")
     icon_result=":parallels:"
     ;;
+  "Parcel")
+    icon_result=":parcel:"
+    ;;
   "Parsec")
     icon_result=":parsec:"
     ;;
