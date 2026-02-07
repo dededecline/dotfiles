@@ -211,9 +211,13 @@ run = "move-node-to-workspace 5"
 if.app-id = "dev.zed.Zed"
 run = "move-node-to-workspace 5"
 
-# Workspace 6: Notion
+# Workspace 6: Notion, Journal
 [[on-window-detected]]
 if.app-id = "notion.id"
+run = "move-node-to-workspace 6"
+
+[[on-window-detected]]
+if.app-id = "com.apple.journal"
 run = "move-node-to-workspace 6"
 
 # Workspace 7: News

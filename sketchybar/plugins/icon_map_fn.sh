@@ -292,6 +292,9 @@ function icon_map() {
   "Joplin")
     icon_result=":joplin:"
     ;;
+  "Journal")
+    icon_result=":journal:"
+    ;;
   "카카오톡" | "KakaoTalk")
     icon_result=":kakaotalk:"
     ;;
