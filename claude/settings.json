@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "defaultMode": "default",
     "allow": [
       "Bash(mkdir:*)",
       "Bash(ls:*)",
@@ -39,11 +38,11 @@
       "WebFetch(domain:*)",
       "WebSearch"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "default"
   },
   "model": "opus",
   "enableAllProjectMcpServers": true,
-  "alwaysThinkingEnabled": true,
   "hooks": {
     "Notification": [
       {
@@ -67,5 +66,9 @@
         ]
       }
     ]
+  },
+  "alwaysThinkingEnabled": true,
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
   }
 }
