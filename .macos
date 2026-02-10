@@ -193,7 +193,7 @@ defaults write com.apple.Siri UserHasDeclinedEnable -bool true
 # Enable Touch ID for sudo authentication (survives macOS updates)
 SUDO_LOCAL="/etc/pam.d/sudo_local"
 if ! grep -q "pam_tid.so" "$SUDO_LOCAL" 2>/dev/null; then
-	echo "auth       sufficient     pam_tid.so" | sudo tee "$SUDO_LOCAL" > /dev/null
+	echo "auth       sufficient     pam_tid.so" | sudo tee -a "$SUDO_LOCAL" > /dev/null
 	echo "Touch ID for sudo enabled."
 else
 	echo "Touch ID for sudo already configured."

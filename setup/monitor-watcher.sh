@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Display Monitor Watcher
 # Detects changes in connected display count and triggers aerospace/sketchybar reload

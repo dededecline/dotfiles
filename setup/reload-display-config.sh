@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Reload Display Configuration
 # Applies display profiles and reloads aerospace/sketchybar when display count changes

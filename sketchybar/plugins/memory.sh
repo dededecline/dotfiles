@@ -38,7 +38,7 @@ if [ "$MEM_PERCENT" -gt 80 ]; then
 elif [ "$MEM_PERCENT" -gt 50 ]; then
   COLOR=$MAUVE
 else
-  COLOR=$MAUVE
+  COLOR=$GREEN
 fi
 
 sketchybar --set "$NAME" label="${MEM_PERCENT}%" icon.color="$COLOR"

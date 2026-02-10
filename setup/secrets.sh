@@ -14,7 +14,7 @@
 #   ~/.config/setup/secrets.sh --check   # Check if secrets are configured
 #
 
-set -eo pipefail
+set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.config}"
 TEMPLATES_DIR="$DOTFILES/templates"
@@ -45,10 +45,12 @@ check_op() {
 }
 
 # Inject secrets from a template file
+# Usage: inject_template <template> <output> <description> [account]
 inject_template() {
     local template="$1"
     local output="$2"
     local description="$3"
+    local account="${4:-}"
 
     if [[ ! -f "$template" ]]; then
         print_warning "Template not found: $template"
@@ -62,7 +64,12 @@ inject_template() {
 
     # Use op inject to replace op:// references with actual values
     # --force allows overwriting existing files without prompting
-    if op inject -f -i "$template" -o "$output" 2>/dev/null; then
+    local op_args=(-f -i "$template" -o "$output")
+    if [[ -n "$account" ]]; then
+        op_args+=(--account "$account")
+    fi
+
+    if op inject "${op_args[@]}" 2>/dev/null; then
         chmod 600 "$output"
         print_status "$description configured"
     else
@@ -122,7 +129,7 @@ inject_claude_skills() {
     echo "  Retrieving work-specific Claude skills from 1Password..."
 
     # Work skills: skill_name:doc_title pairs
-    local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro bastion_zero:claude-skill-bastion_zero lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe spacectl:claude-skill-spacectl"
+    local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro bastion_zero:claude-skill-bastion_zero lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
 
     for pair in $work_skills; do
         local skill_name="${pair%%:*}"
@@ -189,6 +196,56 @@ inject_claude_skills() {
     done
 }
 
+# Retrieve a Claude skill archive (tarball) from 1Password
+# Used for multi-file skills that can't be stored as a single document
+inject_claude_skill_archive() {
+    local doc_title="$1"
+    local skill_name="$2"
+    local output_dir="$SENSITIVE_DIR/claude-skills/$skill_name"
+    local temp_file
+
+    temp_file=$(mktemp)
+
+    # Download tarball from 1Password
+    if ! op document get "$doc_title" --output "$temp_file" --force 2>/dev/null; then
+        rm -f "$temp_file"
+        print_warning "  $skill_name skill archive not found in 1Password (document: $doc_title)"
+        return 1
+    fi
+
+    # If directory exists, extract to temp and compare
+    if [[ -d "$output_dir" ]]; then
+        local temp_extract
+        temp_extract=$(mktemp -d)
+        if tar xf "$temp_file" -C "$temp_extract" 2>/dev/null; then
+            if diff -rq "$output_dir" "$temp_extract" >/dev/null 2>&1; then
+                rm -rf "$temp_extract" "$temp_file"
+                print_status "  $skill_name skill archive unchanged"
+                return 0
+            fi
+            rm -rf "$temp_extract"
+        else
+            rm -rf "$temp_extract" "$temp_file"
+            print_error "  $skill_name skill archive is not a valid tarball"
+            return 1
+        fi
+    fi
+
+    # Extract tarball to output directory (clean first to remove stale files)
+    rm -rf "$output_dir"
+    mkdir -p "$output_dir"
+    if tar xf "$temp_file" -C "$output_dir" 2>/dev/null; then
+        find "$output_dir" -type d -exec chmod 700 {} \;
+        find "$output_dir" -type f -exec chmod 600 {} \;
+        rm -f "$temp_file"
+        print_status "  $skill_name skill archive extracted"
+    else
+        rm -f "$temp_file"
+        print_error "  Failed to extract $skill_name skill archive"
+        return 1
+    fi
+}
+
 # Check which secrets are configured
 check_secrets() {
     echo ""
@@ -239,7 +296,7 @@ check_secrets() {
         fi
 
         # Check work-specific Claude skills
-        local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "spacectl")
+        local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
         for skill in "${work_skills[@]}"; do
             if [[ -d "$DOTFILES/claude/skills/$skill" ]]; then
                 print_status "Claude skill: $skill configured"
@@ -248,11 +305,29 @@ check_secrets() {
                 all_configured=false
             fi
         done
+
+        # Check Claude Code telemetry
+        if [[ -f "$HOME/Library/Application Support/ClaudeCode/managed-settings.json" ]]; then
+            print_status "Claude Code telemetry: configured"
+        else
+            print_warning "Claude Code telemetry: not configured"
+            all_configured=false
+        fi
     else
         print_info "Personal profile: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
 
     # Secrets for all profiles
+    # Check fastfetch logo symlink
+    if [[ -L "$DOTFILES/fastfetch/logo.txt" ]]; then
+        local target
+        target=$(readlink "$DOTFILES/fastfetch/logo.txt")
+        print_status "Fastfetch logo: linked to $(basename "$target")"
+    else
+        print_warning "Fastfetch logo: not configured"
+        all_configured=false
+    fi
+
     # Check Git identity
     if grep -q "email = ." "$DOTFILES/git/config" 2>/dev/null && ! grep -q "email = $" "$DOTFILES/git/config" 2>/dev/null; then
         print_status "Git identity: configured"
@@ -333,11 +408,33 @@ inject_secrets() {
 
         # Retrieve work-specific Claude skills from 1Password
         inject_claude_skills
+
+        # Retrieve multi-file skill archives from 1Password
+        inject_claude_skill_archive "claude-skill-notion-research-documentation" "notion-research-documentation"
+
+        # Claude Code telemetry (WorkWeave OTEL)
+        # Uses work 1Password account for Engineering Account Credentials vault
+        local claude_code_dir="$HOME/Library/Application Support/ClaudeCode"
+        mkdir -p "$claude_code_dir"
+        inject_template "$TEMPLATES_DIR/managed-settings.tpl" \
+            "$claude_code_dir/managed-settings.json" \
+            "Claude Code telemetry" \
+            "laurel-ai.1password.com"
     else
         print_info "Personal profile: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
 
     # Secrets for all profiles
+    # Symlink fastfetch logo based on profile
+    local logo_target
+    if is_work_profile; then
+        logo_target="logo_hera.txt"
+    else
+        logo_target="logo_athena.txt"
+    fi
+    ln -sf "$DOTFILES/fastfetch/$logo_target" "$DOTFILES/fastfetch/logo.txt"
+    print_status "Fastfetch logo: $logo_target"
+
     # Inject git config with identity
     if [[ -f "$TEMPLATES_DIR/git-config.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/git-config.tpl" "$DOTFILES/git/config" "Git identity"

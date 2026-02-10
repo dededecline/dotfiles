@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # display-profiles.sh - Display configuration profiles using displayplacer
 #
@@ -27,13 +27,13 @@ apply_single_display() {
     displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0"
 }
 
-# Dual display: MacBook + external monitor 1 (external positioned above)
+# Dual display: MacBook + portable monitor
 apply_dual_display_1() {
     displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
                   "id:$EXTERNAL_SERIAL_1 res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,-1600) degree:0"
 }
 
-# Dual display: MacBook + external monitor 2 (27" @ 2560x1440, positioned above)
+# Dual display: MacBook + work office monitor
 apply_dual_display_2() {
     displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
                   "id:$EXTERNAL_SERIAL_2 res:2560x1440 hz:100 color_depth:8 enabled:true scaling:on origin:(0,-1440) degree:0"

@@ -17,7 +17,7 @@ if [ "$CPU_INT" -gt 80 ]; then
 elif [ "$CPU_INT" -gt 50 ]; then
   COLOR=$PEACH
 else
-  COLOR=$PEACH
+  COLOR=$GREEN
 fi
 
 sketchybar --set "$NAME" label="${CPU_INT}%" icon.color="$COLOR"

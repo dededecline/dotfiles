@@ -80,9 +80,11 @@ brew "actionlint"               # GitHub Actions linter
 brew "certbot"                  # Let's Encrypt client
 brew "defaultbrowser"           # Set default browser via CLI
 brew "displayplacer"            # Display configuration tool
+brew "gettext"                  # String utilities (envsubst)
 brew "httrack"                  # Website copier
 brew "imagemagick"              # Image manipulation
 brew "mas"                      # Mac App Store CLI
+brew "mise"                     # Dev tool version manager
 brew "reviewdog/tap/reviewdog"  # Code review automation
 brew "tesseract-lang"           # OCR language data
 brew "watch"                    # Execute commands periodically
@@ -192,6 +194,7 @@ mas "DaVinci Resolve", id: 571213070    # Video editor
 mas "Infuse", id: 1136220934            # Media player
 mas "Parcel", id: 375589283             # Delivery tracking
 mas "Reeder Classic", id: 1529448980    # RSS reader
+mas "1Password for Safari", id: 1569813296  # Browser extension
 
 # =============================================================================
 # Fonts

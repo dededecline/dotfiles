@@ -1,16 +1,16 @@
 ---
-description: Principal engineer-level comprehensive code review with fixes
+description: Principal engineer-level comprehensive codebase review with fixes
 ---
 
 # Thorough Code Review
 
-You are a principal engineer tasked with reviewing uncommitted changes in this repository. Perform a comprehensive two-phase review:
+You are a principal engineer tasked with reviewing the entirety of this codebase/repository. Perform a comprehensive two-phase review:
 
 ## Phase 1: Code Quality & Internal Alignment
 
-1. **Discover the changes**: Identify all modified, added, or deleted files not yet committed
+1. **Discover the structure of the repository**: Identify the languages, frameworks, structure, dependencies, and infrastructure involved in the repository.
 2. **Understand the context**: Read any plan documents, PRD files, or design docs referenced (e.g., plan.md, CLAUDE.md, README.md)
-3. **Review each change critically**:
+3. **Review each piece critically**:
    - Code correctness and logic errors
    - Type mismatches and interface contracts
    - Error handling and edge cases
@@ -18,6 +18,11 @@ You are a principal engineer tasked with reviewing uncommitted changes in this r
    - Resource lifecycle management
    - Naming conventions and consistency
    - Missing or incorrect configuration
+   - Unoptimized structure and performance
+   - Code duplication and refactoring opportunities
+   - Code complexity and maintainability
+   - Code readability and documentation
+   - Against the general tendencies of AI code tooling, code should not be sprawling; documentation should be on a clarification-needed-for-human-readability-basis; do not use emotes/emojis anywhere
 4. **Validate against the plan**: Ensure implementation matches documented requirements
 
 ## Phase 2: External Documentation Validation
