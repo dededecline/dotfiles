@@ -10,7 +10,8 @@
 # Serial IDs for reliable monitor identification
 # Both hera and athena MacBooks have the same display serial
 MACBOOK_SERIAL="s4251086178"
-EXTERNAL_SERIAL="s21573"
+EXTERNAL_SERIAL_1="s21573"
+EXTERNAL_SERIAL_2="s825644620"
 
 # Check if displayplacer is available
 check_displayplacer() {
@@ -23,15 +24,19 @@ check_displayplacer() {
 
 # Single display: MacBook only at native resolution
 apply_single_display() {
-    # Both hera and athena use the same configuration: native resolution without scaling
-    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:off origin:(0,0) degree:0"
+    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0"
 }
 
-# Dual display: MacBook + external monitor (external positioned above)
-apply_dual_display() {
-    # Both hera and athena use the same dual display configuration
-    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:off origin:(0,0) degree:0" \
-                  "id:$EXTERNAL_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:off origin:(0,-1600) degree:0"
+# Dual display: MacBook + external monitor 1 (external positioned above)
+apply_dual_display_1() {
+    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
+                  "id:$EXTERNAL_SERIAL_1 res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,-1600) degree:0"
+}
+
+# Dual display: MacBook + external monitor 2 (27" @ 2560x1440, positioned above)
+apply_dual_display_2() {
+    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
+                  "id:$EXTERNAL_SERIAL_2 res:2560x1440 hz:100 color_depth:8 enabled:true scaling:on origin:(0,-1440) degree:0"
 }
 
 # Apply appropriate display profile based on display count
@@ -44,10 +49,12 @@ apply_display_profile() {
         echo "Applying single display profile..."
         apply_single_display
     elif [[ "$display_count" -ge 2 ]]; then
-        # Check if our known external monitor is connected
-        if displayplacer list 2>/dev/null | grep -q "$EXTERNAL_SERIAL"; then
-            echo "Applying dual display profile (external monitor detected)..."
-            apply_dual_display
+        if displayplacer list 2>/dev/null | grep -q "$EXTERNAL_SERIAL_1"; then
+            echo "Applying dual display profile (external monitor 1)..."
+            apply_dual_display_1
+        elif displayplacer list 2>/dev/null | grep -q "$EXTERNAL_SERIAL_2"; then
+            echo "Applying dual display profile (external monitor 2)..."
+            apply_dual_display_2
         else
             echo "Unknown external monitor - skipping display configuration"
         fi

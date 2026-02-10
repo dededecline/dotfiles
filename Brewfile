@@ -199,6 +199,7 @@ mas "Reeder Classic", id: 1529448980    # RSS reader
 cask "font-agave-nerd-font"            # Alternative coding font
 cask "font-fira-code-nerd-font"        # Coding font
 cask "font-hack-nerd-font"             # Coding font with icons (for sketchybar)
+cask "font-jetbrains-mono-nerd-font"   # Coding font (for kitty)
 cask "font-sf-pro"                     # Apple SF Pro font
 cask "font-sketchybar-app-font"        # App icons for sketchybar workspaces
 cask "font-symbols-only-nerd-font"     # Nerd Font symbols (for kitty symbol_map)
