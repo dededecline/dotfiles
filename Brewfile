@@ -6,9 +6,10 @@
 # =============================================================================
 tap "fairwindsops/tap"
 tap "felixkratz/formulae"
-tap "wojciech-kulik/tap"
 tap "nikitabobko/tap"
 tap "reviewdog/tap"
+tap "sheeki03/tap"
+tap "wojciech-kulik/tap"
 
 # =============================================================================
 # Core CLI Tools
@@ -51,6 +52,7 @@ brew "pre-commit"               # Git hooks
 brew "prettier"                 # Code formatter
 brew "pyenv"                    # Python version manager
 brew "python-argcomplete"       # Python argument completion
+brew "sheeki03/tap/tirith"      # Terminal homograph attack defense
 brew "tmux"                     # Terminal multiplexer
 
 # =============================================================================
