@@ -8,7 +8,6 @@ tap "fairwindsops/tap"
 tap "felixkratz/formulae"
 tap "nikitabobko/tap"
 tap "reviewdog/tap"
-tap "sheeki03/tap"
 tap "wojciech-kulik/tap"
 
 # =============================================================================
@@ -87,6 +86,7 @@ brew "httrack"                  # Website copier
 brew "imagemagick"              # Image manipulation
 brew "mas"                      # Mac App Store CLI
 brew "mise"                     # Dev tool version manager
+brew "ncdu"                     # Disk usage analyzer
 brew "reviewdog/tap/reviewdog"  # Code review automation
 brew "tesseract-lang"           # OCR language data
 brew "watch"                    # Execute commands periodically
@@ -168,7 +168,9 @@ cask "spotify"                  # Music streaming
 cask "vlc"                      # Media player
 
 # Gaming
+# @profile:personal
 cask "crossover"                # Windows compatibility
+# @end:personal
 cask "steam"                    # Gaming platform
 
 # Hardware & Peripherals

@@ -211,7 +211,7 @@ function icon_map() {
   "Finder" | "访达")
     icon_result=":finder:"
     ;;
-  "Firefox")
+  "Firefox" | "Waterfox")
     icon_result=":firefox:"
     ;;
   "Firefox Developer Edition" | "Firefox Nightly")
