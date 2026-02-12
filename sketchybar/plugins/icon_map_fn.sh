@@ -673,6 +673,9 @@ function icon_map() {
   "MacVim" | "Vim" | "VimR")
     icon_result=":vim:"
     ;;
+  "Vial")
+    icon_result=":karabiner_elements:"
+    ;;
   "Vivaldi")
     icon_result=":vivaldi:"
     ;;

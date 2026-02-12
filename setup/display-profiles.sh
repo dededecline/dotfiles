@@ -36,7 +36,7 @@ apply_dual_display_1() {
 # Dual display: MacBook + work office monitor
 apply_dual_display_2() {
     displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
-                  "id:$EXTERNAL_SERIAL_2 res:2560x1440 hz:100 color_depth:8 enabled:true scaling:on origin:(0,-1440) degree:0"
+                  "id:$EXTERNAL_SERIAL_2 res:2560x1440 hz:100 color_depth:8 enabled:true scaling:on origin:(-2560,-432) degree:0"
 }
 
 # Apply appropriate display profile based on display count

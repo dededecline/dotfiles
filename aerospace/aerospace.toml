@@ -113,6 +113,10 @@ if.app-id = "org.via.configurator"
 run = "layout floating"
 
 [[on-window-detected]]
+if.app-id = "today.vial"
+run = "layout floating"
+
+[[on-window-detected]]
 if.app-name-regex-substring = "Vial"
 run = "layout floating"
 
@@ -228,9 +232,13 @@ run = "move-node-to-workspace 6"
 if.app-id = "com.apple.journal"
 run = "move-node-to-workspace 6"
 
-# Workspace 7: News
+# Workspace 7: News, Vial
 [[on-window-detected]]
 if.app-id = 'com.apple.news'
+run = 'move-node-to-workspace 7'
+
+[[on-window-detected]]
+if.app-id = 'today.vial'
 run = 'move-node-to-workspace 7'
 
 # Workspace 8: Davinci Resolve, Steam, Infuse (secondary monitor)
