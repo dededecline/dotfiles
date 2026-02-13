@@ -1,0 +1,26 @@
+# Ignore everything by default (Claude Code stores ~850MB of runtime data here)
+*
+
+# Track configuration
+!.gitignore
+!settings.json
+!agents/
+!agents/**
+!commands/
+!commands/**
+!skills/
+!skills/**
+
+# Work-specific skills (sensitive, symlinked from 1Password via symlinks.sh)
+skills/argocd
+skills/astro
+skills/bastion_zero
+skills/lrl-cli
+skills/observe
+skills/spacectl
+skills/prod-release
+skills/prod-version
+skills/notion-research-documentation
+
+!assets/
+!assets/**

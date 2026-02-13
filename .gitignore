@@ -69,17 +69,6 @@ zed/prompts/
 # ArgoCD (may contain cluster info)
 /argocd/
 
-# Work-specific Claude skills (symlinks retrieved from 1Password)
-claude/skills/argocd
-claude/skills/astro
-claude/skills/bastion_zero
-claude/skills/lrl-cli
-claude/skills/observe
-claude/skills/spacectl
-claude/skills/prod-release
-claude/skills/prod-version
-claude/skills/notion-research-documentation
-
 # Generated Claude skills directory
 sensitive/claude-skills/
 

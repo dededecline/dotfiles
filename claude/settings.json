@@ -229,7 +229,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/assets/scripts/session-start.sh"
+            "command": "~/.config/claude/assets/scripts/session-start.sh"
           }
         ]
       }

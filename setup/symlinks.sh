@@ -71,15 +71,6 @@ create_symlink "$DOTFILES/glow/glow.yml" "$HOME/Library/Preferences/glow/glow.ym
 mkdir -p "$HOME/Library/LaunchAgents"
 create_symlink "$DOTFILES/sketchybar/com.felixkratz.sketchybar.plist" "$HOME/Library/LaunchAgents/com.felixkratz.sketchybar.plist"
 
-# Claude Code configuration
-# Claude stores config in ~/.claude but we manage it in ~/.config/claude
-mkdir -p "$HOME/.claude"
-create_symlink "$DOTFILES/claude/settings.json" "$HOME/.claude/settings.json"
-create_symlink "$DOTFILES/claude/commands" "$HOME/.claude/commands"
-create_symlink "$DOTFILES/claude/skills" "$HOME/.claude/skills"
-create_symlink "$DOTFILES/claude/agents" "$HOME/.claude/agents"
-create_symlink "$DOTFILES/claude/assets" "$HOME/.claude/assets"
-
 # Work-specific Claude skills (conditional on profile)
 # Source profile detection if not already available
 if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then

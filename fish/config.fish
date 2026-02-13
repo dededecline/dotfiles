@@ -9,6 +9,7 @@ set -gx EDITOR nvim
 set -gx VISUAL nvim
 set -gx DOTFILES $HOME/.config
 set -gx SHELL (command -s fish)
+set -gx CLAUDE_CONFIG_DIR $HOME/.config/claude
 
 # FZF Catppuccin Frappe colors
 set -gx FZF_DEFAULT_OPTS "\
