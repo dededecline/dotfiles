@@ -33,7 +33,7 @@ tree-edge: 626880
 git-status:
   default: 949cbb
   unmodified: 949cbb
-  ignored: 949cbb
+  ignored: 838ba7
   new-in-index: a6d189
   new-in-workdir: a6d189
   typechange: e5c890

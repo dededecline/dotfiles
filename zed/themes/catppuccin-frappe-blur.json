@@ -137,9 +137,9 @@
         "hint.background": "#a5adce20",
         "hint.border": "#a5adce40",
 
-        "ignored": "#949cbb",
-        "ignored.background": "#949cbb20",
-        "ignored.border": "#949cbb40",
+        "ignored": "#838ba7",
+        "ignored.background": "#838ba720",
+        "ignored.border": "#838ba740",
 
         "info": "#8caaee",
         "info.background": "#8caaee20",

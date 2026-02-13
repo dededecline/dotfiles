@@ -74,3 +74,13 @@ sensitive/claude-skills/
 
 # Yarn global packages (regenerated)
 yarn/
+
+# Claude
+cache/
+debug/
+file-history/
+plans/
+projects/
+todos/
+shell-snapshots/
+history.jsonl
