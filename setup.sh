@@ -209,7 +209,7 @@ ensure_1password_auth() {
         return 1
     fi
 
-    if op account list &>/dev/null 2>&1; then
+    if op vault list --account my.1password.com &>/dev/null 2>&1; then
         print_status "1Password: authenticated"
         return 0
     fi
@@ -230,7 +230,7 @@ ensure_1password_auth() {
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_info "Starting 1Password sign-in..."
         if eval "$(op signin 2>/dev/null)"; then
-            if op account list &>/dev/null 2>&1; then
+            if op vault list --account my.1password.com &>/dev/null 2>&1; then
                 print_status "1Password: authenticated"
                 return 0
             fi
@@ -371,17 +371,18 @@ run_brew_sync() {
     print_header "Syncing Homebrew Packages ($DOTFILES_PROFILE profile)"
 
     # Inject Brewfile.work and set GitHub token from 1Password if authenticated (work profile only)
-    if is_work_profile && command -v op &>/dev/null && op account list &>/dev/null 2>&1; then
+    if is_work_profile && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
         if [[ -f "$DOTFILES/templates/Brewfile.tpl" ]]; then
             print_info "Injecting work Brewfile from 1Password..."
             mkdir -p "$DOTFILES/sensitive"
             op inject -f -i "$DOTFILES/templates/Brewfile.tpl" \
-                      -o "$DOTFILES/sensitive/Brewfile.work" 2>/dev/null || true
+                      -o "$DOTFILES/sensitive/Brewfile.work" \
+                      --account my.1password.com 2>/dev/null || true
         fi
 
         # Set GitHub token for private Homebrew taps
         local gh_token
-        if gh_token=$(op read "op://Private/Github Token/password" 2>/dev/null); then
+        if gh_token=$(op read "op://Private/Github Token/password" --account my.1password.com 2>/dev/null); then
             export HOMEBREW_GITHUB_API_TOKEN="$gh_token"
             print_status "GitHub API token configured for Homebrew"
         fi
@@ -653,7 +654,7 @@ run_setup() {
     echo "Next steps:"
     echo "  1. Restart your terminal to use Fish shell"
     echo "  2. Run 'tmux' and press prefix + I to install tmux plugins"
-    if ! command -v op &>/dev/null || ! op account list &>/dev/null 2>&1; then
+    if ! command -v op &>/dev/null || ! op vault list --account my.1password.com &>/dev/null 2>&1; then
         echo "  3. Set up secrets from 1Password:"
         echo "     - Sign in: op signin"
         echo "     - Run: secrets"
@@ -671,7 +672,7 @@ run_brew() {
 
     # Try to inject Brewfile.work if 1Password is available (work profile only)
     if is_work_profile && command -v op &>/dev/null; then
-        if ! op account list &>/dev/null 2>&1; then
+        if ! op vault list --account my.1password.com &>/dev/null 2>&1; then
             # Skip prompt in non-interactive mode
             if [[ -t 0 ]]; then
                 echo ""

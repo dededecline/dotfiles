@@ -24,19 +24,19 @@ check_displayplacer() {
 
 # Single display: MacBook only at native resolution
 apply_single_display() {
-    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0"
+    displayplacer "id:$MACBOOK_SERIAL res:2056x1329 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0"
 }
 
 # Dual display: MacBook + portable monitor
 apply_dual_display_1() {
-    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
+    displayplacer "id:$MACBOOK_SERIAL res:2056x1329 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
                   "id:$EXTERNAL_SERIAL_1 res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,-1600) degree:0"
 }
 
 # Dual display: MacBook + work office monitor
 apply_dual_display_2() {
-    displayplacer "id:$MACBOOK_SERIAL res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
-                  "id:$EXTERNAL_SERIAL_2 res:2560x1440 hz:100 color_depth:8 enabled:true scaling:on origin:(-2560,-432) degree:0"
+    displayplacer "id:$MACBOOK_SERIAL res:2056x1329 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
+                  "id:$EXTERNAL_SERIAL_2 res:2560x1440 hz:60 color_depth:8 enabled:true scaling:on origin:(-160,-1440) degree:0"
 }
 
 # Apply appropriate display profile based on display count

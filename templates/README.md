@@ -8,6 +8,21 @@ with actual values from 1Password.
 
 Create these items in your 1Password vault:
 
+### Work 1Password Account (no template - uses `op read`)
+- **Vault:** Private
+- **Item name:** 1password-work-account
+- **Field:** domain (the work 1Password account domain)
+
+This is read dynamically by `secrets.sh` to authenticate against the work 1Password account
+for work-specific secrets (e.g., Claude skills, telemetry). Only used on work profile.
+
+To create:
+```bash
+op item create --category=login --title="1password-work-account" \
+  --vault="Private" --account my.1password.com \
+  domain="your-work-account.1password.com"
+```
+
 ### NPM Token (`npmrc.tpl`)
 - **Vault:** Private (or your preferred vault)
 - **Item name:** npm

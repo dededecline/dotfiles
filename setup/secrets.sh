@@ -20,6 +20,9 @@ DOTFILES="${DOTFILES:-$HOME/.config}"
 TEMPLATES_DIR="$DOTFILES/templates"
 SENSITIVE_DIR="$DOTFILES/sensitive"
 
+# 1Password account identifiers
+OP_PERSONAL_ACCOUNT="my.1password.com"
+
 # Source shared output utilities
 source "$DOTFILES/setup/lib/output.sh"
 
@@ -37,9 +40,9 @@ check_op() {
         exit 1
     fi
 
-    if ! op account list &>/dev/null; then
-        print_error "Not signed in to 1Password"
-        echo "  Sign in with: op signin"
+    if ! op vault list --account "$OP_PERSONAL_ACCOUNT" &>/dev/null; then
+        print_error "Not signed in to 1Password ($OP_PERSONAL_ACCOUNT)"
+        echo "  Sign in with: op signin --account $OP_PERSONAL_ACCOUNT"
         exit 1
     fi
 }
@@ -69,7 +72,7 @@ inject_template() {
         op_args+=(--account "$account")
     fi
 
-    if op inject "${op_args[@]}" 2>/dev/null; then
+    if op inject "${op_args[@]}"; then
         chmod 600 "$output"
         print_status "$description configured"
     else
@@ -98,15 +101,15 @@ inject_atuin() {
     echo "  Logging into Atuin sync..."
 
     local username password key
-    username=$(op read "op://Private/Atuin/username" 2>/dev/null) || {
+    username=$(op read "op://Private/Atuin/username" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null) || {
         print_warning "Atuin credentials not found in 1Password (Private/Atuin)"
         return 1
     }
-    password=$(op read "op://Private/Atuin/password" 2>/dev/null) || {
+    password=$(op read "op://Private/Atuin/password" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null) || {
         print_error "Failed to read Atuin password from 1Password"
         return 1
     }
-    key=$(op read "op://Private/Atuin/key" 2>/dev/null) || {
+    key=$(op read "op://Private/Atuin/key" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null) || {
         print_error "Failed to read Atuin key from 1Password"
         return 1
     }
@@ -142,7 +145,7 @@ inject_claude_skills() {
         temp_file=$(mktemp)
 
         # Download from 1Password to temp file (--force avoids op's built-in prompt)
-        if ! op document get "$doc_title" --output "$temp_file" --force 2>/dev/null; then
+        if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
             rm -f "$temp_file"
             print_warning "  $skill_name skill not found in 1Password (document: $doc_title)"
             continue
@@ -186,7 +189,7 @@ inject_claude_skills() {
             l|L|*)
                 rm -f "$temp_file"
                 # Push local version back to 1Password
-                if op document edit "$doc_title" --file-path "$output_file" 2>/dev/null; then
+                if op document edit "$doc_title" --file-path "$output_file" --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
                     print_status "  $skill_name skill: local version pushed to 1Password"
                 else
                     print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
@@ -207,7 +210,7 @@ inject_claude_skill_archive() {
     temp_file=$(mktemp)
 
     # Download tarball from 1Password
-    if ! op document get "$doc_title" --output "$temp_file" --force 2>/dev/null; then
+    if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
         rm -f "$temp_file"
         print_warning "  $skill_name skill archive not found in 1Password (document: $doc_title)"
         return 1
@@ -374,6 +377,17 @@ inject_secrets() {
 
     check_op
 
+    # Read work account domain from personal vault (only needed for work profile)
+    OP_WORK_ACCOUNT=""
+    if is_work_profile; then
+        OP_WORK_ACCOUNT=$(op read "op://Private/1password-work-account/domain" \
+            --account "$OP_PERSONAL_ACCOUNT") || {
+            print_error "Failed to read work 1Password account domain"
+            print_info "Ensure '1password-work-account' item exists in Private vault"
+            exit 1
+        }
+    fi
+
     # Ensure directories exist
     mkdir -p "$SENSITIVE_DIR"
     mkdir -p "$TEMPLATES_DIR"
@@ -387,23 +401,23 @@ inject_secrets() {
     if is_work_profile; then
         # Inject ZLI connect command
         if [[ -f "$TEMPLATES_DIR/zli.tpl" ]]; then
-            inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command"
+            inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command" "$OP_PERSONAL_ACCOUNT"
         fi
 
         # Inject CI identity for empty commits
         if [[ -f "$TEMPLATES_DIR/ci-identity.tpl" ]]; then
-            inject_template "$TEMPLATES_DIR/ci-identity.tpl" "$SENSITIVE_DIR/ci-identity" "CI identity"
+            inject_template "$TEMPLATES_DIR/ci-identity.tpl" "$SENSITIVE_DIR/ci-identity" "CI identity" "$OP_PERSONAL_ACCOUNT"
         fi
 
         # Inject Work CLI additions for Brewfile
         if [[ -f "$TEMPLATES_DIR/Brewfile.tpl" ]]; then
-            inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile"
+            inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile" "$OP_PERSONAL_ACCOUNT"
             echo "  Note: Run 'brew bundle --file=$SENSITIVE_DIR/Brewfile.work' to install work tools"
         fi
 
         # Inject clone.fish with work org
         if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
-            inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function"
+            inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function" "$OP_PERSONAL_ACCOUNT"
         fi
 
         # Retrieve work-specific Claude skills from 1Password
@@ -419,7 +433,7 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/managed-settings.tpl" \
             "$claude_code_dir/managed-settings.json" \
             "Claude Code telemetry" \
-            "laurel-ai.1password.com"
+            "$OP_WORK_ACCOUNT"
     else
         print_info "Personal profile: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
@@ -437,12 +451,12 @@ inject_secrets() {
 
     # Inject git config with identity
     if [[ -f "$TEMPLATES_DIR/git-config.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/git-config.tpl" "$DOTFILES/git/config" "Git identity"
+        inject_template "$TEMPLATES_DIR/git-config.tpl" "$DOTFILES/git/config" "Git identity" "$OP_PERSONAL_ACCOUNT"
     fi
 
     # Inject display monitor LaunchAgent
     if [[ -f "$TEMPLATES_DIR/display-monitor.plist.tpl" ]]; then
-        inject_template "$TEMPLATES_DIR/display-monitor.plist.tpl" "$HOME/Library/LaunchAgents/com.user.display-monitor.plist" "Display monitor LaunchAgent"
+        inject_template "$TEMPLATES_DIR/display-monitor.plist.tpl" "$HOME/Library/LaunchAgents/com.user.display-monitor.plist" "Display monitor LaunchAgent" "$OP_PERSONAL_ACCOUNT"
     fi
 
     # Login to Atuin sync (both profiles)
