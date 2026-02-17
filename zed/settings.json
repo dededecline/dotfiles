@@ -7,8 +7,20 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "languages": {
+    "JSONC": {
+      "prettier": {
+        "trailingComma": "none"
+      }
+    }
+  },
   "window_decorations": "client",
-  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "buffer_font_family": "Maple Mono NF",
+  "buffer_font_features": {
+    "calt": true,
+    "liga": true,
+  },
+  "ui_font_family": "Maple Mono NF",
   "title_bar": {
     "show_branch_icon": true,
   },
@@ -28,7 +40,7 @@
   "buffer_font_weight": 500,
   "buffer_line_height": "comfortable",
   "terminal": {
-    "font_family": "JetBrainsMono Nerd Font",
+    "font_family": "Maple Mono NF",
     "font_size": 12,
     "font_weight": 500,
     "line_height": "comfortable",

@@ -347,6 +347,14 @@ check_secrets() {
         all_configured=false
     fi
 
+    # Check spotlight shortcuts LaunchAgent
+    if [[ -f "$HOME/Library/LaunchAgents/com.user.spotlight-shortcuts.plist" ]]; then
+        print_status "Spotlight shortcuts LaunchAgent: configured"
+    else
+        print_warning "Spotlight shortcuts LaunchAgent: not configured"
+        all_configured=false
+    fi
+
     # Check Atuin sync status
     if command -v atuin &>/dev/null; then
         if atuin status 2>/dev/null | grep -q "Sync enabled"; then
@@ -457,6 +465,11 @@ inject_secrets() {
     # Inject display monitor LaunchAgent
     if [[ -f "$TEMPLATES_DIR/display-monitor.plist.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/display-monitor.plist.tpl" "$HOME/Library/LaunchAgents/com.user.display-monitor.plist" "Display monitor LaunchAgent" "$OP_PERSONAL_ACCOUNT"
+    fi
+
+    # Inject spotlight shortcuts LaunchAgent
+    if [[ -f "$TEMPLATES_DIR/spotlight-shortcuts.plist.tpl" ]]; then
+        inject_template "$TEMPLATES_DIR/spotlight-shortcuts.plist.tpl" "$HOME/Library/LaunchAgents/com.user.spotlight-shortcuts.plist" "Spotlight shortcuts LaunchAgent" "$OP_PERSONAL_ACCOUNT"
     fi
 
     # Login to Atuin sync (both profiles)

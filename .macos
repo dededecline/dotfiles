@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # macOS configuration script
-# Based on dededecline/nix-config settings (excluding Dock configurations)
 # Run: chmod +x .macos && ./.macos
 
 # Close any open System Settings panes to prevent overriding changes
@@ -67,7 +66,7 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
-# TODO: ensure Spotlight keyboard shortcuts are permanently disabled
+# Spotlight shortcuts are re-disabled at login by the com.user.spotlight-shortcuts LaunchAgent
 
 ###############################################################################
 # Sound                                                                       #
@@ -173,6 +172,9 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "{ena
 
 # Spotlight: Cmd+Opt+Space (65)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 "{enabled = 0; value = { parameters = (65535, 49, 1572864); type = 'standard'; }; }"
+
+# Show Apps (Spotlight): key 160
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 160 "{enabled = 0; value = { parameters = (65535, 65535, 0); type = 'standard'; }; }"
 
 # Disable Input Sources keyboard shortcuts that may conflict
 # Select previous input source: Cmd+Space (60)

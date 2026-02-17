@@ -20,7 +20,7 @@ inner.horizontal = 6
 inner.vertical = 6
 outer.left = 6
 outer.bottom = 6
-outer.top = 40
+outer.top = [{ monitor."built-in" = 0 }, 40]
 outer.right = 6
 
 # Hyper = ctrl-alt-cmd

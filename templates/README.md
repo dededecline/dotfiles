@@ -153,6 +153,22 @@ op item create --category=login --title="git-identity" --vault="Private" \
 
 The display monitor runs every 3 seconds and logs to `~/.config/logs/display-monitor.log`.
 
+### Spotlight Shortcuts (`spotlight-shortcuts.plist.tpl`)
+- **Vault:** Private
+- **Item name:** git-identity
+- **Field:** name (your username for the home path)
+
+This LaunchAgent runs `setup/disable-spotlight-shortcuts.sh` at login to re-disable
+Spotlight keyboard shortcuts (keys 64, 65, 160) that macOS re-enables on every restart.
+This prevents conflicts with Raycast's `Option+Space` binding.
+
+The `git-identity` item is already used for git config and display monitor, so no
+additional setup needed.
+
+The script waits 10 seconds after login for macOS to finish its boot-time shortcut
+restoration, then applies the `defaults write` commands and activates the settings.
+Logs to `~/.config/logs/spotlight-shortcuts.log`.
+
 ### Work-Specific Claude Skills (1Password Documents)
 
 Work-specific Claude Code skills are stored as 1Password documents (not templates)

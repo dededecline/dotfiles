@@ -8,7 +8,7 @@ ITEM_DIR="$CONFIG_DIR/items"
 
 # Fonts
 FONT="SF Pro"
-NERD_FONT="Hack Nerd Font"
+NERD_FONT="Maple Mono NF"
 
 ##### Bar Appearance #####
 bar=(

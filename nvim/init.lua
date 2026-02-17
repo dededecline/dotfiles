@@ -1,5 +1,4 @@
 -- Neovim Configuration
--- Converted from nix-config: https://github.com/dededecline/nix-config
 
 -- Load core configuration
 require('config.options')

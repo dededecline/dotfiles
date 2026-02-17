@@ -1,35 +1,45 @@
 # Themes
 
-This directory contains consolidated theme configurations.
+This directory contains the centralized theme configuration.
 
-**Accent Color: Lavender (#babbf1)**
-
-All tools are configured to use lavender as the primary accent for cursor, selection, active tabs, and highlights.
+**Current Theme: Catppuccin Frappe with Lavender accent (#babbf1)**
 
 ## Structure
 
 ```
 themes/
-└── catppuccin-frappe/
-    ├── palette.toml    # Central color reference (source of truth)
-    ├── kitty.conf      # Kitty terminal theme (lavender accent)
-    └── bat.tmTheme     # Bat syntax highlighting theme
+├── theme.toml                     # Single source of truth (flavor + accent)
+├── catppuccin-frappe/
+│   ├── palette.toml               # Color hex values
+│   ├── kitty.conf                 # Upstream kitty theme
+│   └── bat.tmTheme                # Upstream bat theme
+└── wallpapers/                    # Desktop wallpapers
 ```
 
-## Usage
+## How It Works
 
-Each tool references the theme from this central location:
+`themes/theme.toml` declares the flavor and accent color. Running `setup/sync-theme.sh` reads this file plus the palette and updates all downstream tool configs automatically.
 
-| Tool     | Method                                          |
-|----------|------------------------------------------------|
-| kitty    | `include ../themes/catppuccin-frappe/kitty.conf` |
-| bat      | Symlinked from `bat/themes/`                   |
-| starship | Palette inline (TOML can't import)             |
-| lsd      | Colors inline (YAML can't import)              |
-| tmux     | Uses catppuccin/tmux TPM plugin                |
+### What gets synced
 
-## Updating Colors
+| Category | Files | Method |
+|----------|-------|--------|
+| Generated | `sketchybar/colors.sh`, `lsd/colors.yaml`, `atuin/themes/*.toml` | Entire file regenerated |
+| Section | `starship.toml`, `fish/config.fish`, `fastfetch/config.jsonc`, `templates/git-config.tpl` | Content between `@theme:start`/`@theme:end` markers replaced |
+| Flavor string | `nvim`, `tmux`, `bat`, `atuin/config.toml`, `kitty` | Flavor name updated via sed |
+| Upstream | `kitty.conf`, `bat.tmTheme`, `glow/*.json`, `zed/themes/*.json` | Not auto-synced (manual download for flavor changes) |
 
-1. Edit `palette.toml` with new values
-2. For tools with inline colors (starship, lsd), manually sync the values
-3. Run `bat cache --build` if bat theme changes
+## Changing the Theme
+
+1. Edit `themes/theme.toml` (set flavor and accent)
+2. If switching flavors, download upstream theme files for the new flavor into `themes/catppuccin-<flavor>/`
+3. Run `setup/sync-theme.sh`
+4. Run `bat cache --build` if bat theme changed
+5. Restart terminals and reload configs (`refresh`)
+
+## Adding a New Tool
+
+1. Determine which category the tool falls into (generated, section marker, flavor string, or upstream)
+2. Add a sync function to `setup/sync-theme.sh`
+3. For section replacement: add `# @theme:start` / `# @theme:end` markers to the config file
+4. For generated files: add an auto-generated header comment

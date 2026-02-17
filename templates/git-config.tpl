@@ -25,6 +25,7 @@
 	line-numbers = true
 	features = catppuccin-frappe
 
+# @theme:start
 [delta "catppuccin-frappe"]
 	blame-palette = "#303446 #292c3c #232634 #414559 #51576d"
 	commit-decoration-style = "#737994" bold box ul
@@ -46,6 +47,7 @@
 	plus-style = syntax "#475453"
 	map-styles = bold purple => syntax "#66597e", bold blue => syntax "#505d81", bold cyan => syntax "#546b7a", bold yellow => syntax "#6f6860"
 	syntax-theme = Catppuccin Frappe
+# @theme:end
 
 [merge]
 	conflictstyle = diff3

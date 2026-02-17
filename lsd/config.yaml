@@ -1,5 +1,4 @@
 # LSD Configuration
-# Converted from nix-config: https://github.com/dededecline/nix-config
 
 # Color theme (use custom theme file)
 color:

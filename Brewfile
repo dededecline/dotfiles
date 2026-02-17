@@ -203,10 +203,7 @@ mas "1Password for Safari", id: 1569813296  # Browser extension
 # =============================================================================
 # Fonts
 # =============================================================================
-cask "font-agave-nerd-font"            # Alternative coding font
-cask "font-fira-code-nerd-font"        # Coding font
-cask "font-hack-nerd-font"             # Coding font with icons (for sketchybar)
-cask "font-jetbrains-mono-nerd-font"   # Coding font (for kitty)
-cask "font-sf-pro"                     # Apple SF Pro font
-cask "font-sketchybar-app-font"        # App icons for sketchybar workspaces
-cask "font-symbols-only-nerd-font"     # Nerd Font symbols (for kitty symbol_map)
+cask "font-maple-mono-nf"             # Maple Mono coding font (universal)
+cask "font-sf-pro"                     # Apple SF Pro font (sketchybar labels)
+cask "font-sketchybar-app-font"        # App icons (sketchybar workspaces)
+cask "font-symbols-only-nerd-font"     # Nerd Font symbols (kitty symbol_map)

@@ -1,5 +1,4 @@
 -- Neovim Configuration
--- Converted from nix-config: https://github.com/dededecline/nix-config
 
 -- Disable netrw BEFORE anything else (must run before lazy.nvim loads)
 vim.g.loaded_netrw = 1

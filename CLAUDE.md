@@ -36,8 +36,16 @@
                                                                               
     source ~/.config/setup/symlinks.sh  # Just create symlinks                
                                                                               
-  ### Fish Shell                                                              
-                                                                              
+  ### Theme Sync
+
+    ./setup/sync-theme.sh          # Sync theme colors to all tool configs
+
+  Theme is defined in `themes/theme.toml` (flavor + accent). The sync script
+  reads the palette and updates all downstream configs automatically. Runs
+  during full setup.
+
+  ### Fish Shell
+
     refresh                         # Reload all configured processes         
     refresh fish                    # Reload fish config only                 
     refresh aerospace               # Reload aerospace config only            
@@ -55,8 +63,9 @@
   • Installs Xcode CLT and Homebrew (if missing)                              
   • Clones dotfiles repository (if missing)                                   
   • Injects secrets from 1Password (if authenticated)                         
-  • Syncs Homebrew packages (declarative with --cleanup)                      
-  • Creates symlinks                                                          
+  • Syncs Homebrew packages (declarative with --cleanup)
+  • Syncs theme colors to all tool configs
+  • Creates symlinks
   • Configures Fish shell as default                                          
   • Installs Fisher and TPM                                 
   • Applies macOS system preferences                                          
@@ -123,9 +132,62 @@
   • setup/reload-display-config.sh - Reloads configs when changes detected    
   • templates/display-monitor.plist.tpl - LaunchAgent configuration           
                                                                               
-  The system logs to ~/.config/logs/display-monitor.log and is automatically  
-  loaded by setup.sh if aerospace and sketchybar are installed.               
-                                                                              
+  The system logs to ~/.config/logs/display-monitor.log and is automatically
+  loaded by setup.sh if aerospace and sketchybar are installed.
+
+  ### Spotlight Shortcuts LaunchAgent
+
+  macOS re-enables Spotlight keyboard shortcuts on every restart. A
+  LaunchAgent runs setup/disable-spotlight-shortcuts.sh at login to
+  re-disable shortcuts 64, 65, and 160, preventing conflicts with Raycast.
+
+  Components:
+  • setup/disable-spotlight-shortcuts.sh - Disables shortcuts via defaults
+  write and activateSettings
+  • templates/spotlight-shortcuts.plist.tpl - LaunchAgent configuration
+
+  The script waits 10 seconds for macOS to finish boot-time restoration,
+  then applies the settings. Logs to ~/.config/logs/spotlight-shortcuts.log.
+
+  ### Theme System
+
+  Theme colors are centralized via `themes/theme.toml` (flavor + accent) and
+  `themes/catppuccin-frappe/palette.toml` (hex values). The sync script
+  (`setup/sync-theme.sh`) propagates colors to all tool configs:
+
+  - **Generated files**: sketchybar/colors.sh, lsd/colors.yaml,
+  atuin/themes/*.toml (full regeneration)
+  - **Section markers**: starship.toml, fish/config.fish,
+  fastfetch/config.jsonc, templates/git-config.tpl (content between
+  `@theme:start`/`@theme:end` replaced)
+  - **Flavor strings**: nvim, tmux, bat, atuin, kitty (flavor name updated)
+  - **Upstream files**: kitty.conf, bat.tmTheme, glow, zed themes (manual
+  download for flavor changes)
+
+  To change themes: edit `themes/theme.toml`, run `setup/sync-theme.sh`.
+
+  ### Kitty Fonts
+
+  Kitty on macOS has known issues with Homebrew cask-installed fonts (fonts
+  installed to ~/Library/Fonts/). Use NF (Nerd Font) cask variants that
+  include patched glyphs and set `font_family` to the registered family name
+  with `auto` for weight/style variants. The `symbol_map` for `Symbols Nerd
+  Font Mono` provides fallback for any missing glyphs. Ligatures are enabled
+  via `disable_ligatures never`.
+
+  Always enable ligatures if the font supports them (`disable_ligatures
+  never` in kitty.conf).
+
+  Current font: `Maple Mono NF` (cask: `font-maple-mono-nf`)
+
+  To change kitty's font:
+
+  1. Add the font cask to Brewfile and run `brew bundle`
+  2. Find the registered family name: `fc-list | grep "<font name>"`
+  3. Set `font_family <Family Name>` in kitty/kitty.conf with `auto` for
+  bold/italic/bold-italic variants
+  4. Restart kitty (config reload alone may not pick up new fonts)
+
   ### Fish Functions                                                          
                                                                               
   Custom functions in fish/functions/:                                        

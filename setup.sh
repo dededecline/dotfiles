@@ -423,6 +423,16 @@ run_brew_sync() {
 # Shell & Environment Setup
 # =============================================================================
 
+sync_theme() {
+    if [[ -x "$DOTFILES/setup/sync-theme.sh" ]]; then
+        "$DOTFILES/setup/sync-theme.sh"
+    elif [[ -f "$DOTFILES/setup/sync-theme.sh" ]]; then
+        bash "$DOTFILES/setup/sync-theme.sh"
+    else
+        print_warning "sync-theme.sh not found - skipping theme sync"
+    fi
+}
+
 create_symlinks() {
     print_info "Creating symlinks..."
     if [[ -x "$DOTFILES/setup/symlinks.sh" ]]; then
@@ -546,15 +556,32 @@ setup_display_monitor() {
     fi
 }
 
+setup_spotlight_shortcuts() {
+    # Make script executable
+    chmod +x "$DOTFILES/setup/disable-spotlight-shortcuts.sh" 2>/dev/null || true
+
+    # Create log directory
+    mkdir -p "$HOME/.config/logs"
+
+    local plist="$HOME/Library/LaunchAgents/com.user.spotlight-shortcuts.plist"
+
+    # Load the LaunchAgent (created by secrets.sh)
+    if [[ -f "$plist" ]]; then
+        # Unload first if already loaded, then reload
+        launchctl unload "$plist" 2>/dev/null || true
+        launchctl load "$plist"
+        print_status "Spotlight shortcuts: loaded (runs at login)"
+    else
+        print_warning "Spotlight shortcuts plist not found - run 'secrets' first"
+    fi
+}
+
 setup_wallpaper() {
-    local wallpaper_dir="$DOTFILES/themes/wallpapers"
-    local wallpaper="$wallpaper_dir/comfy-home.png"
+    local wallpaper="$DOTFILES/assets/comfy-home.png"
 
     if [[ ! -f "$wallpaper" ]]; then
-        print_info "Downloading wallpaper..."
-        mkdir -p "$wallpaper_dir"
-        curl -fsSL "https://raw.githubusercontent.com/dededecline/nix-config/main/theming/wallpapers/comfy-home.png" \
-            -o "$wallpaper"
+        print_warning "Wallpaper not found at $wallpaper - skipping"
+        return 0
     fi
 
     print_info "Setting wallpaper..."
@@ -628,6 +655,9 @@ run_setup() {
     # Set default browser (after Waterfox and defaultbrowser are installed via brew)
     setup_default_browser
 
+    # Sync theme colors to all tool configs
+    sync_theme
+
     # Shell and environment
     create_symlinks
     setup_fish_shell
@@ -635,6 +665,7 @@ run_setup() {
     setup_tmux_plugins
     setup_sketchybar
     setup_display_monitor
+    setup_spotlight_shortcuts
 
     # Set wallpaper
     setup_wallpaper
