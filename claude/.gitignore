@@ -1,9 +1,9 @@
-# Ignore everything by default (Claude Code stores ~850MB of runtime data here)
+# Ignore everything by default
 *
 
 # Track configuration
 !.gitignore
-!settings.json
+!settings.jsonc
 !agents/
 !agents/**
 !commands/

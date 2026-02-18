@@ -152,6 +152,38 @@ preprocess_brewfile() {
     fi
 }
 
+# Preprocess JSONC files with profile markers (// @profile:X / // @end:X)
+# Strips comments, fixes trailing commas, and formats as valid JSON via jq
+# Usage: preprocess_jsonc_profiles <input_file> <output_file>
+preprocess_jsonc_profiles() {
+    local input="$1"
+    local output="$2"
+    local profile="$DOTFILES_PROFILE"
+    local tmp="${output}.tmp"
+
+    if [[ "$profile" == "work" ]]; then
+        awk '
+            /^[[:space:]]*\/\/ @profile:personal/ { skip=1; next }
+            /^[[:space:]]*\/\/ @end:personal/ { skip=0; next }
+            /^[[:space:]]*\/\/ @profile:/ { next }
+            /^[[:space:]]*\/\/ @end:/ { next }
+            skip==0 { print }
+        ' "$input" > "$tmp"
+    else
+        awk '
+            /^[[:space:]]*\/\/ @profile:work/ { skip=1; next }
+            /^[[:space:]]*\/\/ @end:work/ { skip=0; next }
+            /^[[:space:]]*\/\/ @profile:/ { next }
+            /^[[:space:]]*\/\/ @end:/ { next }
+            skip==0 { print }
+        ' "$input" > "$tmp"
+    fi
+
+    # Fix trailing commas and format as valid JSON
+    sed -E 's/,([[:space:]]*[}\]])/\1/g' "$tmp" | jq . > "$output"
+    rm -f "$tmp"
+}
+
 # =============================================================================
 # Prerequisites
 # =============================================================================
@@ -433,6 +465,25 @@ sync_theme() {
     fi
 }
 
+configure_claude() {
+    local base="$DOTFILES/claude/settings.jsonc"
+    local output="$DOTFILES/claude/settings.json"
+
+    if [[ ! -f "$base" ]]; then
+        print_warning "Claude settings source not found - skipping"
+        return 0
+    fi
+
+    if ! command -v jq &>/dev/null; then
+        print_warning "jq not installed - copying Claude settings as-is"
+        grep -v '^\s*//' "$base" > "$output"
+        return 0
+    fi
+
+    preprocess_jsonc_profiles "$base" "$output"
+    print_status "Claude settings: configured ($DOTFILES_PROFILE profile)"
+}
+
 create_symlinks() {
     print_info "Creating symlinks..."
     if [[ -x "$DOTFILES/setup/symlinks.sh" ]]; then
@@ -663,6 +714,9 @@ run_setup() {
 
     # Sync theme colors to all tool configs
     sync_theme
+
+    # Generate Claude settings based on profile
+    configure_claude
 
     # Shell and environment
     create_symlinks

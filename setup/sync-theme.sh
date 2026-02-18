@@ -344,13 +344,14 @@ sync_fastfetch() {
     local file="$DOTFILES/fastfetch/config.jsonc"
     [[ -f "$file" ]] || return 0
 
-    local mauve_rgb blue_rgb teal_rgb peach_rgb maroon_rgb subtext1_rgb lavender_rgb
+    local mauve_rgb blue_rgb teal_rgb peach_rgb maroon_rgb subtext1_rgb overlay2_rgb lavender_rgb
     mauve_rgb="38;2;$(hex_to_rgb "$(c mauve)")"
     blue_rgb="38;2;$(hex_to_rgb "$(c blue)")"
     teal_rgb="38;2;$(hex_to_rgb "$(c teal)")"
     peach_rgb="38;2;$(hex_to_rgb "$(c peach)")"
     maroon_rgb="38;2;$(hex_to_rgb "$(c maroon)")"
     subtext1_rgb="38;2;$(hex_to_rgb "$(c subtext1)")"
+    overlay2_rgb="38;2;$(hex_to_rgb "$(c overlay2)")"
     lavender_rgb="38;2;$(hex_to_rgb "$(c lavender)")"
 
     # Update color reference comment between markers
@@ -361,8 +362,8 @@ sync_fastfetch() {
     # Update logo color (maroon)
     sed -i '' "s|\"1\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"1\": \"${maroon_rgb}\"|" "$file"
 
-    # Update separator color (subtext1)
-    sed -i '' "s|\"separator\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"separator\": \"${subtext1_rgb}\"|" "$file"
+    # Update separator color (overlay2)
+    sed -i '' "s|\"separator\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"separator\": \"${overlay2_rgb}\"|" "$file"
 
     # Update keyColor values throughout the file
     # Extract current unique RGB patterns and replace with palette values
@@ -378,7 +379,7 @@ sync_fastfetch() {
         if [[ "$old_rgb" == "$mauve_rgb" || "$old_rgb" == "$blue_rgb" || \
               "$old_rgb" == "$teal_rgb" || "$old_rgb" == "$peach_rgb" || \
               "$old_rgb" == "$maroon_rgb" || "$old_rgb" == "$subtext1_rgb" || \
-              "$old_rgb" == "$lavender_rgb" ]]; then
+              "$old_rgb" == "$overlay2_rgb" || "$old_rgb" == "$lavender_rgb" ]]; then
             continue
         fi
         # This pattern doesn't match current palette - it's from an old flavor
