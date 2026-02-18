@@ -1,1 +1,1 @@
-/Users/dani/.config/fastfetch/logo_hera.txt
+/Users/dani/.config/fastfetch/logo_athena.txt

@@ -554,6 +554,12 @@ setup_display_monitor() {
     else
         print_warning "Display monitor plist not found - run 'secrets' first"
     fi
+
+    # Apply display profile now (the watcher only triggers on count changes)
+    if command -v displayplacer &>/dev/null; then
+        print_info "Applying display profile..."
+        bash "$DOTFILES/setup/display-profiles.sh"
+    fi
 }
 
 setup_spotlight_shortcuts() {
