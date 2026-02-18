@@ -233,8 +233,10 @@
     "security-guidance@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
+    // @profile:personal
     "Notion@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
+    // @end:personal
     "hookify@claude-plugins-official": true,
     "slack@claude-plugins-official": true
   },
