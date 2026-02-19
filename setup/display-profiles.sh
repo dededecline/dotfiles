@@ -44,7 +44,7 @@ apply_single_display() {
 apply_dual_display_1() {
     local macbook_id="$1"
     displayplacer "id:$macbook_id res:2056x1329 hz:120 color_depth:8 enabled:true scaling:on origin:(0,0) degree:0" \
-                  "id:$EXTERNAL_SERIAL_1 res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(0,-1600) degree:0"
+                  "id:$EXTERNAL_SERIAL_1 res:2560x1600 hz:120 color_depth:8 enabled:true scaling:on origin:(-200,-1600) degree:0"
 }
 
 # Dual display: MacBook + work office monitor

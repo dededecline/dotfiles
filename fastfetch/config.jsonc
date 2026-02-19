@@ -30,13 +30,8 @@
       "type": "title",
       "keyColor": "38;2;202;158;230"
     },
-    {
-      "type": "separator",
-      "string": "─"
-    },
-
-    // 󰌢 Hardware (Mauve)
     "break",
+    // 󰌢 Hardware (Mauve)
     { "type": "custom", "format": "{#1;38;2;202;158;230}󰌢 Hardware{#}" },
     {
       "type": "host",
@@ -165,12 +160,7 @@
     },
     {
       "type": "dns",
-      "key": "├ DNS      ",
-      "keyColor": "38;2;239;159;118"
-    },
-    {
-      "type": "wifi",
-      "key": "└ WiFi     ",
+      "key": "└ DNS      ",
       "keyColor": "38;2;239;159;118"
     },
     "break",
