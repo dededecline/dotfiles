@@ -8,6 +8,7 @@ tap "fairwindsops/tap"
 tap "felixkratz/formulae"
 tap "nikitabobko/tap"
 tap "reviewdog/tap"
+tap "signadot/tap"
 tap "wojciech-kulik/tap"
 
 # =============================================================================
@@ -63,15 +64,18 @@ brew "golangci-lint"            # Go linter
 # =============================================================================
 # DevOps Tools
 # =============================================================================
-brew "awscli"                   # AWS CLI
-brew "fairwindsops/tap/pluto"   # Kubernetes API deprecation finder
-brew "helm"                     # Kubernetes package manager
-brew "kubernetes-cli"           # kubectl
-brew "opa"                      # Open Policy Agent
-brew "opentofu"                 # Terraform alternative
-brew "terraform-docs"           # Terraform documentation
-brew "tflint"                   # Terraform linter
-brew "trivy"                    # Security scanner
+brew "awscli"                    # AWS CLI
+brew "fairwindsops/tap/pluto"    # Kubernetes API deprecation finder
+brew "helm"                      # Kubernetes package manager
+brew "kubernetes-cli"            # kubectl
+brew "opa"                       # Open Policy Agent
+brew "opentofu"                  # Terraform alternative
+# @profile:work
+brew "signadot/tap/signadot-cli" # Sandbox Environments
+# @end:work
+brew "terraform-docs"            # Terraform documentation
+brew "tflint"                    # Terraform linter
+brew "trivy"                     # Security scanner
 
 # =============================================================================
 # Additional Tools
@@ -186,7 +190,6 @@ cask "adguard"                  # Ad blocker
 cask "parallels"                # Virtual machines
 cask "rar"                      # RAR archive tool
 cask "the-unarchiver"           # Archive utility
-cask "tomatobar"                # Pomodoro timer
 cask "wifiman"                  # Network scanner
 
 # =============================================================================
