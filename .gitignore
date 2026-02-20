@@ -82,5 +82,6 @@ file-history/
 plans/
 projects/
 todos/
+session-env/
 shell-snapshots/
 history.jsonl
