@@ -355,6 +355,14 @@ check_secrets() {
         all_configured=false
     fi
 
+    # Check sketchybar LaunchAgent
+    if [[ -f "$HOME/Library/LaunchAgents/com.felixkratz.sketchybar.plist" ]]; then
+        print_status "Sketchybar LaunchAgent: configured"
+    else
+        print_warning "Sketchybar LaunchAgent: not configured"
+        all_configured=false
+    fi
+
     # Check Atuin sync status
     if command -v atuin &>/dev/null; then
         if atuin status 2>/dev/null | grep -q "Sync enabled"; then
@@ -419,7 +427,7 @@ inject_secrets() {
 
         # Inject Work CLI additions for Brewfile
         if [[ -f "$TEMPLATES_DIR/Brewfile.tpl" ]]; then
-            inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile" "$OP_PERSONAL_ACCOUNT"
+            inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile" "$OP_WORK_ACCOUNT"
             echo "  Note: Run 'brew bundle --file=$SENSITIVE_DIR/Brewfile.work' to install work tools"
         fi
 
@@ -470,6 +478,11 @@ inject_secrets() {
     # Inject spotlight shortcuts LaunchAgent
     if [[ -f "$TEMPLATES_DIR/spotlight-shortcuts.plist.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/spotlight-shortcuts.plist.tpl" "$HOME/Library/LaunchAgents/com.user.spotlight-shortcuts.plist" "Spotlight shortcuts LaunchAgent" "$OP_PERSONAL_ACCOUNT"
+    fi
+
+    # Inject sketchybar LaunchAgent
+    if [[ -f "$TEMPLATES_DIR/sketchybar.plist.tpl" ]]; then
+        inject_template "$TEMPLATES_DIR/sketchybar.plist.tpl" "$HOME/Library/LaunchAgents/com.felixkratz.sketchybar.plist" "Sketchybar LaunchAgent" "$OP_PERSONAL_ACCOUNT"
     fi
 
     # Login to Atuin sync (both profiles)

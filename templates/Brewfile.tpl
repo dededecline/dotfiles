@@ -5,22 +5,28 @@
 # =============================================================================
 # Work Taps
 # =============================================================================
-tap "{{ op://Private/brew-ephemeral-env/tap }}"
-tap "{{ op://Private/brew-incident-mgmt/tap }}"
-tap "{{ op://Private/brew-infra-cd/tap }}"
-tap "{{ op://Private/brew-secure-access/tap }}"
+tap "{{ op://Employee/brew-ephemeral-env/tap }}"
+tap "{{ op://Employee/brew-incident-mgmt/tap }}"
+tap "{{ op://Employee/brew-infra-cd/tap }}"
+tap "{{ op://Employee/brew-secure-access/tap }}"
+tap "{{ op://Employee/brew-internal-cli/tap }}"
 
 # =============================================================================
 # Work CLI Tools
 # =============================================================================
-brew "{{ op://Private/brew-ephemeral-env/formula }}"   # Ephemeral environments
-brew "{{ op://Private/brew-incident-mgmt/formula }}"   # Incident management
-brew "{{ op://Private/brew-infra-cd/formula }}"        # Infrastructure CD
-brew "{{ op://Private/brew-secure-access/formula }}"   # Secure access
+brew "{{ op://Employee/brew-ephemeral-env/formula }}"   # Ephemeral environments
+brew "{{ op://Employee/brew-incident-mgmt/formula }}"   # Incident management
+brew "{{ op://Employee/brew-infra-cd/formula }}"        # Infrastructure CD
+brew "{{ op://Employee/brew-secure-access/formula }}"   # Secure access
 
 # =============================================================================
 # Work Tools (public formulas)
 # =============================================================================
-brew "{{ op://Private/brew-ci-tool/formula }}"         # CI runner
-brew "{{ op://Private/brew-db-cli/formula }}"          # Database CLI
-brew "{{ op://Private/brew-k8s-cd/formula }}"          # Kubernetes CD
+brew "{{ op://Employee/brew-ci-tool/formula }}"         # CI runner
+brew "{{ op://Employee/brew-db-cli/formula }}"          # Database CLI
+brew "{{ op://Employee/brew-k8s-cd/formula }}"          # Kubernetes CD
+
+# =============================================================================
+# Work Applications (casks)
+# =============================================================================
+cask "{{ op://Employee/brew-internal-cli/cask }}"         # Internal CLI

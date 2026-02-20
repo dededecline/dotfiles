@@ -88,51 +88,62 @@ To create:
 The following 1Password items store Homebrew tap/formula references for work tools.
 Item names are anonymized to avoid revealing specific tooling in the dotfiles repo.
 
+All items are stored in the **work 1Password account** (`Employee` vault). Replace
+`your-work.1password.com` with your actual work account domain.
+
 #### Infrastructure CD (`brew-infra-cd`)
 ```bash
-op item create --category=login --title="brew-infra-cd" --vault="Private" \
+op item create --category=login --title="brew-infra-cd" --vault="Employee" \
+  --account your-work.1password.com \
   tap="<tap>" formula="<formula>"
 ```
 
 #### Secure Access (`brew-secure-access`)
 ```bash
-op item create --category=login --title="brew-secure-access" --vault="Private" \
+op item create --category=login --title="brew-secure-access" --vault="Employee" \
+  --account your-work.1password.com \
   tap="<tap>" formula="<formula>"
 ```
 
 #### Ephemeral Environments (`brew-ephemeral-env`)
 ```bash
-op item create --category=login --title="brew-ephemeral-env" --vault="Private" \
+op item create --category=login --title="brew-ephemeral-env" --vault="Employee" \
+  --account your-work.1password.com \
   tap="<tap>" formula="<formula>"
 ```
 
-#### Internal Tool (`brew-internal-tool`)
+#### Internal CLI (`brew-internal-cli`)
 ```bash
-op item create --category=login --title="brew-internal-tool" --vault="Private" \
-  tap="<tap>" formula="<formula>"
+op item create --category=login --title="brew-internal-cli" --vault="Employee" \
+  --account your-work.1password.com \
+  tap="<tap>" cask="<cask>"
 ```
 
 #### Kubernetes CD (`brew-k8s-cd`)
 ```bash
-op item create --category=login --title="brew-k8s-cd" --vault="Private" \
+op item create --category=login --title="brew-k8s-cd" --vault="Employee" \
+  --account your-work.1password.com \
   formula="<formula>"
 ```
 
 #### CI Tool (`brew-ci-tool`)
 ```bash
-op item create --category=login --title="brew-ci-tool" --vault="Private" \
+op item create --category=login --title="brew-ci-tool" --vault="Employee" \
+  --account your-work.1password.com \
   formula="<formula>"
 ```
 
 #### Database CLI (`brew-db-cli`)
 ```bash
-op item create --category=login --title="brew-db-cli" --vault="Private" \
+op item create --category=login --title="brew-db-cli" --vault="Employee" \
+  --account your-work.1password.com \
   formula="<formula>"
 ```
 
 #### Incident Management (`brew-incident-mgmt`)
 ```bash
-op item create --category=login --title="brew-incident-mgmt" --vault="Private" \
+op item create --category=login --title="brew-incident-mgmt" --vault="Employee" \
+  --account your-work.1password.com \
   tap="<tap>" formula="<formula>"
 ```
 

@@ -2,9 +2,10 @@
   "permissions": {
     "allow": [
       "Grep(pattern:*)",
-      "Ls(path:*)",
+      "Ls",
       "Glob(**)",
       "Read",
+      "Fetch(domain:*)",
       "WebFetch(domain:*)",
       "WebSearch",
       "mcp__spacectl",

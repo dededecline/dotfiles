@@ -8,6 +8,7 @@ tap "fairwindsops/tap"
 tap "felixkratz/formulae"
 tap "nikitabobko/tap"
 tap "reviewdog/tap"
+tap "sheeki03/tap"
 tap "signadot/tap"
 tap "wojciech-kulik/tap"
 

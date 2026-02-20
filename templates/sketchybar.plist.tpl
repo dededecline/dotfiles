@@ -13,7 +13,7 @@
         <key>PATH</key>
         <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
         <key>CONFIG_DIR</key>
-        <string>/Users/dani/.config/sketchybar</string>
+        <string>/Users/{{ op://Private/git-identity/name }}/.config/sketchybar</string>
     </dict>
     <key>RunAtLoad</key>
     <true/>
