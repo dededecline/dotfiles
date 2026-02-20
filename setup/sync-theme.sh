@@ -344,46 +344,38 @@ sync_fastfetch() {
     local file="$DOTFILES/fastfetch/config.jsonc"
     [[ -f "$file" ]] || return 0
 
-    local mauve_rgb blue_rgb teal_rgb peach_rgb maroon_rgb subtext1_rgb overlay2_rgb lavender_rgb
+    local lavender_rgb rosewater_rgb flamingo_rgb maroon_rgb red_rgb mauve_rgb blue_rgb overlay2_rgb
+    lavender_rgb="38;2;$(hex_to_rgb "$(c lavender)")"
+    rosewater_rgb="38;2;$(hex_to_rgb "$(c rosewater)")"
+    flamingo_rgb="38;2;$(hex_to_rgb "$(c flamingo)")"
+    maroon_rgb="38;2;$(hex_to_rgb "$(c maroon)")"
+    red_rgb="38;2;$(hex_to_rgb "$(c red)")"
     mauve_rgb="38;2;$(hex_to_rgb "$(c mauve)")"
     blue_rgb="38;2;$(hex_to_rgb "$(c blue)")"
-    teal_rgb="38;2;$(hex_to_rgb "$(c teal)")"
-    peach_rgb="38;2;$(hex_to_rgb "$(c peach)")"
-    maroon_rgb="38;2;$(hex_to_rgb "$(c maroon)")"
-    subtext1_rgb="38;2;$(hex_to_rgb "$(c subtext1)")"
     overlay2_rgb="38;2;$(hex_to_rgb "$(c overlay2)")"
-    lavender_rgb="38;2;$(hex_to_rgb "$(c lavender)")"
 
     # Update color reference comment between markers
     local content
-    content="  // Mauve: ${mauve_rgb} | Blue: ${blue_rgb} | Teal: ${teal_rgb} | Peach: ${peach_rgb} | Subtext1: ${subtext1_rgb}"
+    content="  // Lavender: ${lavender_rgb} | Rosewater: ${rosewater_rgb} | Flamingo: ${flamingo_rgb} | Maroon: ${maroon_rgb} | Red: ${red_rgb} | Mauve: ${mauve_rgb} | Blue: ${blue_rgb}"
     replace_theme_section "$file" "$content"
 
-    # Update logo color (maroon)
-    sed -i '' "s|\"1\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"1\": \"${maroon_rgb}\"|" "$file"
+    # Update logo color (lavender)
+    sed -i '' "s|\"1\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"1\": \"${lavender_rgb}\"|" "$file"
 
     # Update separator color (overlay2)
     sed -i '' "s|\"separator\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"separator\": \"${overlay2_rgb}\"|" "$file"
 
-    # Update keyColor values throughout the file
-    # Extract current unique RGB patterns and replace with palette values
-    # System info section uses mauve, hardware uses blue, display uses teal, network uses peach
+    # Check for unknown color patterns (from old flavor)
     local old_patterns
     old_patterns=$(grep -oE '38;2;[0-9]+;[0-9]+;[0-9]+' "$file" | sort -u)
 
-    # Map each old pattern to its new value based on proximity to known colors
-    # For a clean sync (same flavor), this is a no-op
-    # For flavor changes, we replace old palette RGB values with new ones
     for old_rgb in $old_patterns; do
-        # Skip if it matches a new value already
-        if [[ "$old_rgb" == "$mauve_rgb" || "$old_rgb" == "$blue_rgb" || \
-              "$old_rgb" == "$teal_rgb" || "$old_rgb" == "$peach_rgb" || \
-              "$old_rgb" == "$maroon_rgb" || "$old_rgb" == "$subtext1_rgb" || \
-              "$old_rgb" == "$overlay2_rgb" || "$old_rgb" == "$lavender_rgb" ]]; then
+        if [[ "$old_rgb" == "$lavender_rgb" || "$old_rgb" == "$rosewater_rgb" || \
+              "$old_rgb" == "$flamingo_rgb" || "$old_rgb" == "$maroon_rgb" || \
+              "$old_rgb" == "$red_rgb" || "$old_rgb" == "$mauve_rgb" || \
+              "$old_rgb" == "$blue_rgb" || "$old_rgb" == "$overlay2_rgb" ]]; then
             continue
         fi
-        # This pattern doesn't match current palette - it's from an old flavor
-        # We can't automatically determine which new color to use without context
         print_warning "fastfetch: unknown color pattern ${old_rgb} - manual update may be needed"
     done
 

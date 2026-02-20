@@ -12,7 +12,7 @@
     "type": "file",
     "source": "~/.config/fastfetch/logo.txt",
     "color": {
-      "1": "38;2;234;153;156"
+      "1": "38;2;186;187;241"
     },
     "padding": {
       "top": 1,
@@ -23,145 +23,146 @@
 
   // Modules to display - Catppuccin Frappe colors
   // @theme:start
-  // Mauve: 38;2;202;158;230 | Blue: 38;2;140;170;238 | Teal: 38;2;129;200;190 | Peach: 38;2;239;159;118 | Subtext1: 38;2;181;191;226
+  // Lavender: 38;2;186;187;241 | Rosewater: 38;2;242;213;207 | Flamingo: 38;2;238;190;190 | Maroon: 38;2;234;153;156 | Red: 38;2;231;130;132 | Mauve: 38;2;202;158;230 | Blue: 38;2;140;170;238
   // @theme:end
   "modules": [
     {
       "type": "title",
-      "keyColor": "38;2;202;158;230"
+      "keyColor": "38;2;242;213;207",
+      "format": "{#38;2;242;213;207}{user-name}@{host-name}{#}"
     },
     "break",
-    // 󰌢 Hardware (Mauve)
-    { "type": "custom", "format": "{#1;38;2;202;158;230}󰌢 Hardware{#}" },
+    // 󰌢 Hardware (Flamingo)
+    { "type": "custom", "format": "{#1;38;2;238;190;190}󰌢 Hardware{#}" },
     {
       "type": "host",
       "key": "├ Host   ",
-      "keyColor": "38;2;202;158;230"
+      "keyColor": "38;2;238;190;190"
     },
     {
       "type": "cpu",
       "key": "├ CPU    ",
-      "keyColor": "38;2;202;158;230"
+      "keyColor": "38;2;238;190;190"
     },
     {
       "type": "gpu",
       "key": "├ GPU    ",
-      "keyColor": "38;2;202;158;230",
+      "keyColor": "38;2;238;190;190",
       "format": "{name} ({core-count}) @ {frequency}"
     },
     {
       "type": "memory",
       "key": "├ Memory ",
-      "keyColor": "38;2;202;158;230"
+      "keyColor": "38;2;238;190;190"
     },
     {
       "type": "disk",
       "key": "├ Disk   ",
-      "keyColor": "38;2;202;158;230",
+      "keyColor": "38;2;238;190;190",
       "folders": "/",
       "format": "{size-used} / {size-total} ({size-percentage})"
     },
     {
       "type": "swap",
       "key": "├ Swap   ",
-      "keyColor": "38;2;202;158;230"
+      "keyColor": "38;2;238;190;190"
     },
     {
       "type": "display",
       "key": "├ Display",
-      "keyColor": "38;2;202;158;230",
+      "keyColor": "38;2;238;190;190",
       "format": "{scaled-width}x{scaled-height} in {inch}\", {refresh-rate} Hz [{type}]{?is-primary} *{?}"
     },
     {
       "type": "battery",
       "key": "└ Charge ",
-      "keyColor": "38;2;202;158;230"
+      "keyColor": "38;2;238;190;190"
     },
 
-    // 󰀵 Firmware (Blue)
+    // 󰀵 Firmware (Maroon)
     "break",
-    { "type": "custom", "format": "{#1;38;2;140;170;238}󰀵 Firmware{#}" },
+    { "type": "custom", "format": "{#1;38;2;234;153;156}󰀵 Firmware{#}" },
     {
       "type": "os",
       "key": "├ OS    ",
-      "keyColor": "38;2;140;170;238"
+      "keyColor": "38;2;234;153;156"
     },
     {
       "type": "kernel",
       "key": "├ Kernel",
-      "keyColor": "38;2;140;170;238"
+      "keyColor": "38;2;234;153;156"
     },
     {
       "type": "uptime",
       "key": "└ Uptime",
-      "keyColor": "38;2;140;170;238"
+      "keyColor": "38;2;234;153;156"
     },
 
-    // 󰏗 Software (Teal)
+    // 󰏗 Software (Red)
     "break",
-    { "type": "custom", "format": "{#1;38;2;129;200;190}󰏗 Software{#}" },
+    { "type": "custom", "format": "{#1;38;2;231;130;132}󰏗 Software{#}" },
     {
       "type": "command",
       "key": "├ Packages",
-      "keyColor": "38;2;129;200;190",
+      "keyColor": "38;2;231;130;132",
       "text": "printf '%s (brew), %s (brew-cask), %s (mas)' \"$(ls -1 /opt/homebrew/Cellar 2>/dev/null | wc -l | tr -d ' ')\" \"$(ls -1 /opt/homebrew/Caskroom 2>/dev/null | wc -l | tr -d ' ')\" \"$(mas list 2>/dev/null | wc -l | tr -d ' ')\""
     },
     {
       "type": "shell",
       "key": "├ Shell   ",
-      "keyColor": "38;2;129;200;190"
+      "keyColor": "38;2;231;130;132"
     },
     {
       "type": "terminal",
       "key": "├ Terminal",
-      "keyColor": "38;2;129;200;190"
+      "keyColor": "38;2;231;130;132"
     },
     {
       "type": "command",
       "key": "└ WM      ",
-      "keyColor": "38;2;129;200;190",
+      "keyColor": "38;2;231;130;132",
       "text": "pgrep -xq AeroSpace && echo \"AeroSpace $(aerospace --version 2>/dev/null | head -1 | awk '{print $5}')\" || echo 'Quartz Compositor'"
     },
 
-    // 󰏘 Theme (Lavender)
+    // 󰏘 Theme (Mauve)
     "break",
-    { "type": "custom", "format": "{#1;38;2;186;187;241}󰏘 Theme{#}" },
+    { "type": "custom", "format": "{#1;38;2;202;158;230}󰏘 Theme{#}" },
     {
       "type": "command",
       "key": "├ OS     ",
-      "keyColor": "38;2;186;187;241",
+      "keyColor": "38;2;202;158;230",
       "text": "defaults read -g AppleInterfaceStyle &>/dev/null && echo 'dark' || echo 'light'"
     },
     {
       "type": "command",
       "key": "├ Desktop",
-      "keyColor": "38;2;186;187;241",
+      "keyColor": "38;2;202;158;230",
       "text": "awk -F'\"' '/^name/ {print $2}' ~/.config/themes/theme.toml"
     },
     {
       "type": "terminalfont",
       "key": "└ Font   ",
-      "keyColor": "38;2;186;187;241"
+      "keyColor": "38;2;202;158;230"
     },
 
-    // 󰤨 Network (Peach)
+    // 󰤨 Network (Blue)
     "break",
-    { "type": "custom", "format": "{#1;38;2;239;159;118}󰤨 Network{#}" },
+    { "type": "custom", "format": "{#1;38;2;140;170;238}󰤨 Network{#}" },
     {
       "type": "publicip",
       "key": "├ Public IP",
-      "keyColor": "38;2;239;159;118",
+      "keyColor": "38;2;140;170;238",
       "timeout": 1000
     },
     {
       "type": "localip",
       "key": "├ Local IP ",
-      "keyColor": "38;2;239;159;118"
+      "keyColor": "38;2;140;170;238"
     },
     {
       "type": "dns",
       "key": "└ DNS      ",
-      "keyColor": "38;2;239;159;118"
+      "keyColor": "38;2;140;170;238"
     },
     "break",
     {
