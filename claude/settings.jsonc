@@ -113,7 +113,8 @@
       "Bash(launchctl:*)",
       "Bash(killall:*)",
       "Bash(ln:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(mise:*)"
     ],
     "deny": [
       "Bash(git push:*)",
