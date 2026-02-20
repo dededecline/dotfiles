@@ -118,7 +118,6 @@ cask "pearcleaner"              # App uninstaller
 cask "kitty"                    # Terminal emulator
 
 # Browsers
-cask "google-chrome"            # Chrome browser
 cask "waterfox"                 # Firefox-based browser
 
 # Communication
