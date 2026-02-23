@@ -119,6 +119,7 @@ cask "pearcleaner"              # App uninstaller
 cask "kitty"                    # Terminal emulator
 
 # Browsers
+cask "orion"                    # WebKit-based browser
 cask "waterfox"                 # Firefox-based browser
 
 # Communication
@@ -174,6 +175,7 @@ cask "vlc"                      # Media player
 # Gaming
 # @profile:personal
 cask "crossover"                # Windows compatibility
+brew "nethack"                  # Roguelike terminal game
 # @end:personal
 cask "steam"                    # Gaming platform
 
