@@ -209,9 +209,13 @@ run = "move-node-to-workspace 3"
 if.app-id = "com.sunsama.native-app"
 run = "move-node-to-workspace 3"
 
-# Workspace 4: Waterfox
+# Workspace 4: Waterfox, Orion
 [[on-window-detected]]
 if.app-id = "net.waterfox.waterfox"
+run = "move-node-to-workspace 4"
+
+[[on-window-detected]]
+if.app-id = "com.kagi.kagimacOS"
 run = "move-node-to-workspace 4"
 
 # Workspace 5: kitty, Zed
