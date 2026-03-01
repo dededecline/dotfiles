@@ -167,6 +167,9 @@ cask "microsoft-teams"          # Team collaboration
 # @end:work
 
 # Media
+# @profile:personal
+cask "ableton-live-suite"       # Digital audio workstation
+# @end:personal
 cask "handbrake-app"            # Video encoder
 cask "obs"                      # Streaming/recording
 cask "spotify"                  # Music streaming

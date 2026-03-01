@@ -245,7 +245,7 @@ run = 'move-node-to-workspace 7'
 if.app-id = 'today.vial'
 run = 'move-node-to-workspace 7'
 
-# Workspace 8: Davinci Resolve, Steam, Infuse (secondary monitor)
+# Workspace 8: Davinci Resolve, Steam, Ableton, Infuse (secondary monitor)
 [[on-window-detected]]
 if.app-id = "com.blackmagic-design.DaVinciResolveLite"
 run = "move-node-to-workspace 8"
@@ -260,4 +260,8 @@ run = "move-node-to-workspace 8"
 
 [[on-window-detected]]
 if.app-id = "com.firecore.infuse"
+run = "move-node-to-workspace 8"
+
+[[on-window-detected]]
+if.app-id = "com.ableton.live"
 run = "move-node-to-workspace 8"
