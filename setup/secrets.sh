@@ -264,8 +264,8 @@ check_secrets() {
         print_warning "GitHub CLI: not configured (run 'gh auth login')"
     fi
 
-    # Work-only secrets (hera)
-    if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
+    # Work-only secrets (work group machines)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
         # Check ZLI command
         if [[ -f "$SENSITIVE_DIR/zli-command" ]]; then
             print_status "ZLI connect: configured"
@@ -393,9 +393,9 @@ inject_secrets() {
 
     check_op
 
-    # Read work account domain from personal vault (only needed for hera)
+    # Read work account domain from personal vault (work group machines only)
     OP_WORK_ACCOUNT=""
-    if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
         OP_WORK_ACCOUNT=$(op read "op://Private/1password-work-account/domain" \
             --account "$OP_PERSONAL_ACCOUNT") || {
             print_error "Failed to read work 1Password account domain"
@@ -413,8 +413,8 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/gh-hosts.tpl" "$HOME/.config/gh/hosts.yml" "GitHub CLI credentials"
     fi
 
-    # Work-only secrets (hera)
-    if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
+    # Work-only secrets (work group machines)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
         # Inject ZLI connect command
         if [[ -f "$TEMPLATES_DIR/zli.tpl" ]]; then
             inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command" "$OP_PERSONAL_ACCOUNT"

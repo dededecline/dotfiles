@@ -101,14 +101,16 @@
   │   │   ├── Brewfile         # All machines
   │   │   └── hostnames        # Lists all hostnames in this group
   │   ├── laptops/
-  │   │   ├── Brewfile         # hera + athena
+  │   │   ├── Brewfile         # Laptop machines
   │   │   └── hostnames
   │   ├── personal/
-  │   │   ├── Brewfile         # athena + nyx
+  │   │   ├── Brewfile         # Personal machines
   │   │   └── hostnames
-  │   └── infra/
-  │       ├── Brewfile         # hera + nyx
-  │       └── hostnames
+  │   ├── infra/
+  │   │   ├── Brewfile         # Infrastructure machines
+  │   │   └── hostnames
+  │   └── work/
+  │       └── hostnames        # Work machines (1Password/secrets)
   └── individual/
       ├── hera/Brewfile        # hera only
       ├── athena/Brewfile      # athena only
@@ -118,14 +120,11 @@
   Machine groups are defined by the filesystem — each `hostnames` file
   lists which machines belong to that group (one per line). Adding a new
   machine or group requires only filesystem changes, no code edits.
-  • hera: all + laptops + infra + hera + sensitive/Brewfile.work
-  • athena: all + laptops + personal + athena
-  • nyx: all + personal + infra + nyx
-  
-  The profiles/individual subdirectory names and the profiles/shared/*/hostnames files are the singular sources of truth for defining machines and machine groups.
+
+  The profiles/individual subdirectory names and the profiles/shared/*/hostnames files are the singular sources of truth for defining machines and machine groups. The `work` group gates 1Password work-account integration and sensitive/Brewfile.work injection.
 
   Work packages in templates/Brewfile.tpl are injected via 1Password to
-  sensitive/Brewfile.work and appended on hera only.              
+  sensitive/Brewfile.work and appended on work group machines only.              
                                                                               
   ### Secrets System                                                          
                                                                               

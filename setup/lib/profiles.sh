@@ -50,3 +50,11 @@ get_machine_groups() {
         echo "${groups[*]} $hostname"
     fi
 }
+
+# Check if a hostname belongs to a specific group
+# Usage: is_machine_in_group <hostname> <group>
+is_machine_in_group() {
+    local hostname="$1" group="$2"
+    local hostnames_file="$DOTFILES/profiles/shared/$group/hostnames"
+    [[ -f "$hostnames_file" ]] && grep -qx "$hostname" "$hostnames_file"
+}

@@ -80,8 +80,8 @@ if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
     MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
 fi
 
-if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
-    echo "hera detected - linking work-specific Claude skills..."
+if type -t is_machine_in_group &>/dev/null && is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
+    echo "Work machine detected - linking work-specific Claude skills..."
     WORK_SKILLS_DIR="$DOTFILES/sensitive/claude-skills"
     if [[ -d "$WORK_SKILLS_DIR" ]]; then
         for skill_dir in "$WORK_SKILLS_DIR"/*/; do

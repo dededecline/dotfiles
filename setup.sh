@@ -51,30 +51,27 @@ else
     print_info() { echo -e "  $1"; }
 fi
 
-# Source hostname utilities (with fallback for fresh installs)
+# Source hostname utilities (deferred for fresh installs where repo isn't cloned yet)
+_PROFILES_LOADED=false
+
+ensure_profiles_loaded() {
+    if [[ "$_PROFILES_LOADED" == "true" ]]; then
+        return 0
+    fi
+    if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
+        source "$DOTFILES/setup/lib/profiles.sh"
+        _PROFILES_LOADED=true
+    else
+        print_error "profiles.sh not found - dotfiles repo may not be cloned"
+        print_info "Expected at: $DOTFILES/setup/lib/profiles.sh"
+        exit 1
+    fi
+}
+
+# Source immediately if available (covers local ./setup.sh runs)
 if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
     source "$DOTFILES/setup/lib/profiles.sh"
-else
-    # Minimal fallback for fresh installs - define hostname mapping inline
-    # NOTE: Update these manually when machines change (filesystem not available pre-clone)
-    is_known_hostname() {
-        case "$1" in
-            hera|athena|nyx) return 0 ;;
-            *) return 1 ;;
-        esac
-    }
-    get_known_hosts() {
-        if [[ "${1-}" == "--csv" ]]; then echo "hera, athena, nyx"
-        else printf '%s\n' hera athena nyx; fi
-    }
-    get_machine_groups() {
-        case "$1" in
-            hera)   echo "all laptops infra hera" ;;
-            athena) echo "all laptops personal athena" ;;
-            nyx)    echo "all personal infra nyx" ;;
-            *)      echo "all $1" ;;
-        esac
-    }
+    _PROFILES_LOADED=true
 fi
 
 # Hostname configuration (set by argument parsing or auto-detection)
@@ -339,8 +336,8 @@ prepare_brewfile() {
         cat "$individual_brewfile" >> "$combined"
     fi
 
-    # Append work Brewfile if it exists (hera only)
-    if [[ "$MACHINE_HOSTNAME" == "hera" ]] && [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
+    # Append work Brewfile if it exists (work group machines only)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
         echo "" >> "$combined"
         echo "# Work additions (from 1Password)" >> "$combined"
         cat "$DOTFILES/sensitive/Brewfile.work" >> "$combined"
@@ -444,8 +441,8 @@ cleanup_undeclared_taps() {
 run_brew_sync() {
     print_header "Syncing Homebrew Packages ($MACHINE_HOSTNAME)"
 
-    # Inject Brewfile.work and set GitHub token from 1Password if authenticated (hera only)
-    if [[ "$MACHINE_HOSTNAME" == "hera" ]] && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
+    # Inject Brewfile.work and set GitHub token from 1Password if authenticated (work group only)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
         # Read work account domain (Brewfile.tpl references op://Employee vault on work account)
         local work_account
         work_account=$(op read "op://Private/1password-work-account/domain" --account my.1password.com 2>/dev/null) || true
@@ -747,13 +744,16 @@ apply_macos_defaults() {
 run_setup() {
     print_header "Dotfiles Setup"
 
-    # Detect hostname first
-    detect_and_validate_hostname
-
-    # Prerequisites
+    # Prerequisites (must run before hostname detection for fresh installs)
     ensure_xcode_clt
     ensure_homebrew
     ensure_dotfiles
+
+    # Source profiles now that dotfiles repo is available
+    ensure_profiles_loaded
+
+    # Detect hostname (uses profiles.sh functions)
+    detect_and_validate_hostname
 
     cd "$DOTFILES"
 
@@ -814,13 +814,13 @@ run_setup() {
 run_brew() {
     print_header "Homebrew Sync"
 
-    # Detect hostname first
+    ensure_profiles_loaded
     detect_and_validate_hostname
 
     cd "$DOTFILES"
 
-    # Try to inject Brewfile.work if 1Password is available (hera only)
-    if [[ "$MACHINE_HOSTNAME" == "hera" ]] && command -v op &>/dev/null; then
+    # Try to inject Brewfile.work if 1Password is available (work group only)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null; then
         if ! op vault list --account my.1password.com &>/dev/null 2>&1; then
             # Skip prompt in non-interactive mode
             if [[ -t 0 ]]; then
@@ -845,7 +845,7 @@ run_brew() {
 run_macos() {
     print_header "macOS Preferences"
 
-    # Detect hostname first
+    ensure_profiles_loaded
     detect_and_validate_hostname
 
     cd "$DOTFILES"
@@ -858,7 +858,7 @@ run_macos() {
 }
 
 show_help() {
-    cat << EOF
+    cat << 'EOF'
 Dotfiles Setup Script (Idempotent, Multi-Machine)
 
 Usage:
@@ -868,19 +868,30 @@ Usage:
   ./setup.sh --macos                Apply macOS preferences only
   ./setup.sh --help                 Show this help message
 
-Machines:
-  Hostname is auto-detected. Each machine gets specific brew groups:
-    hera   - work laptop   (all + laptops + infra + hera)
-    athena - personal laptop (all + laptops + personal + athena)
-    nyx    - personal server (all + personal + infra + nyx)
+EOF
 
-  Use --hostname to override: ./setup.sh --hostname athena
+    # Dynamic machine listing
+    echo "Machines:"
+    echo "  Hostname is auto-detected. Each machine gets specific brew groups:"
+    if [[ "$_PROFILES_LOADED" == "true" ]]; then
+        while IFS= read -r host; do
+            local groups
+            groups=$(get_machine_groups "$host")
+            printf '    %-8s (%s)\n' "$host" "$groups"
+        done < <(get_known_hosts)
+    else
+        echo "    (Run from dotfiles directory to see machine list)"
+    fi
+    echo ""
+    echo "  Use --hostname to override: ./setup.sh --hostname <name>"
+
+    cat << 'EOF'
 
 Full Setup:
   Runs all setup tasks idempotently:
   - Installs Xcode CLT and Homebrew (if missing)
   - Clones dotfiles repository (if missing)
-  - Injects secrets from 1Password (hera only)
+  - Injects secrets from 1Password (work group machines)
   - Syncs Homebrew packages (declarative with --cleanup)
   - Creates symlinks
   - Configures Fish shell as default
@@ -894,7 +905,7 @@ Homebrew Sync (--brew):
 macOS Preferences (--macos):
   Applies system preferences: UI, input, sound, Finder, screenshots, etc.
 
-1Password Integration (hera only):
+1Password Integration (work group machines):
   Work tools from templates/Brewfile.tpl require 1Password authentication.
   The script will prompt to sign in if needed, or you can skip and run
   'secrets' later.
@@ -915,7 +926,11 @@ main() {
             --hostname|-n)
                 shift
                 if [[ $# -eq 0 ]]; then
-                    print_error "--hostname requires a value ($(get_known_hosts --csv))"
+                    local hosts_hint=""
+                    if [[ "$_PROFILES_LOADED" == "true" ]]; then
+                        hosts_hint=" ($(get_known_hosts --csv))"
+                    fi
+                    print_error "--hostname requires a value${hosts_hint}"
                     exit 1
                 fi
                 HOSTNAME_OVERRIDE="$1"
