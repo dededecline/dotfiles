@@ -63,7 +63,10 @@ else
             *) return 1 ;;
         esac
     }
-    get_known_hosts() { echo "hera, athena, nyx"; }
+    get_known_hosts() {
+        if [[ "${1-}" == "--csv" ]]; then echo "hera, athena, nyx"
+        else printf '%s\n' hera athena nyx; fi
+    }
     get_machine_groups() {
         case "$1" in
             hera)   echo "all laptops infra hera" ;;
@@ -102,7 +105,7 @@ detect_and_validate_hostname() {
         # Hostname override provided - validate it
         if ! is_known_hostname "$HOSTNAME_OVERRIDE"; then
             print_error "Unknown hostname: $HOSTNAME_OVERRIDE"
-            print_info "Known hosts: $(get_known_hosts)"
+            print_info "Known hosts: $(get_known_hosts --csv)"
             exit 1
         fi
         MACHINE_HOSTNAME="$HOSTNAME_OVERRIDE"
@@ -112,12 +115,61 @@ detect_and_validate_hostname() {
         MACHINE_HOSTNAME=$(hostname -s)
 
         if ! is_known_hostname "$MACHINE_HOSTNAME"; then
-            print_error "Unknown hostname: $MACHINE_HOSTNAME"
-            print_info "Known hosts: $(get_known_hosts)"
-            print_info "Override with: ./setup.sh --hostname <name>"
-            exit 1
+            # Non-interactive mode — can't prompt
+            if [[ ! -t 0 ]]; then
+                print_error "Unknown hostname: $MACHINE_HOSTNAME"
+                print_info "Known hosts: $(get_known_hosts --csv)"
+                print_info "Override with: ./setup.sh --hostname <name>"
+                exit 1
+            fi
+
+            print_warning "Unknown hostname: $MACHINE_HOSTNAME"
+            read -p "  Set up this machine under an existing hostname? (y/n) " -n 1 -r
+            echo ""
+
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Override with: ./setup.sh --hostname <name>"
+                exit 1
+            fi
+
+            # Build hostname list
+            local hosts=()
+            while IFS= read -r host; do
+                hosts+=("$host")
+            done < <(get_known_hosts)
+
+            echo ""
+            print_info "Select a hostname for this machine:"
+            local i
+            for i in "${!hosts[@]}"; do
+                echo "  $((i + 1))) ${hosts[$i]}"
+            done
+            echo "  $((${#hosts[@]} + 1))) Cancel"
+            echo ""
+
+            local choice
+            read -p "  Enter selection [1-$((${#hosts[@]} + 1))]: " choice
+
+            if ! [[ "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#hosts[@]} + 1 )); then
+                print_error "Invalid selection"
+                exit 1
+            fi
+
+            if (( choice == ${#hosts[@]} + 1 )); then
+                exit 1
+            fi
+
+            local selected="${hosts[$((choice - 1))]}"
+
+            print_info "Setting hostname to $selected (requires sudo)..."
+            sudo scutil --set ComputerName "$selected"
+            sudo scutil --set HostName "$selected"
+            sudo scutil --set LocalHostName "$selected"
+            MACHINE_HOSTNAME="$selected"
+            print_status "Machine: $MACHINE_HOSTNAME (configured)"
+        else
+            print_status "Machine: $MACHINE_HOSTNAME (detected)"
         fi
-        print_status "Machine: $MACHINE_HOSTNAME (detected)"
     fi
 
     # Export for child scripts
@@ -863,7 +915,7 @@ main() {
             --hostname|-n)
                 shift
                 if [[ $# -eq 0 ]]; then
-                    print_error "--hostname requires a value ($(get_known_hosts))"
+                    print_error "--hostname requires a value ($(get_known_hosts --csv))"
                     exit 1
                 fi
                 HOSTNAME_OVERRIDE="$1"

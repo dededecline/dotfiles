@@ -13,16 +13,22 @@ is_known_hostname() {
     [[ -n "$1" ]] && [[ -d "$DOTFILES/profiles/individual/$1" ]]
 }
 
-# Get known hostnames for error messages
+# Get known hostnames
+# Usage: get_known_hosts         → one per line
+#        get_known_hosts --csv   → comma-separated (e.g. "hera, athena, nyx")
 get_known_hosts() {
     local hosts=()
     local dir
     for dir in "$DOTFILES/profiles/individual"/*/; do
         [[ -d "$dir" ]] && hosts+=("$(basename "$dir")")
     done
-    local result
-    printf -v result '%s, ' "${hosts[@]}"
-    echo "${result%, }"
+    if [[ "${1-}" == "--csv" ]]; then
+        local result
+        printf -v result '%s, ' "${hosts[@]}"
+        echo "${result%, }"
+    else
+        printf '%s\n' "${hosts[@]}"
+    fi
 }
 
 # Get machine groups for a hostname
