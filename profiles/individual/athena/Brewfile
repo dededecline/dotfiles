@@ -1,0 +1,24 @@
+# =============================================================================
+# Additional Terminal Packages
+# =============================================================================
+brew "imagemagick"              # Image manipulation
+brew "nethack"                  # Roguelike terminal game
+brew "yt-dlp"                   # Video downloader
+
+# =============================================================================
+# Applications (Casks)
+# =============================================================================
+
+# Gaming
+cask "crossover"                # Windows compatibility
+cask "steam"                    # Gaming platform
+
+# Media
+cask "ableton-live-suite"       # Digital audio workstation
+cask "handbrake-app"            # Video encoder
+cask "obs"                      # Streaming/recording
+
+# =============================================================================
+# Mac App Store
+# =============================================================================
+mas "DaVinci Resolve", id: 571213070    # Video editor

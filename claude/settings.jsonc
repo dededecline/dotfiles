@@ -225,19 +225,19 @@
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
-    // @profile:work
+    // @machine:hera
     "Laurel@Laurel": true,
-    // @end:work
+    // @end:hera
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    // @profile:personal
+    // @machine:athena
     "Notion@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
-    // @end:personal
+    // @end:athena
     "hookify@claude-plugins-official": true,
     "slack@claude-plugins-official": true
   },

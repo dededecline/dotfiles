@@ -1,0 +1,110 @@
+# =============================================================================
+# Taps
+# =============================================================================
+tap "felixkratz/formulae"
+tap "nikitabobko/tap"
+tap "sheeki03/tap"
+
+# =============================================================================
+# Core CLI Tools
+# =============================================================================
+brew "fish"                     # Primary shell
+brew "gh"                       # GitHub CLI
+brew "git"                      # Version control
+brew "starship"                 # Cross-shell prompt
+
+# =============================================================================
+# Modern CLI Tools
+# =============================================================================
+brew "atuin"                    # Shell history
+brew "bat"                      # cat replacement
+brew "btop"                     # top replacement
+brew "dust"                     # du replacement
+brew "fastfetch"                # System info
+brew "fd"                       # find replacement
+brew "fzf"                      # Fuzzy finder
+brew "git-delta"                # Syntax-highlighting pager for git/diff
+brew "glow"                     # Markdown renderer
+brew "gping"                    # ping replacement
+brew "jq"                       # JSON processor
+brew "lsd"                      # ls replacement
+brew "ripgrep"                  # grep replacement
+brew "watch"                    # Execute commands periodically
+brew "wget"                     # Download utility
+brew "yq"                       # YAML processor
+
+# =============================================================================
+# Language Tools
+# =============================================================================
+brew "go"                       # Go language
+brew "luarocks"                 # Lua package manager (for nvim image.nvim)
+brew "jsonlint"                 # JSON linter
+brew "jsonnet"                  # JSON templating
+brew "node"                     # Node.js
+brew "pipx"                     # Python package installer
+brew "pyenv"                    # Python version manager
+
+# =============================================================================
+# Development Tools
+# =============================================================================
+brew "certbot"                  # Let's Encrypt client
+brew "neovim"                   # Editor
+brew "mise"                     # Dev tool version manager
+brew "sheeki03/tap/tirith"      # Terminal homograph attack defense
+brew "tmux"                     # Terminal multiplexer
+
+# =============================================================================
+# Additional Tools
+# =============================================================================
+brew "defaultbrowser"           # Set default browser via CLI
+brew "displayplacer"            # Display configuration tool
+brew "gettext"                  # String utilities (envsubst)
+brew "mas"                      # Mac App Store CLI
+brew "ncdu"                     # Disk usage analyzer
+
+# =============================================================================
+# Applications (Casks)
+# =============================================================================
+
+# Password & Security
+cask "1password"                # Password manager
+cask "1password-cli"            # Password manager CLI
+cask "little-snitch"            # Network monitor
+cask "yubico-authenticator"     # YubiKey manager
+
+# Window Management
+cask "nikitabobko/tap/aerospace"      # Tiling window manager
+brew "felixkratz/formulae/sketchybar" # Custom macOS menu bar
+
+# Terminals
+cask "kitty"                    # Terminal emulator
+
+# Browsers
+cask "waterfox"                 # Firefox-based browser
+
+# Productivity
+cask "raycast"                  # Launcher
+
+# Development
+cask "claude-code"              # Code Assistant
+cask "docker-desktop"           # Docker Desktop
+cask "wireshark-app"            # Network analyzer
+cask "zed"                      # Code Editor
+
+# Utilities
+cask "adguard"                  # Ad blocker
+cask "adobe-acrobat-reader"     # PDF viewer
+cask "parallels"                # Virtual machines
+cask "pearcleaner"              # App uninstaller
+cask "protonvpn"                # VPN
+cask "rar"                      # RAR archive tool
+cask "the-unarchiver"           # Archive utility
+
+# =============================================================================
+# Fonts
+# =============================================================================
+cask "font-maple-mono-nf"          # Maple Mono coding font (universal)
+cask "font-sf-pro"                 # Apple SF Pro font (sketchybar labels)
+cask "font-sketchybar-app-font"    # App icons (sketchybar workspaces)
+cask "font-symbols-only-nerd-font" # Nerd Font symbols (kitty symbol_map)
+cask "sf-symbols"                  # Apple SF Symbols (sketchybar)

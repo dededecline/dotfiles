@@ -1,0 +1,6 @@
+# =============================================================================
+# DevOps Tools
+# =============================================================================
+brew "helm"                      # Kubernetes package manager
+brew "kubernetes-cli"            # kubectl
+brew "opentofu"                  # Terraform alternative

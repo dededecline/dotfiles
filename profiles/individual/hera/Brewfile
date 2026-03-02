@@ -1,0 +1,35 @@
+# =============================================================================
+# Taps
+# =============================================================================
+tap "fairwindsops/tap"
+tap "signadot/tap"
+
+# =============================================================================
+# DevOps Tools
+# =============================================================================
+brew "awscli"                    # AWS CLI
+brew "fairwindsops/tap/pluto"    # Kubernetes API deprecation finder
+brew "opa"                       # Open Policy Agent
+brew "signadot/tap/signadot-cli" # Sandbox Environments
+brew "terraform-docs"            # Terraform documentation
+brew "tflint"                    # Terraform linter
+brew "trivy"                     # Security scanner
+
+# =============================================================================
+# Applications (Casks)
+# =============================================================================
+
+# Cloud Storage
+cask "google-drive"             # Google Drive sync
+
+# Communication
+cask "granola"                  # Meeting notes
+cask "microsoft-teams"          # Team collaboration
+
+# Development
+cask "mongodb-compass"          # MongoDB GUI
+cask "powershell"               # PowerShell
+
+# Productivity
+cask "microsoft-excel"          # Spreadsheets
+cask "microsoft-word"           # Word processor

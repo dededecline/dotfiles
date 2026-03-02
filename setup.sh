@@ -3,15 +3,14 @@
 # setup.sh - Unified dotfiles setup script (idempotent)
 #
 # Usage:
-#   ./setup.sh                      # Run full setup (auto-detect profile from hostname)
-#   ./setup.sh --profile work       # Override profile (work or personal)
+#   ./setup.sh                      # Run full setup (auto-detect from hostname)
+#   ./setup.sh --hostname athena    # Override hostname
 #   ./setup.sh --brew               # Sync Homebrew packages only
 #   ./setup.sh --macos              # Apply macOS preferences only
 #   ./setup.sh --help               # Show usage
 #
-# Supported machines:
-#   hera   -> work profile (includes work tools and secrets)
-#   athena -> personal profile (skips work-specific items)
+# Supported machines: defined by profiles/individual/ directory names
+# Machine groups: defined by profiles/shared/*/hostnames files
 #
 # For fresh installs from a new machine:
 #   curl -fsSL https://raw.githubusercontent.com/dededecline/dotfiles/main/setup.sh | bash
@@ -52,27 +51,31 @@ else
     print_info() { echo -e "  $1"; }
 fi
 
-# Source profile utilities (with fallback for fresh installs)
+# Source hostname utilities (with fallback for fresh installs)
 if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
     source "$DOTFILES/setup/lib/profiles.sh"
 else
-    # Minimal fallback for fresh installs - define profile mapping inline
-    detect_profile() {
-        local hostname="${1:-$(hostname -s)}"
-        case "$hostname" in
-            hera)   echo "work" ;;
-            athena) echo "personal" ;;
-            *)      echo "" ;;
+    # Minimal fallback for fresh installs - define hostname mapping inline
+    # NOTE: Update these manually when machines change (filesystem not available pre-clone)
+    is_known_hostname() {
+        case "$1" in
+            hera|athena|nyx) return 0 ;;
+            *) return 1 ;;
         esac
     }
-    get_known_hosts() { echo "hera (work), athena (personal)"; }
-    is_work_profile() { [[ "${DOTFILES_PROFILE:-}" == "work" ]]; }
-    is_personal_profile() { [[ "${DOTFILES_PROFILE:-}" == "personal" ]]; }
+    get_known_hosts() { echo "hera, athena, nyx"; }
+    get_machine_groups() {
+        case "$1" in
+            hera)   echo "all laptops infra hera" ;;
+            athena) echo "all laptops personal athena" ;;
+            nyx)    echo "all personal infra nyx" ;;
+            *)      echo "all" ;;
+        esac
+    }
 fi
 
-# Profile configuration (set by argument parsing or auto-detection)
-PROFILE_OVERRIDE=""
-DOTFILES_PROFILE=""
+# Hostname configuration (set by argument parsing or auto-detection)
+HOSTNAME_OVERRIDE=""
 MACHINE_HOSTNAME=""
 
 # Detect Homebrew prefix based on architecture
@@ -89,98 +92,62 @@ get_fish_path() {
 }
 
 # =============================================================================
-# Profile Detection
+# Hostname Detection
 # =============================================================================
 
-# Detect and validate profile from hostname or override
-# Sets global DOTFILES_PROFILE and MACHINE_HOSTNAME variables
-detect_and_validate_profile() {
-    # Determine hostname
-    if [[ -n "$PROFILE_OVERRIDE" ]]; then
-        # Profile override provided - validate it
-        if [[ "$PROFILE_OVERRIDE" != "work" && "$PROFILE_OVERRIDE" != "personal" ]]; then
-            print_error "Invalid profile: $PROFILE_OVERRIDE"
-            print_info "Valid profiles: work, personal"
+# Detect and validate hostname
+# Sets global MACHINE_HOSTNAME variable
+detect_and_validate_hostname() {
+    if [[ -n "$HOSTNAME_OVERRIDE" ]]; then
+        # Hostname override provided - validate it
+        if ! is_known_hostname "$HOSTNAME_OVERRIDE"; then
+            print_error "Unknown hostname: $HOSTNAME_OVERRIDE"
+            print_info "Known hosts: $(get_known_hosts)"
             exit 1
         fi
-        DOTFILES_PROFILE="$PROFILE_OVERRIDE"
-        MACHINE_HOSTNAME=$(hostname -s)
-        print_status "Profile: $DOTFILES_PROFILE (overridden, hostname: $MACHINE_HOSTNAME)"
+        MACHINE_HOSTNAME="$HOSTNAME_OVERRIDE"
+        print_status "Machine: $MACHINE_HOSTNAME (overridden)"
     else
         # Auto-detect from hostname
         MACHINE_HOSTNAME=$(hostname -s)
-        DOTFILES_PROFILE=$(detect_profile "$MACHINE_HOSTNAME")
 
-        if [[ -z "$DOTFILES_PROFILE" ]]; then
+        if ! is_known_hostname "$MACHINE_HOSTNAME"; then
             print_error "Unknown hostname: $MACHINE_HOSTNAME"
             print_info "Known hosts: $(get_known_hosts)"
-            print_info "Override with: ./setup.sh --profile <work|personal>"
+            print_info "Override with: ./setup.sh --hostname <name>"
             exit 1
         fi
-        print_status "Profile: $DOTFILES_PROFILE (detected from hostname: $MACHINE_HOSTNAME)"
+        print_status "Machine: $MACHINE_HOSTNAME (detected)"
     fi
 
     # Export for child scripts
-    export DOTFILES_PROFILE
     export MACHINE_HOSTNAME
 }
 
-# Preprocess Brewfile to filter profile-specific packages
-# Usage: preprocess_brewfile <input_file> <output_file>
-# Markers:
-#   # @profile:work ... # @end:work       - work-only packages
-#   # @profile:personal ... # @end:personal - personal-only packages
-preprocess_brewfile() {
-    local input="$1"
-    local output="$2"
-    local profile="$DOTFILES_PROFILE"
-
-    if [[ "$profile" == "work" ]]; then
-        # Work profile: strip personal-only sections, keep work sections
-        awk '
-            /^# @profile:personal/ { skip=1; next }
-            /^# @end:personal/ { skip=0; next }
-            !skip { print }
-        ' "$input" > "$output"
-    else
-        # Personal profile: strip work-only sections, keep personal sections
-        awk '
-            /^# @profile:work/ { skip=1; next }
-            /^# @end:work/ { skip=0; next }
-            !skip { print }
-        ' "$input" > "$output"
-    fi
-}
-
-# Preprocess JSONC files with profile markers (// @profile:X / // @end:X)
+# Preprocess JSONC files with machine markers (// @machine:X / // @end:X)
+# Markers accept hostnames or group names (e.g., @machine:hera, @machine:laptops)
 # Strips comments, fixes trailing commas, and formats as valid JSON via jq
-# Usage: preprocess_jsonc_profiles <input_file> <output_file>
-preprocess_jsonc_profiles() {
+# Usage: preprocess_jsonc_machines <input_file> <output_file>
+preprocess_jsonc_machines() {
     local input="$1"
     local output="$2"
-    local profile="$DOTFILES_PROFILE"
+    local groups
+    groups=$(get_machine_groups "$MACHINE_HOSTNAME")
     local tmp="${output}.tmp"
 
-    if [[ "$profile" == "work" ]]; then
-        awk '
-            /^[[:space:]]*\/\/ @profile:personal/ { skip=1; next }
-            /^[[:space:]]*\/\/ @end:personal/ { skip=0; next }
-            /^[[:space:]]*\/\/ @profile:/ { next }
-            /^[[:space:]]*\/\/ @end:/ { next }
-            skip==0 { print }
-        ' "$input" > "$tmp"
-    else
-        awk '
-            /^[[:space:]]*\/\/ @profile:work/ { skip=1; next }
-            /^[[:space:]]*\/\/ @end:work/ { skip=0; next }
-            /^[[:space:]]*\/\/ @profile:/ { next }
-            /^[[:space:]]*\/\/ @end:/ { next }
-            skip==0 { print }
-        ' "$input" > "$tmp"
-    fi
+    awk -v groups=" $groups " '
+        /^[[:space:]]*\/\/ @machine:/ {
+            tag = $0
+            sub(/.*@machine:/, "", tag)
+            sub(/[[:space:]].*/, "", tag)
+            if (index(groups, " " tag " ") == 0) skip=1
+            next
+        }
+        /^[[:space:]]*\/\/ @end:/ { skip=0; next }
+        skip==0 { print }
+    ' "$input" > "$tmp"
 
-    # Fix trailing commas and format as valid JSON
-    sed -E 's/,([[:space:]]*[}\]])/\1/g' "$tmp" | jq . > "$output"
+    sed -E 's/,([[:space:]]*[}\\]])/\1/g' "$tmp" | jq . > "$output"
     rm -f "$tmp"
 }
 
@@ -296,17 +263,32 @@ inject_secrets() {
 
 prepare_brewfile() {
     local combined="$DOTFILES/.brewfile.combined"
-    local preprocessed="$DOTFILES/.brewfile.preprocessed"
+    local groups
+    groups=$(get_machine_groups "$MACHINE_HOSTNAME")
 
-    # Preprocess base Brewfile to filter profile-specific packages
-    preprocess_brewfile "$DOTFILES/Brewfile" "$preprocessed"
+    # Start fresh
+    : > "$combined"
 
-    # Start with preprocessed Brewfile
-    cat "$preprocessed" > "$combined"
-    rm -f "$preprocessed"
+    # Append shared group Brewfiles (skip the hostname entry - it's for JSONC matching)
+    for group in $groups; do
+        local shared_brewfile="$DOTFILES/profiles/shared/$group/Brewfile"
+        if [[ -f "$shared_brewfile" ]]; then
+            echo "" >> "$combined"
+            echo "# shared/$group" >> "$combined"
+            cat "$shared_brewfile" >> "$combined"
+        fi
+    done
 
-    # Append work Brewfile if it exists (only for work profile)
-    if is_work_profile && [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
+    # Append individual machine Brewfile
+    local individual_brewfile="$DOTFILES/profiles/individual/$MACHINE_HOSTNAME/Brewfile"
+    if [[ -f "$individual_brewfile" ]]; then
+        echo "" >> "$combined"
+        echo "# individual/$MACHINE_HOSTNAME" >> "$combined"
+        cat "$individual_brewfile" >> "$combined"
+    fi
+
+    # Append work Brewfile if it exists (hera only)
+    if [[ "$MACHINE_HOSTNAME" == "hera" ]] && [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
         echo "" >> "$combined"
         echo "# Work additions (from 1Password)" >> "$combined"
         cat "$DOTFILES/sensitive/Brewfile.work" >> "$combined"
@@ -408,10 +390,10 @@ cleanup_undeclared_taps() {
 }
 
 run_brew_sync() {
-    print_header "Syncing Homebrew Packages ($DOTFILES_PROFILE profile)"
+    print_header "Syncing Homebrew Packages ($MACHINE_HOSTNAME)"
 
-    # Inject Brewfile.work and set GitHub token from 1Password if authenticated (work profile only)
-    if is_work_profile && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
+    # Inject Brewfile.work and set GitHub token from 1Password if authenticated (hera only)
+    if [[ "$MACHINE_HOSTNAME" == "hera" ]] && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
         # Read work account domain (Brewfile.tpl references op://Employee vault on work account)
         local work_account
         work_account=$(op read "op://Private/1password-work-account/domain" --account my.1password.com 2>/dev/null) || true
@@ -430,8 +412,6 @@ run_brew_sync() {
             export HOMEBREW_GITHUB_API_TOKEN="$gh_token"
             print_status "GitHub API token configured for Homebrew"
         fi
-    elif is_personal_profile; then
-        print_info "Personal profile: skipping work-specific Homebrew packages"
     fi
 
     # Prepare combined Brewfile
@@ -506,8 +486,8 @@ configure_claude() {
         return 0
     fi
 
-    preprocess_jsonc_profiles "$base" "$output"
-    print_status "Claude settings: configured ($DOTFILES_PROFILE profile)"
+    preprocess_jsonc_machines "$base" "$output"
+    print_status "Claude settings: configured ($MACHINE_HOSTNAME)"
 }
 
 create_symlinks() {
@@ -715,8 +695,8 @@ apply_macos_defaults() {
 run_setup() {
     print_header "Dotfiles Setup"
 
-    # Detect profile first
-    detect_and_validate_profile
+    # Detect hostname first
+    detect_and_validate_hostname
 
     # Prerequisites
     ensure_xcode_clt
@@ -729,7 +709,7 @@ run_setup() {
     # This must run before Homebrew sync to ensure terminal has required permissions
     apply_macos_defaults
 
-    # Inject secrets (needed for Brewfile.work) - profile-aware
+    # Inject secrets (needed for Brewfile.work) - hostname-aware
     inject_secrets
 
     # Declarative Homebrew sync
@@ -741,7 +721,7 @@ run_setup() {
     # Sync theme colors to all tool configs
     sync_theme
 
-    # Generate Claude settings based on profile
+    # Generate Claude settings based on hostname
     configure_claude
 
     # Shell and environment
@@ -782,13 +762,13 @@ run_setup() {
 run_brew() {
     print_header "Homebrew Sync"
 
-    # Detect profile first
-    detect_and_validate_profile
+    # Detect hostname first
+    detect_and_validate_hostname
 
     cd "$DOTFILES"
 
-    # Try to inject Brewfile.work if 1Password is available (work profile only)
-    if is_work_profile && command -v op &>/dev/null; then
+    # Try to inject Brewfile.work if 1Password is available (hera only)
+    if [[ "$MACHINE_HOSTNAME" == "hera" ]] && command -v op &>/dev/null; then
         if ! op vault list --account my.1password.com &>/dev/null 2>&1; then
             # Skip prompt in non-interactive mode
             if [[ -t 0 ]]; then
@@ -813,8 +793,8 @@ run_brew() {
 run_macos() {
     print_header "macOS Preferences"
 
-    # Detect profile first (needed for hostname)
-    detect_and_validate_profile
+    # Detect hostname first
+    detect_and_validate_hostname
 
     cd "$DOTFILES"
 
@@ -830,24 +810,25 @@ show_help() {
 Dotfiles Setup Script (Idempotent, Multi-Machine)
 
 Usage:
-  ./setup.sh                      Run full setup (auto-detect profile)
-  ./setup.sh --profile <profile>  Override profile (work or personal)
-  ./setup.sh --brew               Sync Homebrew packages only
-  ./setup.sh --macos              Apply macOS preferences only
-  ./setup.sh --help               Show this help message
+  ./setup.sh                        Run full setup (auto-detect hostname)
+  ./setup.sh --hostname <hostname>  Override hostname
+  ./setup.sh --brew                 Sync Homebrew packages only
+  ./setup.sh --macos                Apply macOS preferences only
+  ./setup.sh --help                 Show this help message
 
-Profiles:
-  Profile is auto-detected from hostname:
-    hera   -> work (includes work tools and secrets)
-    athena -> personal (skips work-specific items)
+Machines:
+  Hostname is auto-detected. Each machine gets specific brew groups:
+    hera   - work laptop   (all + laptops + infra + hera)
+    athena - personal laptop (all + laptops + personal + athena)
+    nyx    - personal server (all + personal + infra + nyx)
 
-  Use --profile to override: ./setup.sh --profile personal
+  Use --hostname to override: ./setup.sh --hostname athena
 
 Full Setup:
   Runs all setup tasks idempotently:
   - Installs Xcode CLT and Homebrew (if missing)
   - Clones dotfiles repository (if missing)
-  - Injects secrets from 1Password (work profile only)
+  - Injects secrets from 1Password (hera only)
   - Syncs Homebrew packages (declarative with --cleanup)
   - Creates symlinks
   - Configures Fish shell as default
@@ -855,14 +836,13 @@ Full Setup:
   - Applies macOS system preferences
 
 Homebrew Sync (--brew):
-  Installs packages from Brewfile and removes packages not in Brewfile.
-  Work-only packages (marked with @profile:work) are skipped on personal profile.
+  Combines Brewfiles from profiles/shared/ and profiles/individual/ based
+  on machine groups. Installs packages and removes unlisted ones.
 
 macOS Preferences (--macos):
   Applies system preferences: UI, input, sound, Finder, screenshots, etc.
-  Hostname is set based on detected or overridden profile.
 
-1Password Integration (work profile only):
+1Password Integration (hera only):
   Work tools from templates/Brewfile.tpl require 1Password authentication.
   The script will prompt to sign in if needed, or you can skip and run
   'secrets' later.
@@ -880,13 +860,13 @@ main() {
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --profile|-p)
+            --hostname|-n)
                 shift
                 if [[ $# -eq 0 ]]; then
-                    print_error "--profile requires a value (work or personal)"
+                    print_error "--hostname requires a value ($(get_known_hosts))"
                     exit 1
                 fi
-                PROFILE_OVERRIDE="$1"
+                HOSTNAME_OVERRIDE="$1"
                 ;;
             --brew|-b)
                 mode="brew"

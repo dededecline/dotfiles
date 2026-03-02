@@ -1,50 +1,46 @@
 #!/usr/bin/env bash
 #
-# profiles.sh - Multi-machine profile detection and configuration
+# profiles.sh - Multi-machine hostname detection and configuration
 #
-# Supports:
-#   hera   -> work profile
-#   athena -> personal profile
-#
+# Reads machine definitions from the profiles/ directory:
+#   profiles/individual/*/       - Known hostnames (directory names)
+#   profiles/shared/*/hostnames  - Group membership (one hostname per line)
 
-# =============================================================================
-# Profile Mapping
-# =============================================================================
+DOTFILES="${DOTFILES:-$HOME/.config}"
 
-# Get profile for a hostname
-# Usage: get_profile_for_hostname <hostname>
-get_profile_for_hostname() {
-    case "$1" in
-        hera)   echo "work" ;;
-        athena) echo "personal" ;;
-        *)      echo "" ;;
-    esac
+# Validate a hostname is known
+is_known_hostname() {
+    [[ -n "$1" ]] && [[ -d "$DOTFILES/profiles/individual/$1" ]]
 }
 
-# =============================================================================
-# Profile Detection
-# =============================================================================
-
-# Detect profile from hostname or use override
-# Usage: detect_profile [hostname_override]
-# Returns: profile name (work/personal) or empty string if unknown
-detect_profile() {
-    local hostname_override="${1:-}"
-    local hostname="${hostname_override:-$(hostname -s)}"
-    get_profile_for_hostname "$hostname"
-}
-
-# Get list of known hostnames for error messages
+# Get known hostnames for error messages
 get_known_hosts() {
-    echo "hera (work), athena (personal)"
+    local hosts=()
+    local dir
+    for dir in "$DOTFILES/profiles/individual"/*/; do
+        [[ -d "$dir" ]] && hosts+=("$(basename "$dir")")
+    done
+    local result
+    printf -v result '%s, ' "${hosts[@]}"
+    echo "${result%, }"
 }
 
-# Check if profile is work
-is_work_profile() {
-    [[ "${DOTFILES_PROFILE:-}" == "work" ]]
-}
-
-# Check if profile is personal
-is_personal_profile() {
-    [[ "${DOTFILES_PROFILE:-}" == "personal" ]]
+# Get machine groups for a hostname
+# Used for both Brewfile composition and JSONC marker filtering
+# Returns space-separated list matching: shared dirs + the hostname itself
+get_machine_groups() {
+    local hostname="$1"
+    local groups=()
+    local hostnames_file
+    for hostnames_file in "$DOTFILES/profiles/shared"/*/hostnames; do
+        [[ -f "$hostnames_file" ]] || continue
+        if grep -qx "$hostname" "$hostnames_file"; then
+            groups+=("$(basename "$(dirname "$hostnames_file")")")
+        fi
+    done
+    if [[ ${#groups[@]} -eq 0 ]]; then
+        echo "all"
+    else
+        echo "${groups[*]} $hostname"
+    fi
 }

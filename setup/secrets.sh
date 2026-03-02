@@ -26,11 +26,11 @@ OP_PERSONAL_ACCOUNT="my.1password.com"
 # Source shared output utilities
 source "$DOTFILES/setup/lib/output.sh"
 
-# Source profile utilities
+# Source hostname utilities
 source "$DOTFILES/setup/lib/profiles.sh"
 
-# Use profile from environment or default to work (for backwards compatibility)
-DOTFILES_PROFILE="${DOTFILES_PROFILE:-work}"
+# Use hostname from environment or auto-detect
+MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
 
 # Check if 1Password CLI is installed and authenticated
 check_op() {
@@ -252,7 +252,7 @@ inject_claude_skill_archive() {
 # Check which secrets are configured
 check_secrets() {
     echo ""
-    echo "Checking secrets configuration ($DOTFILES_PROFILE profile)..."
+    echo "Checking secrets configuration ($MACHINE_HOSTNAME)..."
     echo ""
 
     local all_configured=true
@@ -264,8 +264,8 @@ check_secrets() {
         print_warning "GitHub CLI: not configured (run 'gh auth login')"
     fi
 
-    # Work-only secrets
-    if is_work_profile; then
+    # Work-only secrets (hera)
+    if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
         # Check ZLI command
         if [[ -f "$SENSITIVE_DIR/zli-command" ]]; then
             print_status "ZLI connect: configured"
@@ -317,10 +317,10 @@ check_secrets() {
             all_configured=false
         fi
     else
-        print_info "Personal profile: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone, claude skills)"
+        print_info "$MACHINE_HOSTNAME: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
 
-    # Secrets for all profiles
+    # Secrets for all machines
     # Check fastfetch logo symlink
     if [[ -L "$DOTFILES/fastfetch/logo.txt" ]]; then
         local target
@@ -387,15 +387,15 @@ check_secrets() {
 inject_secrets() {
     echo ""
     echo "=========================================="
-    echo "  1Password Secrets Injection ($DOTFILES_PROFILE profile)"
+    echo "  1Password Secrets Injection ($MACHINE_HOSTNAME)"
     echo "=========================================="
     echo ""
 
     check_op
 
-    # Read work account domain from personal vault (only needed for work profile)
+    # Read work account domain from personal vault (only needed for hera)
     OP_WORK_ACCOUNT=""
-    if is_work_profile; then
+    if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
         OP_WORK_ACCOUNT=$(op read "op://Private/1password-work-account/domain" \
             --account "$OP_PERSONAL_ACCOUNT") || {
             print_error "Failed to read work 1Password account domain"
@@ -413,8 +413,8 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/gh-hosts.tpl" "$HOME/.config/gh/hosts.yml" "GitHub CLI credentials"
     fi
 
-    # Work-only secrets
-    if is_work_profile; then
+    # Work-only secrets (hera)
+    if [[ "$MACHINE_HOSTNAME" == "hera" ]]; then
         # Inject ZLI connect command
         if [[ -f "$TEMPLATES_DIR/zli.tpl" ]]; then
             inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command" "$OP_PERSONAL_ACCOUNT"
@@ -451,17 +451,12 @@ inject_secrets() {
             "Claude Code telemetry" \
             "$OP_WORK_ACCOUNT"
     else
-        print_info "Personal profile: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone, claude skills)"
+        print_info "$MACHINE_HOSTNAME: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone, claude skills)"
     fi
 
-    # Secrets for all profiles
-    # Symlink fastfetch logo based on profile
-    local logo_target
-    if is_work_profile; then
-        logo_target="logo_hera.txt"
-    else
-        logo_target="logo_athena.txt"
-    fi
+    # Secrets for all machines
+    # Symlink fastfetch logo based on hostname
+    local logo_target="logo_${MACHINE_HOSTNAME}.txt"
     ln -sf "$DOTFILES/fastfetch/$logo_target" "$DOTFILES/fastfetch/logo.txt"
     print_status "Fastfetch logo: $logo_target"
 
@@ -485,7 +480,7 @@ inject_secrets() {
         inject_template "$TEMPLATES_DIR/sketchybar.plist.tpl" "$HOME/Library/LaunchAgents/com.felixkratz.sketchybar.plist" "Sketchybar LaunchAgent" "$OP_PERSONAL_ACCOUNT"
     fi
 
-    # Login to Atuin sync (both profiles)
+    # Login to Atuin sync (all machines)
     inject_atuin
 
     echo ""

@@ -17,8 +17,8 @@ curl -fsSL https://raw.githubusercontent.com/dededecline/dotfiles/main/setup.sh 
 ### Existing Installation
 
 ```bash
-./setup.sh                      # Run full setup (auto-detects profile from hostname)
-./setup.sh --profile personal   # Override profile (work or personal)
+./setup.sh                      # Run full setup (auto-detects from hostname)
+./setup.sh --hostname athena    # Override hostname
 ./setup.sh --brew               # Sync Homebrew packages only
 ./setup.sh --macos              # Apply macOS preferences only
 ./setup.sh --help               # Show all options
@@ -28,41 +28,53 @@ The setup script is fully idempotent - run it anytime to ensure everything is co
 
 ## Multi-Machine Support
 
-The setup supports multiple machines with profile-based configuration:
+The setup supports multiple machines with hostname-based configuration:
 
-| Hostname | Profile | Description |
-|----------|---------|-------------|
-| hera | work | Work laptop - includes all work tools and secrets |
-| athena | personal | Personal laptop - skips work-specific items |
+| Hostname | Type | Brew Groups |
+|----------|------|-------------|
+| hera | Work laptop | all + laptops + infra + hera |
+| athena | Personal laptop | all + laptops + personal + athena |
+| nyx | Personal server | all + personal + infra + nyx |
 
-Profile is auto-detected from hostname. Override with `--profile <work|personal>`.
+Hostname is auto-detected. Override with `--hostname <name>`.
 
-### Profile-Specific Packages
+### Machine-Specific Packages
 
-Use markers in `Brewfile` to install packages only on specific profiles:
+Packages are organized under `profiles/`:
 
-```ruby
-# @profile:work
-cask "linear-linear"        # Work-only
-# @end:work
-
-# @profile:personal
-cask "some-personal-app"    # Personal-only
-# @end:personal
+```
+profiles/
+├── shared/
+│   ├── all/
+│   │   ├── Brewfile         # All machines
+│   │   └── hostnames        # Lists all hostnames in this group
+│   ├── laptops/
+│   │   ├── Brewfile         # hera + athena
+│   │   └── hostnames
+│   ├── personal/
+│   │   ├── Brewfile         # athena + nyx
+│   │   └── hostnames
+│   └── infra/
+│       ├── Brewfile         # hera + nyx
+│       └── hostnames
+└── individual/
+    ├── hera/Brewfile        # hera only
+    ├── athena/Brewfile      # athena only
+    └── nyx/Brewfile         # nyx only
 ```
 
-### Work-Only Items (skipped on personal profile)
+### Hera-Specific Items
 
-- **Brewfile packages**: Apps marked with `# @profile:work` markers
-- **Secrets**: ZLI, CI identity, Brewfile.work, clone function
-- **1Password integration**: Skipped entirely on personal profile
+- **Work Brewfile**: `templates/Brewfile.tpl` injected via 1Password to `sensitive/Brewfile.work`
+- **Work secrets**: ZLI, CI identity, clone function, Claude skills
+- **1Password work integration**: Only on hera
 
 ## Structure
 
 ```
 ~/.config/
 ├── setup.sh                 # Main setup script (idempotent)
-├── Brewfile                 # Homebrew packages
+├── profiles/                # Machine profiles (shared + individual Brewfiles + hostnames)
 ├── .macos                   # macOS system preferences
 ├── setup/
 │   ├── symlinks.sh          # Symlink creation
@@ -72,7 +84,7 @@ cask "some-personal-app"    # Personal-only
 │   ├── reload-display-config.sh  # Reload aerospace/sketchybar on display change
 │   └── lib/
 │       ├── output.sh        # Shared output utilities
-│       └── profiles.sh      # Multi-machine profile mapping
+│       └── profiles.sh      # Multi-machine hostname utilities
 ├── templates/               # 1Password template files (op:// refs)
 ├── sensitive/               # Injected secrets (gitignored)
 ├── fish/
@@ -109,15 +121,14 @@ secrets check            # Check which secrets are configured
 2. **secrets.sh** processes templates via `op inject`
 3. **Output** goes to `sensitive/` (gitignored)
 
-### Work Tools (work profile only)
+### Work Tools (hera only)
 
-Work-specific items are only installed on the work profile:
+Work-specific items are only installed on hera:
 
 1. **Brewfile packages** in `templates/Brewfile.tpl` (injected via 1Password)
-2. **Profile-marked packages** in main `Brewfile` (between `# @profile:work` markers)
-3. **Work secrets**: ZLI, CI identity, clone function
+2. **Work secrets**: ZLI, CI identity, clone function, Claude skills
 
-On personal profile, these are skipped automatically.
+On other machines, these are skipped automatically.
 
 ## Process Management
 
@@ -135,7 +146,7 @@ The `refresh` command is useful after editing dotfiles to apply changes immediat
 
 ## Homebrew Management
 
-Homebrew packages are managed declaratively through `Brewfile`:
+Homebrew packages are managed declaratively through `profiles/`:
 
 ```bash
 ./setup.sh --brew    # Sync Homebrew packages (declarative with --cleanup)
@@ -143,10 +154,10 @@ Homebrew packages are managed declaratively through `Brewfile`:
 
 ### Features
 
-- **Declarative sync**: Installs packages from Brewfile and removes unlisted packages
-- **Profile-specific packages**: Uses `@profile:work` and `@profile:personal` markers
+- **Declarative sync**: Combines shared + individual Brewfiles per machine, removes unlisted packages
+- **Group-based composition**: Each machine maps to brew groups via `profiles/shared/*/hostnames` files
 - **Automatic tap cleanup**: Removes broken taps (deleted remotes) and undeclared taps
-- **Work package injection**: Combines `Brewfile` with `templates/Brewfile.tpl` (work profile only)
+- **Work package injection**: Appends `sensitive/Brewfile.work` on hera (from 1Password)
 
 The script automatically:
 1. Detects and removes broken taps (with deleted/missing remotes)
