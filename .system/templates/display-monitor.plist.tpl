@@ -7,7 +7,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/{{ op://Private/git-identity/name }}/.config/setup/monitor-watcher.sh</string>
+        <string>/Users/{{ op://Private/git-identity/name }}/.config/.system/setup/monitor-watcher.sh</string>
     </array>
 
     <key>StartInterval</key>

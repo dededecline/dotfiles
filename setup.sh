@@ -9,8 +9,8 @@
 #   ./setup.sh --macos              # Apply macOS preferences only
 #   ./setup.sh --help               # Show usage
 #
-# Supported machines: defined by profiles/individual/ directory names
-# Machine groups: defined by profiles/shared/*/hostnames files
+# Supported machines: defined by .system/profiles/individual/ directory names
+# Machine groups: defined by .system/profiles/shared/*/hostnames files
 #
 # For fresh installs from a new machine:
 #   curl -fsSL https://raw.githubusercontent.com/dededecline/dotfiles/main/setup.sh | bash
@@ -23,6 +23,8 @@ set -euo pipefail
 # =============================================================================
 
 DOTFILES="${DOTFILES:-$HOME/.config}"
+SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
+export SYSTEM_DIR
 
 # Auto-detect repo URL from git remote (for forks), fallback to original for fresh installs
 get_repo_url() {
@@ -40,8 +42,8 @@ get_repo_url() {
 REPO_URL=$(get_repo_url)
 
 # Source output utilities (compact fallback for curl installs where lib doesn't exist yet)
-if [[ -f "$DOTFILES/setup/lib/output.sh" ]]; then
-    source "$DOTFILES/setup/lib/output.sh"
+if [[ -f "$SYSTEM_DIR/setup/lib/output.sh" ]]; then
+    source "$SYSTEM_DIR/setup/lib/output.sh"
 else
     RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'; BLUE='\033[0;34m'; NC='\033[0m'
     print_header() { echo -e "\n${BLUE}===========================================================${NC}\n${BLUE}  $1${NC}\n${BLUE}===========================================================${NC}\n"; }
@@ -58,19 +60,19 @@ ensure_profiles_loaded() {
     if [[ "$_PROFILES_LOADED" == "true" ]]; then
         return 0
     fi
-    if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
-        source "$DOTFILES/setup/lib/profiles.sh"
+    if [[ -f "$SYSTEM_DIR/setup/lib/profiles.sh" ]]; then
+        source "$SYSTEM_DIR/setup/lib/profiles.sh"
         _PROFILES_LOADED=true
     else
         print_error "profiles.sh not found - dotfiles repo may not be cloned"
-        print_info "Expected at: $DOTFILES/setup/lib/profiles.sh"
+        print_info "Expected at: $SYSTEM_DIR/setup/lib/profiles.sh"
         exit 1
     fi
 }
 
 # Source immediately if available (covers local ./setup.sh runs)
-if [[ -f "$DOTFILES/setup/lib/profiles.sh" ]]; then
-    source "$DOTFILES/setup/lib/profiles.sh"
+if [[ -f "$SYSTEM_DIR/setup/lib/profiles.sh" ]]; then
+    source "$SYSTEM_DIR/setup/lib/profiles.sh"
     _PROFILES_LOADED=true
 fi
 
@@ -299,10 +301,10 @@ inject_secrets() {
     fi
 
     print_info "Injecting secrets from 1Password..."
-    if [[ -x "$DOTFILES/setup/secrets.sh" ]]; then
-        "$DOTFILES/setup/secrets.sh"
+    if [[ -x "$SYSTEM_DIR/setup/secrets.sh" ]]; then
+        "$SYSTEM_DIR/setup/secrets.sh"
     else
-        bash "$DOTFILES/setup/secrets.sh"
+        bash "$SYSTEM_DIR/setup/secrets.sh"
     fi
 }
 
@@ -320,7 +322,7 @@ prepare_brewfile() {
 
     # Includes hostname in groups which has no shared Brewfile, handled by individual section below
     for group in $groups; do
-        local shared_brewfile="$DOTFILES/profiles/shared/$group/Brewfile"
+        local shared_brewfile="$SYSTEM_DIR/profiles/shared/$group/Brewfile"
         if [[ -f "$shared_brewfile" ]]; then
             echo "" >> "$combined"
             echo "# shared/$group" >> "$combined"
@@ -329,7 +331,7 @@ prepare_brewfile() {
     done
 
     # Append individual machine Brewfile
-    local individual_brewfile="$DOTFILES/profiles/individual/$MACHINE_HOSTNAME/Brewfile"
+    local individual_brewfile="$SYSTEM_DIR/profiles/individual/$MACHINE_HOSTNAME/Brewfile"
     if [[ -f "$individual_brewfile" ]]; then
         echo "" >> "$combined"
         echo "# individual/$MACHINE_HOSTNAME" >> "$combined"
@@ -337,10 +339,10 @@ prepare_brewfile() {
     fi
 
     # Append work Brewfile if it exists (work group machines only)
-    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && [[ -f "$DOTFILES/sensitive/Brewfile.work" ]]; then
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && [[ -f "$SYSTEM_DIR/sensitive/Brewfile.work" ]]; then
         echo "" >> "$combined"
         echo "# Work additions (from 1Password)" >> "$combined"
-        cat "$DOTFILES/sensitive/Brewfile.work" >> "$combined"
+        cat "$SYSTEM_DIR/sensitive/Brewfile.work" >> "$combined"
     fi
 
     echo "$combined"
@@ -357,8 +359,8 @@ check_and_remove_broken_taps() {
     while IFS= read -r tap; do
         [[ -z "$tap" ]] && continue
 
-        # Try to update the tap to see if it's broken
-        if ! git -C "$(brew --repository "$tap")" fetch --dry-run origin 2>&1 | grep -q "fatal: couldn't find remote ref"; then
+        # Check if remote is reachable
+        if git -C "$(brew --repository "$tap")" ls-remote origin HEAD &>/dev/null; then
             continue
         fi
 
@@ -447,11 +449,11 @@ run_brew_sync() {
         local work_account
         work_account=$(op read "op://Private/1password-work-account/domain" --account my.1password.com 2>/dev/null) || true
 
-        if [[ -n "$work_account" ]] && [[ -f "$DOTFILES/templates/Brewfile.tpl" ]]; then
+        if [[ -n "$work_account" ]] && [[ -f "$SYSTEM_DIR/templates/Brewfile.tpl" ]]; then
             print_info "Injecting work Brewfile from 1Password..."
-            mkdir -p "$DOTFILES/sensitive"
-            op inject -f -i "$DOTFILES/templates/Brewfile.tpl" \
-                      -o "$DOTFILES/sensitive/Brewfile.work" \
+            mkdir -p "$SYSTEM_DIR/sensitive"
+            op inject -f -i "$SYSTEM_DIR/templates/Brewfile.tpl" \
+                      -o "$SYSTEM_DIR/sensitive/Brewfile.work" \
                       --account "$work_account" 2>/dev/null || true
         fi
 
@@ -511,10 +513,10 @@ run_brew_sync() {
 # =============================================================================
 
 sync_theme() {
-    if [[ -x "$DOTFILES/setup/sync-theme.sh" ]]; then
-        "$DOTFILES/setup/sync-theme.sh"
-    elif [[ -f "$DOTFILES/setup/sync-theme.sh" ]]; then
-        bash "$DOTFILES/setup/sync-theme.sh"
+    if [[ -x "$SYSTEM_DIR/setup/sync-theme.sh" ]]; then
+        "$SYSTEM_DIR/setup/sync-theme.sh"
+    elif [[ -f "$SYSTEM_DIR/setup/sync-theme.sh" ]]; then
+        bash "$SYSTEM_DIR/setup/sync-theme.sh"
     else
         print_warning "sync-theme.sh not found - skipping theme sync"
     fi
@@ -541,10 +543,10 @@ configure_claude() {
 
 create_symlinks() {
     print_info "Creating symlinks..."
-    if [[ -x "$DOTFILES/setup/symlinks.sh" ]]; then
-        source "$DOTFILES/setup/symlinks.sh"
+    if [[ -x "$SYSTEM_DIR/setup/symlinks.sh" ]]; then
+        source "$SYSTEM_DIR/setup/symlinks.sh"
     else
-        bash "$DOTFILES/setup/symlinks.sh"
+        bash "$SYSTEM_DIR/setup/symlinks.sh"
     fi
 }
 
@@ -642,9 +644,9 @@ setup_display_monitor() {
     fi
 
     # Make scripts executable
-    chmod +x "$DOTFILES/setup/monitor-watcher.sh" 2>/dev/null || true
-    chmod +x "$DOTFILES/setup/reload-display-config.sh" 2>/dev/null || true
-    chmod +x "$DOTFILES/setup/display-profiles.sh" 2>/dev/null || true
+    chmod +x "$SYSTEM_DIR/setup/monitor-watcher.sh" 2>/dev/null || true
+    chmod +x "$SYSTEM_DIR/setup/reload-display-config.sh" 2>/dev/null || true
+    chmod +x "$SYSTEM_DIR/setup/display-profiles.sh" 2>/dev/null || true
 
     # Create log directory
     mkdir -p "$HOME/.config/logs"
@@ -664,13 +666,13 @@ setup_display_monitor() {
     # Apply display profile now (the watcher only triggers on count changes)
     if command -v displayplacer &>/dev/null; then
         print_info "Applying display profile..."
-        bash "$DOTFILES/setup/display-profiles.sh"
+        bash "$SYSTEM_DIR/setup/display-profiles.sh"
     fi
 }
 
 setup_spotlight_shortcuts() {
     # Make script executable
-    chmod +x "$DOTFILES/setup/disable-spotlight-shortcuts.sh" 2>/dev/null || true
+    chmod +x "$SYSTEM_DIR/setup/disable-spotlight-shortcuts.sh" 2>/dev/null || true
 
     # Create log directory
     mkdir -p "$HOME/.config/logs"
@@ -689,16 +691,50 @@ setup_spotlight_shortcuts() {
 }
 
 setup_wallpaper() {
-    local wallpaper="$DOTFILES/assets/comfy-home.png"
-
-    if [[ ! -f "$wallpaper" ]]; then
-        print_warning "Wallpaper not found at $wallpaper - skipping"
+    local theme_file="$SYSTEM_DIR/themes/theme.toml"
+    if [[ ! -f "$theme_file" ]]; then
+        print_warning "Theme file not found - skipping wallpaper"
         return 0
+    fi
+
+    local flavor
+    flavor=$(grep '^flavor *= *"' "$theme_file" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/')
+    local wallpaper_dir="$SYSTEM_DIR/themes/catppuccin-${flavor}/wallpapers"
+
+    if [[ ! -d "$wallpaper_dir" ]]; then
+        return 0
+    fi
+
+    local wallpapers=()
+    while IFS= read -r -d '' f; do
+        wallpapers+=("$f")
+    done < <(find "$wallpaper_dir" -maxdepth 1 -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) -print0 | sort -z)
+
+    if [[ ${#wallpapers[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    local wallpaper
+    if [[ ${#wallpapers[@]} -eq 1 ]]; then
+        wallpaper="${wallpapers[0]}"
+    else
+        print_info "Available wallpapers:"
+        for i in "${!wallpapers[@]}"; do
+            echo "  $((i + 1))) $(basename "${wallpapers[$i]}")"
+        done
+        local choice
+        read -rp "Select wallpaper [1-${#wallpapers[@]}]: " choice
+        if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#wallpapers[@]} )); then
+            wallpaper="${wallpapers[$((choice - 1))]}"
+        else
+            print_warning "Invalid selection - skipping wallpaper"
+            return 0
+        fi
     fi
 
     print_info "Setting wallpaper..."
     osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$wallpaper\""
-    print_status "Wallpaper: applied to all desktops"
+    print_status "Wallpaper: $(basename "$wallpaper") applied to all desktops"
 }
 
 setup_default_browser() {
@@ -727,13 +763,13 @@ setup_default_browser() {
 }
 
 apply_macos_defaults() {
-    if [[ ! -f "$DOTFILES/macos/.macos" ]]; then
-        print_error "macOS preferences file not found: $DOTFILES/macos/.macos"
+    if [[ ! -f "$SYSTEM_DIR/macos/.macos" ]]; then
+        print_error "macOS preferences file not found: $SYSTEM_DIR/macos/.macos"
         return 1
     fi
 
     print_info "Applying macOS preferences..."
-    source "$DOTFILES/macos/.macos"
+    source "$SYSTEM_DIR/macos/.macos"
     print_status "macOS preferences applied"
 }
 
@@ -899,14 +935,14 @@ Full Setup:
   - Applies macOS system preferences
 
 Homebrew Sync (--brew):
-  Combines Brewfiles from profiles/shared/ and profiles/individual/ based
-  on machine groups. Installs packages and removes unlisted ones.
+  Combines Brewfiles from .system/profiles/shared/ and .system/profiles/individual/
+  based on machine groups. Installs packages and removes unlisted ones.
 
 macOS Preferences (--macos):
   Applies system preferences: UI, input, sound, Finder, screenshots, etc.
 
 1Password Integration (work group machines):
-  Work tools from templates/Brewfile.tpl require 1Password authentication.
+  Work tools from .system/templates/Brewfile.tpl require 1Password authentication.
   The script will prompt to sign in if needed, or you can skip and run
   'secrets' later.
 

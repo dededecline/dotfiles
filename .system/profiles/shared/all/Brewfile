@@ -104,7 +104,4 @@ cask "the-unarchiver"           # Archive utility
 # Fonts
 # =============================================================================
 cask "font-maple-mono-nf"          # Maple Mono coding font (universal)
-cask "font-sf-pro"                 # Apple SF Pro font (sketchybar labels)
 cask "font-sketchybar-app-font"    # App icons (sketchybar workspaces)
-cask "font-symbols-only-nerd-font" # Nerd Font symbols (kitty symbol_map)
-cask "sf-symbols"                  # Apple SF Symbols (sketchybar)

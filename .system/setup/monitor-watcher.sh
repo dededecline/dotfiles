@@ -3,8 +3,10 @@
 # Display Monitor Watcher
 # Detects changes in connected display count and triggers aerospace/sketchybar reload
 
+DOTFILES="${DOTFILES:-$HOME/.config}"
+SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
 CACHE_FILE="/tmp/display_count_cache"
-RELOAD_SCRIPT="$HOME/.config/setup/reload-display-config.sh"
+RELOAD_SCRIPT="$SYSTEM_DIR/setup/reload-display-config.sh"
 
 # Get current display count using system_profiler
 get_display_count() {

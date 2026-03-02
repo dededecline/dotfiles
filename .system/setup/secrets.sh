@@ -10,24 +10,25 @@
 #   - Signed in to 1Password: `op signin`
 #
 # Usage:
-#   ~/.config/setup/secrets.sh           # Inject all secrets
-#   ~/.config/setup/secrets.sh --check   # Check if secrets are configured
+#   ~/.config/.system/setup/secrets.sh           # Inject all secrets
+#   ~/.config/.system/setup/secrets.sh --check   # Check if secrets are configured
 #
 
 set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.config}"
-TEMPLATES_DIR="$DOTFILES/templates"
-SENSITIVE_DIR="$DOTFILES/sensitive"
+SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
+TEMPLATES_DIR="$SYSTEM_DIR/templates"
+SENSITIVE_DIR="$SYSTEM_DIR/sensitive"
 
 # 1Password account identifiers
 OP_PERSONAL_ACCOUNT="my.1password.com"
 
 # Source shared output utilities
-source "$DOTFILES/setup/lib/output.sh"
+source "$SYSTEM_DIR/setup/lib/output.sh"
 
 # Source hostname utilities
-source "$DOTFILES/setup/lib/profiles.sh"
+source "$SYSTEM_DIR/setup/lib/profiles.sh"
 
 # Use hostname from environment or auto-detect
 MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
@@ -169,7 +170,7 @@ inject_claude_skills() {
 
         # Files differ - show diff and prompt
         echo ""
-        echo -e "${YELLOW}$skill_name skill has changed:${NC}"
+        print_warning "$skill_name skill has changed:"
         echo "─────────────────────────────────────────"
         diff --color=auto -u "$output_file" "$temp_file" | head -50 || true
         echo "─────────────────────────────────────────"
@@ -301,7 +302,7 @@ check_secrets() {
         # Check work-specific Claude skills
         local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
         for skill in "${work_skills[@]}"; do
-            if [[ -d "$DOTFILES/claude/skills/$skill" ]]; then
+            if [[ -d "$DOTFILES/claude/skills/$skill" ]] || [[ -d "$SENSITIVE_DIR/claude-skills/$skill" ]]; then
                 print_status "Claude skill: $skill configured"
             else
                 print_warning "Claude skill: $skill not configured"

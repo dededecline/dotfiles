@@ -7,7 +7,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/{{ op://Private/git-identity/name }}/.config/setup/disable-spotlight-shortcuts.sh</string>
+        <string>/Users/{{ op://Private/git-identity/name }}/.config/.system/setup/disable-spotlight-shortcuts.sh</string>
     </array>
 
     <key>RunAtLoad</key>

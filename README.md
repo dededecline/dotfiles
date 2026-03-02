@@ -2,8 +2,8 @@
 
 Personal dotfiles managed as a git repository in `~/.config`.
 
-![Kitty Terminal](assets/terminal.jpg)
-![Empty Screen](assets/empty-screen.jpg)
+![Kitty Terminal](.system/assets/terminal.jpg)
+![Empty Screen](.system/assets/empty-screen.jpg)
 
 ## Quick Start
 
@@ -32,7 +32,7 @@ The setup supports multiple machines with hostname-based configuration:
 
 | Hostname | Type | Brew Groups |
 |----------|------|-------------|
-| hera | Work laptop | all + laptops + infra + hera |
+| hera | Work laptop | all + laptops + work + infra + hera |
 | athena | Personal laptop | all + laptops + personal + athena |
 | nyx | Personal server | all + personal + infra + nyx |
 
@@ -40,10 +40,10 @@ Hostname is auto-detected. Override with `--hostname <name>`.
 
 ### Machine-Specific Packages
 
-Packages are organized under `profiles/`:
+Packages are organized under `.system/profiles/`:
 
 ```
-profiles/
+.system/profiles/
 ├── shared/
 │   ├── all/
 │   │   ├── Brewfile         # All machines
@@ -54,9 +54,11 @@ profiles/
 │   ├── personal/
 │   │   ├── Brewfile         # athena + nyx
 │   │   └── hostnames
-│   └── infra/
-│       ├── Brewfile         # hera + nyx
-│       └── hostnames
+│   ├── infra/
+│   │   ├── Brewfile         # hera + nyx
+│   │   └── hostnames
+│   └── work/
+│       └── hostnames        # Work machines (1Password/secrets)
 └── individual/
     ├── hera/Brewfile        # hera only
     ├── athena/Brewfile      # athena only
@@ -65,7 +67,7 @@ profiles/
 
 ### Hera-Specific Items
 
-- **Work Brewfile**: `templates/Brewfile.tpl` injected via 1Password to `sensitive/Brewfile.work`
+- **Work Brewfile**: `.system/templates/Brewfile.tpl` injected via 1Password to `.system/sensitive/Brewfile.work`
 - **Work secrets**: ZLI, CI identity, clone function, Claude skills
 - **1Password work integration**: Only on hera
 
@@ -74,19 +76,22 @@ profiles/
 ```
 ~/.config/
 ├── setup.sh                 # Main setup script (idempotent)
-├── profiles/                # Machine profiles (shared + individual Brewfiles + hostnames)
-├── macos/                   # macOS system preferences
-├── setup/
-│   ├── symlinks.sh          # Symlink creation
-│   ├── secrets.sh           # 1Password secrets injection
-│   ├── ssh.sh               # SSH key generation
-│   ├── monitor-watcher.sh   # Display monitor detection
-│   ├── reload-display-config.sh  # Reload aerospace/sketchybar on display change
-│   └── lib/
-│       ├── output.sh        # Shared output utilities
-│       └── profiles.sh      # Multi-machine hostname utilities
-├── templates/               # 1Password template files (op:// refs)
-├── sensitive/               # Injected secrets (gitignored)
+├── .system/
+│   ├── assets/              # Images and static assets
+│   ├── macos/               # macOS system preferences
+│   ├── profiles/            # Machine profiles (shared + individual Brewfiles + hostnames)
+│   ├── sensitive/           # Injected secrets (gitignored)
+│   ├── setup/
+│   │   ├── symlinks.sh          # Symlink creation
+│   │   ├── secrets.sh           # 1Password secrets injection
+│   │   ├── ssh.sh               # SSH key generation
+│   │   ├── monitor-watcher.sh   # Display monitor detection
+│   │   ├── reload-display-config.sh  # Reload aerospace/sketchybar on display change
+│   │   └── lib/
+│   │       ├── output.sh        # Shared output utilities
+│   │       └── profiles.sh      # Multi-machine hostname utilities
+│   ├── templates/           # 1Password template files (op:// refs)
+│   └── themes/              # Shared Catppuccin theme files
 ├── fish/
 │   ├── config.fish          # Main config
 │   ├── conf.d/
@@ -102,8 +107,7 @@ profiles/
 ├── tmux/                    # Tmux
 ├── atuin/                   # Atuin shell history
 ├── bat/                     # Bat (syntax themes)
-├── lsd/                     # LSD (ls replacement)
-└── themes/                  # Shared Catppuccin theme files
+└── lsd/                     # LSD (ls replacement)
 ```
 
 ## Secrets Management
@@ -117,15 +121,15 @@ secrets check            # Check which secrets are configured
 
 ### Template System
 
-1. **Templates** (`templates/*.tpl`) contain `{{ op://Vault/Item/Field }}` references
+1. **Templates** (`.system/templates/*.tpl`) contain `{{ op://Vault/Item/Field }}` references
 2. **secrets.sh** processes templates via `op inject`
-3. **Output** goes to `sensitive/` (gitignored)
+3. **Output** goes to `.system/sensitive/` (gitignored)
 
 ### Work Tools (hera only)
 
 Work-specific items are only installed on hera:
 
-1. **Brewfile packages** in `templates/Brewfile.tpl` (injected via 1Password)
+1. **Brewfile packages** in `.system/templates/Brewfile.tpl` (injected via 1Password)
 2. **Work secrets**: ZLI, CI identity, clone function, Claude skills
 
 On other machines, these are skipped automatically.
@@ -146,7 +150,7 @@ The `refresh` command is useful after editing dotfiles to apply changes immediat
 
 ## Homebrew Management
 
-Homebrew packages are managed declaratively through `profiles/`:
+Homebrew packages are managed declaratively through `.system/profiles/`:
 
 ```bash
 ./setup.sh --brew    # Sync Homebrew packages (declarative with --cleanup)
@@ -155,9 +159,9 @@ Homebrew packages are managed declaratively through `profiles/`:
 ### Features
 
 - **Declarative sync**: Combines shared + individual Brewfiles per machine, removes unlisted packages
-- **Group-based composition**: Each machine maps to brew groups via `profiles/shared/*/hostnames` files
+- **Group-based composition**: Each machine maps to brew groups via `.system/profiles/shared/*/hostnames` files
 - **Automatic tap cleanup**: Removes broken taps (deleted remotes) and undeclared taps
-- **Work package injection**: Appends `sensitive/Brewfile.work` on hera (from 1Password)
+- **Work package injection**: Appends `.system/sensitive/Brewfile.work` on hera (from 1Password)
 
 The script automatically:
 1. Detects and removes broken taps (with deleted/missing remotes)
@@ -169,7 +173,7 @@ This prevents errors like "fatal: couldn't find remote ref" when taps are manual
 
 ## macOS Preferences
 
-The `macos/.macos` script configures system preferences via `defaults write`:
+The `.system/macos/.macos` script configures system preferences via `defaults write`:
 
 - **UI**: Dark mode, auto-hide menu bar, expanded save panels
 - **Input**: Key repeat enabled, smart punctuation disabled, auto-correct disabled

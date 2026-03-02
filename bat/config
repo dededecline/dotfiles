@@ -1,6 +1,6 @@
 # Bat Configuration
 
-# Theme - symlinked from ~/.config/themes/catppuccin-frappe/bat.tmTheme
+# Theme - managed by symlinks.sh from .system/themes/
 # Run `bat cache --build` after changes
 --theme="Catppuccin Frappe"
 

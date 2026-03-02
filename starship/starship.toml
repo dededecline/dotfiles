@@ -1,5 +1,5 @@
 # Catppuccin Frappe theme
-# Palette source: ~/.config/themes/catppuccin-frappe/palette.toml
+# Palette source: ~/.config/.system/themes/catppuccin-frappe/palette.toml
 # Starship requires inline palette definition
 
 palette = "catppuccin_frappe"

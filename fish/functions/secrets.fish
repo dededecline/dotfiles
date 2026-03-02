@@ -1,5 +1,5 @@
 function secrets --description "Manage secrets from 1Password"
-    set -l secrets_script "$HOME/.config/setup/secrets.sh"
+    set -l secrets_script "$HOME/.config/.system/setup/secrets.sh"
 
     if not test -f "$secrets_script"
         echo "Secrets script not found: $secrets_script"

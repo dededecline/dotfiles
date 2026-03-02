@@ -1,5 +1,5 @@
 function z --description "Connect to k8s cluster via zli"
-    set -l zli_cmd_file "$HOME/.config/sensitive/zli-command"
+    set -l zli_cmd_file "$HOME/.config/.system/sensitive/zli-command"
 
     if not test -f "$zli_cmd_file"
         echo "ZLI command not configured. Run 'secrets' to inject from 1Password."

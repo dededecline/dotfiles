@@ -1,5 +1,5 @@
 function empty --description "Create empty commit for CI"
-    set -l ci_file "$HOME/.config/sensitive/ci-identity"
+    set -l ci_file "$HOME/.config/.system/sensitive/ci-identity"
 
     if not test -f "$ci_file"
         echo "CI identity not configured. Run 'secrets' to inject from 1Password."

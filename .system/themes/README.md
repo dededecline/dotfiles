@@ -7,39 +7,39 @@ This directory contains the centralized theme configuration.
 ## Structure
 
 ```
-themes/
+.system/themes/
 ├── theme.toml                     # Single source of truth (flavor + accent)
-├── catppuccin-frappe/
-│   ├── palette.toml               # Color hex values
-│   ├── kitty.conf                 # Upstream kitty theme
-│   └── bat.tmTheme                # Upstream bat theme
-└── wallpapers/                    # Desktop wallpapers
+└── catppuccin-frappe/
+    ├── palette.toml               # Color hex values
+    ├── kitty.conf                 # Upstream kitty theme
+    ├── bat.tmTheme                # Upstream bat theme
+    └── wallpapers/                # Desktop wallpapers
 ```
 
 ## How It Works
 
-`themes/theme.toml` declares the flavor and accent color. Running `setup/sync-theme.sh` reads this file plus the palette and updates all downstream tool configs automatically.
+`.system/themes/theme.toml` declares the flavor and accent color. Running `.system/setup/sync-theme.sh` reads this file plus the palette and updates all downstream tool configs automatically.
 
 ### What gets synced
 
 | Category | Files | Method |
 |----------|-------|--------|
 | Generated | `sketchybar/colors.sh`, `lsd/colors.yaml`, `atuin/themes/*.toml` | Entire file regenerated |
-| Section | `starship/starship.toml`, `fish/config.fish`, `fastfetch/config.jsonc`, `templates/git-config.tpl` | Content between `@theme:start`/`@theme:end` markers replaced |
+| Section | `starship/starship.toml`, `fish/config.fish`, `fastfetch/config.jsonc`, `.system/templates/git-config.tpl` | Content between `@theme:start`/`@theme:end` markers replaced |
 | Flavor string | `nvim`, `tmux`, `bat`, `atuin/config.toml`, `kitty` | Flavor name updated via sed |
 | Upstream | `kitty.conf`, `bat.tmTheme`, `glow/*.json`, `zed/themes/*.json` | Not auto-synced (manual download for flavor changes) |
 
 ## Changing the Theme
 
-1. Edit `themes/theme.toml` (set flavor and accent)
-2. If switching flavors, download upstream theme files for the new flavor into `themes/catppuccin-<flavor>/`
-3. Run `setup/sync-theme.sh`
+1. Edit `.system/themes/theme.toml` (set flavor and accent)
+2. If switching flavors, download upstream theme files for the new flavor into `.system/themes/catppuccin-<flavor>/`
+3. Run `.system/setup/sync-theme.sh`
 4. Run `bat cache --build` if bat theme changed
 5. Restart terminals and reload configs (`refresh`)
 
 ## Adding a New Tool
 
 1. Determine which category the tool falls into (generated, section marker, flavor string, or upstream)
-2. Add a sync function to `setup/sync-theme.sh`
+2. Add a sync function to `.system/setup/sync-theme.sh`
 3. For section replacement: add `# @theme:start` / `# @theme:end` markers to the config file
 4. For generated files: add an auto-generated header comment

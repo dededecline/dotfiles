@@ -1,6 +1,6 @@
 # Work CLI additions for Brewfile
 # Injected from 1Password - do not edit directly
-# Run: secrets (or ~/.config/setup/secrets.sh)
+# Run: secrets (or ~/.config/.system/setup/secrets.sh)
 
 # =============================================================================
 # Work Taps

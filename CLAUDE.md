@@ -31,17 +31,17 @@
                                                                               
     secrets                         # Inject all secrets from 1Password       
     secrets check                   # Check which secrets are configured      
-    ~/.config/setup/secrets.sh --check  # Same as above (bash)                
+    ~/.config/.system/setup/secrets.sh --check  # Same as above (bash)
                                                                               
   ### Symlinks Only                                                           
                                                                               
-    source ~/.config/setup/symlinks.sh  # Just create symlinks                
+    source ~/.config/.system/setup/symlinks.sh  # Just create symlinks
                                                                               
   ### Theme Sync
 
-    ./setup/sync-theme.sh          # Sync theme colors to all tool configs
+    ./.system/setup/sync-theme.sh          # Sync theme colors to all tool configs
 
-  Theme is defined in `themes/theme.toml` (flavor + accent). The sync script
+  Theme is defined in `.system/themes/theme.toml` (flavor + accent). The sync script
   reads the palette and updates all downstream configs automatically. Runs
   during full setup.
 
@@ -76,7 +76,7 @@
                                                                               
   ### macOS Preferences                                                       
                                                                               
-  The macos/.macos script sets system defaults via defaults write commands:         
+  The .system/macos/.macos script sets system defaults via defaults write commands:         
                                                                               
   • **UI**: Dark mode, auto-hide menu bar, expanded save panels               
   • **Input**: Key repeat enabled, smart punctuation disabled, auto-correct   
@@ -92,10 +92,10 @@
   ### Homebrew Management
 
   Homebrew packages are managed declaratively with brew bundle --cleanup.
-  Packages are organized under `profiles/`:
+  Packages are organized under `.system/profiles/`:
 
   ```
-  profiles/
+  .system/profiles/
   ├── shared/
   │   ├── all/
   │   │   ├── Brewfile         # All machines
@@ -121,33 +121,33 @@
   lists which machines belong to that group (one per line). Adding a new
   machine or group requires only filesystem changes, no code edits.
 
-  The profiles/individual subdirectory names and the profiles/shared/*/hostnames files are the singular sources of truth for defining machines and machine groups. The `work` group gates 1Password work-account integration and sensitive/Brewfile.work injection.
+  The .system/profiles/individual subdirectory names and the .system/profiles/shared/*/hostnames files are the singular sources of truth for defining machines and machine groups. The `work` group gates 1Password work-account integration and .system/sensitive/Brewfile.work injection.
 
-  Work packages in templates/Brewfile.tpl are injected via 1Password to
-  sensitive/Brewfile.work and appended on work group machines only.              
+  Work packages in .system/templates/Brewfile.tpl are injected via 1Password to
+  .system/sensitive/Brewfile.work and appended on work group machines only.              
                                                                               
   ### Secrets System                                                          
                                                                               
   The secrets system uses 1Password CLI (op inject) to populate sensitive     
   values:                                                                     
                                                                               
-  1. **Templates** (templates/*.tpl) - Files with {{ op://Vault/Item/Field }} 
-  references                                                                  
-  2. **secrets.sh** - Processes templates and writes to sensitive/ directory  
-  3. **sensitive/** - Gitignored directory containing injected credentials    
+  1. **Templates** (.system/templates/*.tpl) - Files with {{ op://Vault/Item/Field }}
+  references
+  2. **secrets.sh** - Processes templates and writes to .system/sensitive/ directory
+  3. **.system/sensitive/** - Gitignored directory containing injected credentials    
                                                                               
   To add a new secret:                                                        
                                                                               
-  1. Create a template in templates/ with op:// references                    
-  2. Add injection logic to setup/secrets.sh                                  
-  3. Document the required 1Password item in templates/README.md              
+  1. Create a template in .system/templates/ with op:// references
+  2. Add injection logic to .system/setup/secrets.sh
+  3. Document the required 1Password item in .system/templates/README.md              
                                                                               
   ### Symlinks                                                                
                                                                               
   Traditional dotfiles that expect ~/. are symlinked:                         
                                                                               
   • git/config → ~/.gitconfig                                                 
-  • sensitive/.npmrc → ~/.npmrc                                               
+  • .system/sensitive/.npmrc → ~/.npmrc                                               
                                                                               
   ### Display Monitor System                                                  
                                                                               
@@ -156,10 +156,10 @@
   every 3 seconds.                                                            
                                                                               
   Components:                                                                 
-  • setup/monitor-watcher.sh - Detects display count changes using            
-  system_profiler                                                             
-  • setup/reload-display-config.sh - Reloads configs when changes detected    
-  • templates/display-monitor.plist.tpl - LaunchAgent configuration           
+  • .system/setup/monitor-watcher.sh - Detects display count changes using
+  system_profiler
+  • .system/setup/reload-display-config.sh - Reloads configs when changes detected
+  • .system/templates/display-monitor.plist.tpl - LaunchAgent configuration           
                                                                               
   The system logs to ~/.config/logs/display-monitor.log and is automatically
   loaded by setup.sh if aerospace and sketchybar are installed.
@@ -167,33 +167,33 @@
   ### Spotlight Shortcuts LaunchAgent
 
   macOS re-enables Spotlight keyboard shortcuts on every restart. A
-  LaunchAgent runs setup/disable-spotlight-shortcuts.sh at login to
+  LaunchAgent runs .system/setup/disable-spotlight-shortcuts.sh at login to
   re-disable shortcuts 64, 65, and 160, preventing conflicts with Raycast.
 
   Components:
-  • setup/disable-spotlight-shortcuts.sh - Disables shortcuts via defaults
+  • .system/setup/disable-spotlight-shortcuts.sh - Disables shortcuts via defaults
   write and activateSettings
-  • templates/spotlight-shortcuts.plist.tpl - LaunchAgent configuration
+  • .system/templates/spotlight-shortcuts.plist.tpl - LaunchAgent configuration
 
   The script waits 10 seconds for macOS to finish boot-time restoration,
   then applies the settings. Logs to ~/.config/logs/spotlight-shortcuts.log.
 
   ### Theme System
 
-  Theme colors are centralized via `themes/theme.toml` (flavor + accent) and
-  `themes/catppuccin-frappe/palette.toml` (hex values). The sync script
-  (`setup/sync-theme.sh`) propagates colors to all tool configs:
+  Theme colors are centralized via `.system/themes/theme.toml` (flavor + accent) and
+  `.system/themes/catppuccin-frappe/palette.toml` (hex values). The sync script
+  (`.system/setup/sync-theme.sh`) propagates colors to all tool configs:
 
   - **Generated files**: sketchybar/colors.sh, lsd/colors.yaml,
   atuin/themes/*.toml (full regeneration)
   - **Section markers**: starship/starship.toml, fish/config.fish,
-  fastfetch/config.jsonc, templates/git-config.tpl (content between
+  fastfetch/config.jsonc, .system/templates/git-config.tpl (content between
   `@theme:start`/`@theme:end` replaced)
   - **Flavor strings**: nvim, tmux, bat, atuin, kitty (flavor name updated)
   - **Upstream files**: kitty.conf, bat.tmTheme, glow, zed themes (manual
   download for flavor changes)
 
-  To change themes: edit `themes/theme.toml`, run `setup/sync-theme.sh`.
+  To change themes: edit `.system/themes/theme.toml`, run `.system/setup/sync-theme.sh`.
 
   ### Claude Settings
 
@@ -237,7 +237,7 @@
   • gitdone - Switch to default branch and pull                               
   • clone - Clone work repos with archive detection                           
   • empty - Create empty commit with CI identity for triggering pipelines     
-  • z - Zoxide wrapper for directory jumping                                  
+  • z - Connect to k8s clusters via ZLI (work, requires secrets)                                  
   • awsall - Run AWS CLI command across all profiles                          
                                                                               
   ### Key Aliases                                                             
