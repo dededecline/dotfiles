@@ -8,8 +8,8 @@
 |--------|----------|
 | Focus up/left/down/right | `Hyper` + `I/J/K/L` |
 | Move window up/left/down/right | `Hyper+Shift` + `I/J/K/L` |
-| Workspace 1-7 | `Hyper` + `Q/W/E/R/T/Y/U` |
-| Move to workspace 1-7 | `Hyper+Shift` + `Q/W/E/R/T/Y/U` |
+| Workspace 1-8 | `Hyper` + `1-8` |
+| Move to workspace 1-8 | `Hyper+Shift` + `1-8` |
 | Toggle fullscreen | `Hyper+Shift+F` |
 | Toggle float/tile | `Hyper+F` |
 | Toggle tiles layout | `Hyper+/` |
@@ -46,6 +46,8 @@
 | Clear line | `Ctrl+U` |
 | Cancel command | `Ctrl+C` |
 | History search | `Ctrl+R` (via Atuin) |
+| Paste file path (fzf) | `Ctrl+T` |
+| cd into directory (fzf) | `Alt+C` |
 
 ## Kitty (Terminal)
 
@@ -57,6 +59,8 @@
 | Close tab | `Cmd+W` |
 | Next/prev tab | `Cmd+Shift+]/[` |
 | Scroll up/down | `Cmd+Up/Down` |
+| Word back/forward | `Alt+Left/Right` |
+| Line start/end | `Cmd+Left/Right` |
 
 ## Neovim
 
@@ -78,7 +82,17 @@
 | Go to symbol | `Space+O` |
 | Command palette | `Space+P` |
 | Git files | `Ctrl+G` |
+| Find projects | `Space+FP` |
 | Help | `F1` |
+
+**Claude AI:**
+| Action | Shortcut |
+|--------|----------|
+| Toggle Claude panel | `Ctrl+;` |
+| Focus Claude panel | `Space+;` |
+| Send selection to Claude | `Space+A` (visual) |
+| Accept diff | `Ctrl+Enter` |
+| Deny diff | `Ctrl+Backspace` |
 
 **Diagnostics:**
 | Action | Shortcut |
@@ -93,6 +107,14 @@
 | Trigger completion | `Ctrl+Space` |
 | Next/prev item | `Tab/Shift+Tab` or `Ctrl+N/P` |
 | Confirm selection | `Enter` |
+
+**Tabs:**
+| Action | Shortcut |
+|--------|----------|
+| Next/prev tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` |
+| New tab | `Ctrl+W T` |
+| Close tab | `Ctrl+W Q` |
+| Go to tab 1-9 | `Alt+1-9` |
 
 **Window Splitting (VSCode-style):**
 | Action | Shortcut |
@@ -115,7 +137,6 @@
 | Increase/decrease width | `Ctrl+W >/<` |
 | Increase/decrease height | `Ctrl+W +/-` |
 | Rotate splits | `Ctrl+W R` |
-
 
 ## Tmux
 
@@ -144,15 +165,65 @@ Prefix: `Ctrl+B`
 | Calculator | type math in Raycast |
 | File search | `Cmd+Space` then filename |
 
-## Dotfiles Management
+## CLI Replacements
+
+**Tool Replacements:**
+| Alias | Replacement | Notes |
+|-------|-------------|-------|
+| `ls` | `lsd` | Modern ls with icons |
+| `cat` | `bat` / `glow` | bat for code, glow for markdown |
+| `find` | `fd` | Faster, friendlier find |
+| `diff` | `delta` | Better diff viewer |
+| `du` | `dust` | Better disk usage |
+| `ping` | `gping` | Graphical ping |
+| `top` | `btop` | Better process monitor |
+| `fetch` | `fastfetch` | System info display |
+| `vim` | `nvim` | Neovim |
+| `pip` | `pip3` | Python 3 pip |
+| `python` | `python3` | Python 3 |
+
+**Listing Shortcuts:**
+| Alias | Command |
+|-------|---------|
+| `l` | `ls -l` |
+| `la` | `ls -a` |
+| `ll` | `ls -la` |
+
+**Git Shortcuts:**
+| Alias | Command |
+|-------|---------|
+| `gs` | `git status` |
+| `gb` | `git branch` |
+| `gc` | `git checkout` |
+| `gd` | `git diff` |
+| `ga` | `git add` |
+| `gp` | `git push` |
+| `gl` | `git pull` |
+| `gst` | `git stash` |
+| `gpop` | `git stash pop` |
+
+**Other Aliases:**
+| Alias | Command |
+|-------|---------|
+| `search` | `grep -rnw . -e` (recursive word search) |
+| `tofulint` | `tofu fmt && tofu validate` |
+| `fishconfig` | Edit fish config in nvim |
+| `kctx` | `kubectl config current-context` |
+| `dotfiles` | `cd ~/.config` |
+
+## Fish Functions
 
 | Command | Description |
 |---------|-------------|
+| `setup` | Run setup.sh from anywhere (passes all args through) |
 | `refresh` | Reload all configured processes (fish, aerospace, sketchybar, tmux) |
-| `refresh fish` | Reload Fish shell config only |
-| `refresh aerospace` | Reload Aerospace window manager config only |
-| `refresh sketchybar` | Reload Sketchybar status bar config only |
-| `refresh tmux` | Reload Tmux config only (if in tmux session) |
+| `refresh <target>` | Reload specific target: `fish`, `aerospace`, `sketchybar`, `tmux` |
 | `secrets` | Inject secrets from 1Password |
 | `secrets check` | Check which secrets are configured |
-| `dotfiles` | Navigate to ~/.config directory |
+| `cat <file>` | Smart cat: glow for markdown, bat for everything else |
+| `sketchybar reload` | Reload sketchybar config |
+| `sketchybar restart` | Full restart via launchctl |
+| `sketchybar stop/start` | Stop or start sketchybar |
+| `gitdone` | Switch to default branch and pull |
+| `clone <repo>` | Clone work repo with archive detection |
+| `empty` | Empty commit to trigger CI pipelines |
