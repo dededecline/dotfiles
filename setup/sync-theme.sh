@@ -474,6 +474,7 @@ sync_flavor_strings() {
     file="$DOTFILES/bat/config"
     if [[ -f "$file" ]]; then
         sed -i '' "s/--theme=\"Catppuccin .*\"/--theme=\"Catppuccin ${cap_flavor}\"/" "$file"
+        bat cache --build --source "$DOTFILES/bat" >/dev/null 2>&1 || true
         print_status "bat/config: theme → Catppuccin ${cap_flavor}"
     fi
 
