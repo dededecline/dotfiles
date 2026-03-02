@@ -285,7 +285,7 @@ EOF
 # =============================================================================
 
 sync_starship() {
-    local file="$DOTFILES/starship.toml"
+    local file="$DOTFILES/starship/starship.toml"
     [[ -f "$file" ]] || return 0
 
     local content

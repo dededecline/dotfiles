@@ -75,7 +75,7 @@ profiles/
 ~/.config/
 ├── setup.sh                 # Main setup script (idempotent)
 ├── profiles/                # Machine profiles (shared + individual Brewfiles + hostnames)
-├── .macos                   # macOS system preferences
+├── macos/                   # macOS system preferences
 ├── setup/
 │   ├── symlinks.sh          # Symlink creation
 │   ├── secrets.sh           # 1Password secrets injection
@@ -96,7 +96,7 @@ profiles/
 ├── aerospace/               # AeroSpace window manager
 ├── sketchybar/              # SketchyBar status bar
 ├── git/                     # Git configuration
-├── starship.toml            # Starship prompt (Catppuccin themed)
+├── starship/                # Starship prompt (Catppuccin themed)
 ├── kitty/                   # Kitty terminal
 ├── nvim/                    # Neovim
 ├── tmux/                    # Tmux
@@ -169,7 +169,7 @@ This prevents errors like "fatal: couldn't find remote ref" when taps are manual
 
 ## macOS Preferences
 
-The `.macos` script configures system preferences via `defaults write`:
+The `macos/.macos` script configures system preferences via `defaults write`:
 
 - **UI**: Dark mode, auto-hide menu bar, expanded save panels
 - **Input**: Key repeat enabled, smart punctuation disabled, auto-correct disabled

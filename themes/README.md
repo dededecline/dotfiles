@@ -25,7 +25,7 @@ themes/
 | Category | Files | Method |
 |----------|-------|--------|
 | Generated | `sketchybar/colors.sh`, `lsd/colors.yaml`, `atuin/themes/*.toml` | Entire file regenerated |
-| Section | `starship.toml`, `fish/config.fish`, `fastfetch/config.jsonc`, `templates/git-config.tpl` | Content between `@theme:start`/`@theme:end` markers replaced |
+| Section | `starship/starship.toml`, `fish/config.fish`, `fastfetch/config.jsonc`, `templates/git-config.tpl` | Content between `@theme:start`/`@theme:end` markers replaced |
 | Flavor string | `nvim`, `tmux`, `bat`, `atuin/config.toml`, `kitty` | Flavor name updated via sed |
 | Upstream | `kitty.conf`, `bat.tmTheme`, `glow/*.json`, `zed/themes/*.json` | Not auto-synced (manual download for flavor changes) |
 

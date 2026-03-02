@@ -727,13 +727,13 @@ setup_default_browser() {
 }
 
 apply_macos_defaults() {
-    if [[ ! -f "$DOTFILES/.macos" ]]; then
-        print_error "macOS preferences file not found: $DOTFILES/.macos"
+    if [[ ! -f "$DOTFILES/macos/.macos" ]]; then
+        print_error "macOS preferences file not found: $DOTFILES/macos/.macos"
         return 1
     fi
 
     print_info "Applying macOS preferences..."
-    source "$DOTFILES/.macos"
+    source "$DOTFILES/macos/.macos"
     print_status "macOS preferences applied"
 }
 

@@ -57,7 +57,7 @@ echo "Creating symlinks..."
 create_symlink "$DOTFILES/git/config" "$HOME/.gitconfig"
 
 # Hush login (suppress "Last login:" message)
-create_symlink "$DOTFILES/hushlogin" "$HOME/.hushlogin"
+create_symlink "$DOTFILES/fish/hushlogin" "$HOME/.hushlogin"
 
 # Sensitive files (if they exist)
 create_symlink "$DOTFILES/sensitive/.npmrc" "$HOME/.npmrc"

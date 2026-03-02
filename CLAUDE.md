@@ -76,7 +76,7 @@
                                                                               
   ### macOS Preferences                                                       
                                                                               
-  The .macos script sets system defaults via defaults write commands:         
+  The macos/.macos script sets system defaults via defaults write commands:         
                                                                               
   • **UI**: Dark mode, auto-hide menu bar, expanded save panels               
   • **Input**: Key repeat enabled, smart punctuation disabled, auto-correct   
@@ -186,7 +186,7 @@
 
   - **Generated files**: sketchybar/colors.sh, lsd/colors.yaml,
   atuin/themes/*.toml (full regeneration)
-  - **Section markers**: starship.toml, fish/config.fish,
+  - **Section markers**: starship/starship.toml, fish/config.fish,
   fastfetch/config.jsonc, templates/git-config.tpl (content between
   `@theme:start`/`@theme:end` replaced)
   - **Flavor strings**: nvim, tmux, bat, atuin, kitty (flavor name updated)

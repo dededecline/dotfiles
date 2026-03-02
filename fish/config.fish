@@ -28,6 +28,7 @@ tirith init --shell fish | source
 # Starship Prompt
 # =============================================================================
 if type -q starship
+    set -gx STARSHIP_CONFIG $DOTFILES/starship/starship.toml
     starship init fish | source
 end
 
