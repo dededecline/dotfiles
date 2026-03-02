@@ -69,7 +69,7 @@ else
             hera)   echo "all laptops infra hera" ;;
             athena) echo "all laptops personal athena" ;;
             nyx)    echo "all personal infra nyx" ;;
-            *)      echo "all" ;;
+            *)      echo "all $1" ;;
         esac
     }
 fi
@@ -147,7 +147,7 @@ preprocess_jsonc_machines() {
         skip==0 { print }
     ' "$input" > "$tmp"
 
-    sed -E 's/,([[:space:]]*[}\\]])/\1/g' "$tmp" | jq . > "$output"
+    sed -E 's/,([[:space:]]*[]{}])/\1/g' "$tmp" | jq . > "$output"
     rm -f "$tmp"
 }
 
@@ -269,7 +269,7 @@ prepare_brewfile() {
     # Start fresh
     : > "$combined"
 
-    # Append shared group Brewfiles (skip the hostname entry - it's for JSONC matching)
+    # Includes hostname in groups which has no shared Brewfile, handled by individual section below
     for group in $groups; do
         local shared_brewfile="$DOTFILES/profiles/shared/$group/Brewfile"
         if [[ -f "$shared_brewfile" ]]; then

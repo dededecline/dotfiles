@@ -121,6 +121,8 @@
   • hera: all + laptops + infra + hera + sensitive/Brewfile.work
   • athena: all + laptops + personal + athena
   • nyx: all + personal + infra + nyx
+  
+  The profiles/individual subdirectory names and the profiles/shared/*/hostnames files are the singular sources of truth for defining machines and machine groups.
 
   Work packages in templates/Brewfile.tpl are injected via 1Password to
   sensitive/Brewfile.work and appended on hera only.              
@@ -267,6 +269,4 @@
   • Always attempt the simplest possible coding output solutions to a problem 
                                                                               
   • Always ensure that templated/protected files' generated output are        
-  excluded from commit in the gitignore                                       
-
-
+  excluded from commit in the gitignore

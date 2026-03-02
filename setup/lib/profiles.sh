@@ -39,7 +39,7 @@ get_machine_groups() {
         fi
     done
     if [[ ${#groups[@]} -eq 0 ]]; then
-        echo "all"
+        echo "all $hostname"
     else
         echo "${groups[*]} $hostname"
     fi
