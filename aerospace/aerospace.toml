@@ -11,8 +11,9 @@ automatically-unhide-macos-hidden-apps = true
 
 # Sketchybar integration updates workspace indicators on workspace change
 exec-on-workspace-change = [
-  '/bin/bash', '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE && ~/.config/sketchybar/plugins/update_workspace_icons.sh'
+  "/bin/bash",
+  "-c",
+  "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE && ~/.config/sketchybar/plugins/update_workspace_icons.sh"
 ]
 
 [gaps]
@@ -69,18 +70,6 @@ ctrl-alt-cmd-shift-tab = "move-workspace-to-monitor --wrap-around next"
 
 ctrl-alt-cmd-shift-semicolon = "mode service"
 
-[workspace-to-monitor-force-assignment]
-# Workspace to monitor assignment
-1 = "main"
-2 = "main"
-3 = "main"
-4 = "main"
-5 = "main"
-6 = ["secondary", "main"]
-7 = ["secondary", "main"]
-8 = ["secondary", "main"]
-9 = ["secondary", "main"]
-
 [mode.service.binding]
 esc = ["reload-config", "mode main"]
 r = ["flatten-workspace-tree", "mode main"]
@@ -92,11 +81,19 @@ j = ["join-with left", "mode main"]
 k = ["join-with down", "mode main"]
 l = ["join-with right", "mode main"]
 
-# Floating apps
-[[on-window-detected]]
-if.app-id = "us.zoom.xos"
-run = ["layout floating", "move-node-to-workspace 9"]
+[workspace-to-monitor-force-assignment]
+# Workspace to monitor assignment
+1 = "main"
+2 = "main"
+3 = "main"
+4 = "main"
+5 = ["secondary", "main"]
+6 = ["secondary", "main"]
+7 = ["secondary", "main"]
+8 = ["secondary", "main"]
+9 = "main"
 
+# Floating apps
 [[on-window-detected]]
 if.app-id = "com.1password.1password"
 run = "layout floating"
@@ -110,36 +107,12 @@ if.app-id = "com.iconfactory.Tot"
 run = "layout floating"
 
 [[on-window-detected]]
-if.app-id = "org.via.configurator"
-run = "layout floating"
-
-[[on-window-detected]]
-if.app-id = "today.vial"
-run = "layout floating"
-
-[[on-window-detected]]
 if.app-id = "com.apple.findmy"
-run = "layout floating"
-
-[[on-window-detected]]
-if.app-name-regex-substring = "Vial"
 run = "layout floating"
 
 [[on-window-detected]]
 if.app-id = "com.protonmail.bridge"
 run = "layout floating"
-
-[[on-window-detected]]
-if.app-id = "com.valvesoftware.steam"
-run = "layout floating"
-
-[[on-window-detected]]
-if.app-id = "com.valvesoftware.steam.helper"
-run = "layout floating"
-
-[[on-window-detected]]
-if.app-id = "com.granola.app"
-run = "move-node-to-workspace 9"
 
 [[on-window-detected]]
 if.app-id = "com.apple.ActivityMonitor"
@@ -216,12 +189,16 @@ run = "move-node-to-workspace 3"
 if.app-id = "com.apple.journal"
 run = "move-node-to-workspace 3"
 
-# Workspace 4: Browser
+# Workspace 4: Browsing
 [[on-window-detected]]
 if.app-id = "com.kagi.kagimacOS"
 run = "move-node-to-workspace 4"
 
-# Workspace 5: kitty, Zed
+[[on-window-detected]]
+if.app-id = "com.apple.news"
+run = "move-node-to-workspace 4"
+
+# Workspace 5: Development
 [[on-window-detected]]
 if.app-id = "net.kovidgoyal.kitty"
 run = "move-node-to-workspace 5"
@@ -230,49 +207,50 @@ run = "move-node-to-workspace 5"
 if.app-id = "dev.zed.Zed"
 run = "move-node-to-workspace 5"
 
-# Workspace 6: Notion, Journal
-[[on-window-detected]]
-if.app-id = "notion.id"
-run = "move-node-to-workspace 6"
-
-[[on-window-detected]]
-if.app-id = "com.apple.journal"
-run = "move-node-to-workspace 6"
-
-# Workspace 7: News, Vial, Music, RustDesk
-[[on-window-detected]]
-if.app-id = 'com.apple.news'
-run = 'move-node-to-workspace 7'
-
-[[on-window-detected]]
-if.app-id = 'today.vial'
-run = 'move-node-to-workspace 7'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.Music'
-run = 'move-node-to-workspace 7'
-
-[[on-window-detected]]
-if.app-id = 'com.carriez.rustdesk'
-run = 'move-node-to-workspace 7'
-
-# Workspace 8: Davinci Resolve, Steam, Ableton, Infuse (secondary monitor)
+# Workspace 6: Art
 [[on-window-detected]]
 if.app-id = "com.blackmagic-design.DaVinciResolveLite"
-run = "move-node-to-workspace 8"
-
-[[on-window-detected]]
-if.app-id = "com.valvesoftware.steam"
-run = "move-node-to-workspace 8"
-
-[[on-window-detected]]
-if.app-id = "com.valvesoftware.steam.helper"
-run = "move-node-to-workspace 8"
-
-[[on-window-detected]]
-if.app-id = "com.firecore.infuse"
-run = "move-node-to-workspace 8"
+run = "move-node-to-workspace 6"
 
 [[on-window-detected]]
 if.app-id = "com.ableton.live"
+run = "move-node-to-workspace 6"
+
+# Workspace 7: Media
+[[on-window-detected]]
+if.app-id = "com.valvesoftware.steam"
+run = "move-node-to-workspace 7"
+
+[[on-window-detected]]
+if.app-id = "com.valvesoftware.steam.helper"
+run = "move-node-to-workspace 7"
+
+[[on-window-detected]]
+if.app-id = "com.firecore.infuse"
+run = "move-node-to-workspace 7"
+
+[[on-window-detected]]
+if.app-id = "com.apple.Music"
+run = "move-node-to-workspace 7"
+
+# Workspace 8: Meetings and overflow
+[[on-window-detected]]
+if.app-id = "com.granola.app"
 run = "move-node-to-workspace 8"
+
+[[on-window-detected]]
+if.app-id = "us.zoom.xos"
+run = ["layout floating", "move-node-to-workspace 8"]
+
+# Workspace 9: Miscellaneous, not in need of a larger screen
+[[on-window-detected]]
+if.app-id = "today.vial"
+run = "move-node-to-workspace 9"
+
+[[on-window-detected]]
+if.app-id = "com.carriez.rustdesk"
+run = "move-node-to-workspace 9"
+
+[[on-window-detected]]
+if.app-id = "org.via.configurator"
+run = "move-node-to-workspace 9"

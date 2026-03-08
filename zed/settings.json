@@ -71,6 +71,6 @@
     "sql": true,
     "swift": true,
     "terraform": true,
-    "toml": true
+    "tombi": true
   }
 }

@@ -31,7 +31,15 @@ history_filter = [
 ]
 
 [stats]
-common_subcommands = ["git", "docker", "kubectl", "npm", "brew", "cargo", "fish"]
+common_subcommands = [
+  "git",
+  "docker",
+  "kubectl",
+  "npm",
+  "brew",
+  "cargo",
+  "fish"
+]
 common_prefix = ["sudo"]
 ignored_commands = ["cd", "ls", "ll", "la", "clear", "pwd"]
 

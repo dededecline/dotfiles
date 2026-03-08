@@ -63,7 +63,7 @@ symbol = " "
 style = "bold mauve"
 
 [git_status]
-format = '([$all_status$ahead_behind]($style) )'
+format = "([$all_status$ahead_behind]($style) )"
 style = "bold red"
 ahead = "⇡${count}"
 behind = "⇣${count}"
@@ -96,7 +96,14 @@ format = '[${symbol}(${version} )(\($virtualenv\) )]($style)'
 symbol = " "
 style = "yellow"
 detect_extensions = ["py"]
-detect_files = ["requirements.txt", ".python-version", "pyproject.toml", "Pipfile", "setup.py", "tox.ini"]
+detect_files = [
+  "requirements.txt",
+  ".python-version",
+  "pyproject.toml",
+  "Pipfile",
+  "setup.py",
+  "tox.ini"
+]
 detect_folders = [".venv", "venv", ".virtualenv"]
 
 [kubernetes]
@@ -106,15 +113,36 @@ symbol = "☸ "
 style = "bold blue"
 detect_env_vars = []  # Override default KUBECONFIG detection
 detect_extensions = []
-detect_files = ["Chart.yaml", "Chart.yml", "helmfile.yaml", "helmfile.yml", "kustomization.yaml", "kustomization.yml", "skaffold.yaml"]
-detect_folders = ["k8s", "kubernetes", "kustomize", "helm", "charts", "manifests"]
+detect_files = [
+  "Chart.yaml",
+  "Chart.yml",
+  "helmfile.yaml",
+  "helmfile.yml",
+  "kustomization.yaml",
+  "kustomization.yml",
+  "skaffold.yaml"
+]
+detect_folders = [
+  "k8s",
+  "kubernetes",
+  "kustomize",
+  "helm",
+  "charts",
+  "manifests"
+]
 
 [terraform]
-format = '[$symbol$workspace]($style) '
+format = "[$symbol$workspace]($style) "
 symbol = "󱁢 "
 style = "bold mauve"
 detect_extensions = ["tf", "tfvars", "hcl", "tofu"]
-detect_files = [".terraform-version", ".opentofu-version", "terraform.tfstate", ".terraformrc", ".tofurc"]
+detect_files = [
+  ".terraform-version",
+  ".opentofu-version",
+  "terraform.tfstate",
+  ".terraformrc",
+  ".tofurc"
+]
 detect_folders = [".terraform", ".opentofu"]
 
 [aws]
@@ -127,10 +155,13 @@ force_display = false
 format = '[$symbol$account(@$domain)(\($project\))]($style) '
 symbol = " "
 style = "bold blue"
-detect_env_vars = ["CLOUDSDK_ACTIVE_CONFIG_NAME", "GOOGLE_APPLICATION_CREDENTIALS"]
+detect_env_vars = [
+  "CLOUDSDK_ACTIVE_CONFIG_NAME",
+  "GOOGLE_APPLICATION_CREDENTIALS"
+]
 
 [time]
 disabled = false
-format = '[$time]($style)'
+format = "[$time]($style)"
 style = "bold text"
 time_format = "%H:%M"
