@@ -16,19 +16,23 @@ if [[ ! -f "$RUSTDESK" ]]; then
     return 0 2>/dev/null || exit 0
 fi
 
+# Ensure root config directory exists (RustDesk doesn't auto-create it)
+RUSTDESK_ROOT_CONFIG="/var/root/Library/Preferences/com.carriez.RustDesk"
+sudo mkdir -p "$RUSTDESK_ROOT_CONFIG"
+
 # Enable direct IP access (no relay server needed over Tailscale)
 # sudo is required — RustDesk service runs as root on macOS and reads config from root's preferences
-sudo "$RUSTDESK" --option direct-server=Y
+sudo "$RUSTDESK" --option direct-server Y &>/dev/null
 # Clear any residual relay server config
-sudo "$RUSTDESK" --option custom-rendezvous-server=
+sudo "$RUSTDESK" --option custom-rendezvous-server "" &>/dev/null
 # Use permanent password (no click-to-approve)
-sudo "$RUSTDESK" --option verification-method=use-permanent-password
-sudo "$RUSTDESK" --option approve-mode=password
+sudo "$RUSTDESK" --option verification-method use-permanent-password &>/dev/null
+sudo "$RUSTDESK" --option approve-mode password &>/dev/null
 
 # Apply permanent password from 1Password if available
 if [[ -f "$SYSTEM_DIR/sensitive/rustdesk-password" ]]; then
     # RustDesk CLI does not support stdin or file-based password input.
-    sudo "$RUSTDESK" --password "$(tr -d '\n' < "$SYSTEM_DIR/sensitive/rustdesk-password")"
+    sudo "$RUSTDESK" --password "$(tr -d '\n' < "$SYSTEM_DIR/sensitive/rustdesk-password")" &>/dev/null
     print_status "RustDesk: configured with permanent password"
 else
     print_warning "RustDesk: configured (set permanent password manually or via 'secrets')"
