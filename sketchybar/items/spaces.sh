@@ -11,17 +11,32 @@ all_workspaces=$(for monitor in $(aerospace list-monitors --format "%{monitor-ap
   aerospace list-workspaces --monitor "$monitor"
 done | sort -n | uniq)
 
+# Parse workspace-to-monitor assignments from aerospace.toml
+secondary_workspaces=""
+aerospace_config="$CONFIG_DIR/../aerospace/aerospace.toml"
+in_section=false
+while IFS= read -r line; do
+  if [[ "$line" =~ ^\[workspace-to-monitor-force-assignment\] ]]; then
+    in_section=true
+    continue
+  fi
+  if $in_section && [[ "$line" =~ ^\[ ]]; then
+    break
+  fi
+  if $in_section && [[ "$line" =~ ^([0-9]+)[[:space:]]*= ]]; then
+    ws="${BASH_REMATCH[1]}"
+    first_val=$(echo "$line" | sed -nE 's/.*=[[:space:]]*\[?[[:space:]]*"([^"]*)".*/\1/p')
+    if [ "$first_val" = "secondary" ]; then
+      secondary_workspaces="$secondary_workspaces $ws"
+    fi
+  fi
+done < "$aerospace_config"
+
 for sid in $all_workspaces; do
-  # Determine which display this workspace should be shown on
-  # If only one display, show all workspaces on display 1
-  # If multiple displays:
-  #   1, 2, 4, 7 = main (display 1)
-  #   3, 5, 6, 8 = secondary (display 2)
+  # Use parsed mapping; default to display 1; skip lookup on single display
   display_id="1"
-  if [ "$display_count" -ge "2" ]; then
-    case "$sid" in
-      3|5|6|8) display_id="2" ;;
-    esac
+  if [ "$display_count" -ge "2" ] && [[ " $secondary_workspaces " == *" $sid "* ]]; then
+    display_id="2"
   fi
 
   sketchybar --add item space.$sid left \
