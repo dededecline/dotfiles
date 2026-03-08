@@ -21,4 +21,13 @@ cask "obs"                      # Streaming/recording
 # =============================================================================
 # Mac App Store
 # =============================================================================
-mas "DaVinci Resolve", id: 571213070    # Video editor
+
+# Music
+mas "Logic Pro: Make Music",       id: 1615087040 # Music production
+mas "MainStage: Perform Live",     id: 6746637089 # Live music production
+
+# Photo
+mas "Pixelmator Pro: Edit Images", id: 6746662575 # Image editor
+
+# Video
+mas "Final Cut Pro: Create Video", id: 1631624924 # Video editor
