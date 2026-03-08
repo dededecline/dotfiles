@@ -41,7 +41,7 @@ check_op() {
         exit 1
     fi
 
-    if ! op vault list --account "$OP_PERSONAL_ACCOUNT" &>/dev/null; then
+    if ! op vault list --account "$OP_PERSONAL_ACCOUNT" &>/dev/null < /dev/null; then
         print_error "Not signed in to 1Password ($OP_PERSONAL_ACCOUNT)"
         echo "  Sign in with: op signin --account $OP_PERSONAL_ACCOUNT"
         exit 1
@@ -89,12 +89,8 @@ inject_atuin() {
         return 0
     fi
 
-    # Check if already logged in (session file exists or status reports sync enabled)
-    if [[ -f "$HOME/.local/share/atuin/session" ]]; then
-        print_status "Atuin: already logged in (session exists)"
-        return 0
-    fi
-    if atuin status 2>/dev/null | grep -q "Sync enabled"; then
+    # Check if already logged in (username present in status output)
+    if atuin status 2>/dev/null | grep -q "^Username:"; then
         print_status "Atuin: already logged in"
         return 0
     fi
@@ -375,7 +371,7 @@ check_secrets() {
 
     # Check Atuin sync status
     if command -v atuin &>/dev/null; then
-        if atuin status 2>/dev/null | grep -q "Sync enabled"; then
+        if atuin status 2>/dev/null | grep -q "^Username:"; then
             print_status "Atuin sync: logged in"
         else
             print_warning "Atuin sync: not logged in"

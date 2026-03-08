@@ -1,0 +1,22 @@
+# Display monitor definitions
+# Each section defines a named monitor with its displayplacer parameters.
+# "builtin" is special: no serial, detected at runtime via displayplacer.
+
+[builtin]
+res = "2056x1329"
+hz = "120"
+color_depth = "8"
+
+[portable]
+serial = "s21573"
+res = "2560x1600"
+hz = "120"
+color_depth = "8"
+dual_origin = "(-200,-1600)"
+
+[office]
+serial = "s825644620"
+res = "2560x1440"
+hz = "60"
+color_depth = "8"
+dual_origin = "(-160,-1440)"

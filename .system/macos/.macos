@@ -266,11 +266,11 @@ check_full_disk_access
 ###############################################################################
 
 if is_machine_in_group "$HOSTNAME" "server"; then
-    # Enable Remote Login (SSH) — allows standard SSH access
+    # Enable Remote Login (SSH). Allows standard SSH access
     sudo launchctl enable system/com.openssh.sshd
     sudo launchctl bootstrap system /System/Library/LaunchDaemons/ssh.plist 2>/dev/null || true
 
-    # Enable macOS Application Firewall (stealth mode — no response to probes)
+    # Enable macOS Application Firewall
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
     sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 

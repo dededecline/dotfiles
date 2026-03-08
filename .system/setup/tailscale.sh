@@ -10,7 +10,7 @@ SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
 source "$SYSTEM_DIR/setup/lib/output.sh"
 
 if ! command -v tailscale &>/dev/null; then
-    print_warning "Tailscale not installed — skipping"
+    print_warning "Tailscale not installed, skipping"
     return 0 2>/dev/null || exit 0
 fi
 

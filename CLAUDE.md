@@ -140,18 +140,28 @@
   • git/config → ~/.gitconfig                                                 
   • .system/sensitive/.npmrc → ~/.npmrc                                               
                                                                               
-  ### Display Monitor System                                                  
-                                                                              
-  Automatically detects display connection/disconnection and reloads          
-  aerospace and sketchybar configurations. Runs as a LaunchAgent that checks  
-  every 3 seconds.                                                            
-                                                                              
-  Components:                                                                 
+  ### Display Monitor System
+
+  Automatically detects display connection/disconnection and reloads
+  aerospace and sketchybar configurations. Runs as a LaunchAgent that checks
+  every 3 seconds.
+
+  Monitor definitions (resolution, refresh rate, serial, arrangement) are
+  configured in `.system/profiles/displays.toml`. The `display-profiles.sh`
+  script reads this TOML and builds displayplacer commands generically.
+
+  To add a new monitor: add a `[name]` section to `displays.toml` with
+  `serial`, `res`, `hz`, `color_depth`, and `dual_origin` keys. The
+  `builtin` section is special (no serial; detected at runtime).
+
+  Components:
+  • .system/profiles/displays.toml - Monitor definitions (resolution, serial, layout)
+  • .system/setup/display-profiles.sh - Data-driven display profile application
   • .system/setup/monitor-watcher.sh - Detects display count changes using
   system_profiler
   • .system/setup/reload-display-config.sh - Reloads configs when changes detected
-  • .system/templates/display-monitor.plist.tpl - LaunchAgent configuration           
-                                                                              
+  • .system/templates/display-monitor.plist.tpl - LaunchAgent configuration
+
   The system logs to ~/.config/logs/display-monitor.log and is automatically
   loaded by setup.sh if aerospace and sketchybar are installed.
 

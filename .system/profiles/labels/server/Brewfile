@@ -1,4 +1,4 @@
 # =============================================================================
 # Remote Access
 # =============================================================================
-brew "tailscale"                # Mesh VPN (CLI — required for Tailscale SSH server)
+brew "tailscale"                # Mesh VPN

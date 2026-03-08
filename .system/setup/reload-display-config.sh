@@ -19,14 +19,11 @@ log_message() {
 
 log_message "Display count changed to: $DISPLAY_COUNT"
 
-# Export display count for scripts to use
-export DISPLAY_COUNT
-
 # Apply display profile using displayplacer
 if [[ -f "$SCRIPT_DIR/display-profiles.sh" ]]; then
     source "$SCRIPT_DIR/display-profiles.sh"
     log_message "Applying display profile..."
-    apply_display_profile "$DISPLAY_COUNT" 2>&1 | while IFS= read -r line; do
+    apply_display_profile 2>&1 | while IFS= read -r line; do
         log_message "  displayplacer: $line"
     done
     # Small delay for macOS to settle after display changes

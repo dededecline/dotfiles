@@ -255,17 +255,23 @@ ensure_dotfiles() {
 
 ensure_1password_auth() {
     if ! command -v op &>/dev/null; then
-        print_warning "1Password CLI not installed - work tools will be skipped"
+        print_warning "1Password CLI not installed. Required for git identity and secrets"
         return 1
     fi
 
-    if op vault list --account my.1password.com &>/dev/null 2>&1; then
+    if op vault list --account my.1password.com &>/dev/null < /dev/null; then
         print_status "1Password: authenticated"
         return 0
     fi
 
     echo ""
-    print_warning "1Password CLI found but not authenticated"
+    print_warning "1Password authentication required for git identity and secrets"
+
+    # Detect missing CLI integration
+    if pgrep -q "1Password" && [[ ! -S ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock ]]; then
+        print_warning "1Password app is running but CLI integration is not enabled"
+        print_info "Enable it: 1Password > Settings > Developer > 'Integrate with 1Password CLI'"
+    fi
 
     # Skip prompt in non-interactive mode
     if [[ ! -t 0 ]]; then
@@ -274,30 +280,32 @@ ensure_1password_auth() {
         return 1
     fi
 
-    read -p "Sign in to 1Password for work tools and secrets? (y/n) " -n 1 -r
-    echo ""
-
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Starting 1Password sign-in..."
-        if eval "$(op signin 2>/dev/null)"; then
-            if op vault list --account my.1password.com &>/dev/null 2>&1; then
-                print_status "1Password: authenticated"
-                return 0
-            fi
-        fi
-        print_error "Authentication failed"
-        print_info "You can run 'secrets' later to set up work tools"
-        return 1
-    else
+    read -p "Press Enter to retry after signing in (or 'skip' to continue without secrets): " -r
+    if [[ "$REPLY" == "skip" ]]; then
         print_info "Skipping 1Password authentication"
-        print_info "Run 'secrets' later to set up work tools"
         return 1
     fi
+
+    # Re-check after user signs in via system prompt
+    if op vault list --account my.1password.com &>/dev/null < /dev/null; then
+        print_status "1Password: authenticated"
+        return 0
+    fi
+
+    print_error "1Password still not authenticated"
+    print_info "Run 'secrets' after signing in to 1Password"
+    return 1
 }
 
 inject_secrets() {
     if ! ensure_1password_auth; then
-        return 0  # Continue without secrets
+        echo ""
+        print_warning "Secrets not injected. The following require manual setup:"
+        print_warning "  • Git identity (~/.gitconfig)"
+        print_warning "  • LaunchAgents (display monitor, spotlight shortcuts)"
+        print_warning "  Run 'secrets' after signing in to 1Password"
+        echo ""
+        return 0
     fi
 
     print_info "Injecting secrets from 1Password..."
@@ -437,7 +445,7 @@ run_brew_sync() {
     print_header "Syncing Homebrew Packages ($MACHINE_HOSTNAME)"
 
     # Set GitHub token for private Homebrew taps (work group only)
-    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
+    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null < /dev/null; then
         local gh_token
         if gh_token=$(op read "op://Private/Github Token/password" --account my.1password.com 2>/dev/null); then
             export HOMEBREW_GITHUB_API_TOKEN="$gh_token"
@@ -858,7 +866,7 @@ run_setup() {
     echo "Next steps:"
     echo "  1. Restart your terminal to use Fish shell"
     echo "  2. Run 'tmux' and press prefix + I to install tmux plugins"
-    if ! command -v op &>/dev/null || ! op vault list --account my.1password.com &>/dev/null 2>&1; then
+    if ! command -v op &>/dev/null || ! op vault list --account my.1password.com &>/dev/null < /dev/null; then
         echo "  3. Set up secrets from 1Password:"
         echo "     - Sign in: op signin"
         echo "     - Run: secrets"
@@ -876,7 +884,7 @@ run_brew() {
 
     # Prompt for 1Password sign-in if needed (GitHub token for private taps)
     if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null; then
-        if ! op vault list --account my.1password.com &>/dev/null 2>&1; then
+        if ! op vault list --account my.1password.com &>/dev/null < /dev/null; then
             if [[ -t 0 ]]; then
                 echo ""
                 read -p "Sign in to 1Password for private tap access? (y/n) " -n 1 -r

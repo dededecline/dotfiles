@@ -12,7 +12,7 @@ source "$SYSTEM_DIR/setup/lib/output.sh"
 RUSTDESK="/Applications/RustDesk.app/Contents/MacOS/RustDesk"
 
 if [[ ! -f "$RUSTDESK" ]]; then
-    print_warning "RustDesk not installed — skipping configuration"
+    print_warning "RustDesk not installed, skipping configuration"
     return 0 2>/dev/null || exit 0
 fi
 

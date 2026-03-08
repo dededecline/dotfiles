@@ -36,7 +36,7 @@ For each major change area, include:
 
 ## Style Guidelines
 
-- Be concise—prefer dense information over verbose explanations
+- Be concise. Prefer dense information over verbose explanations
 - Use tables to organize structured data (endpoints, config options, type changes)
 - Use fenced code blocks with language hints for examples
 - Avoid filler phrases like "This PR adds..." or "We decided to..."
