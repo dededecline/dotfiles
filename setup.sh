@@ -806,6 +806,11 @@ run_setup() {
     # Source profiles now that dotfiles repo is available
     ensure_profiles_loaded
 
+    # Restore interactive stdin when running via curl pipe (e.g., curl ... | bash)
+    if [[ ! -t 0 ]] && [[ -e /dev/tty ]]; then
+        exec < /dev/tty
+    fi
+
     # Detect hostname (uses profiles.sh functions)
     detect_and_validate_hostname
 
