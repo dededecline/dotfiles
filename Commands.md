@@ -8,8 +8,8 @@
 |--------|----------|
 | Focus up/left/down/right | `Hyper` + `I/J/K/L` |
 | Move window up/left/down/right | `Hyper+Shift` + `I/J/K/L` |
-| Workspace 1-8 | `Hyper` + `1-8` |
-| Move to workspace 1-8 | `Hyper+Shift` + `1-8` |
+| Workspace 1-9 | `Hyper` + `1-9` |
+| Move to workspace 1-9 | `Hyper+Shift` + `1-9` |
 | Toggle fullscreen | `Hyper+Shift+F` |
 | Toggle float/tile | `Hyper+F` |
 | Toggle tiles layout | `Hyper+/` |
