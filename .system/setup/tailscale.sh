@@ -46,3 +46,14 @@ else
     echo "ListenAddress 127.0.0.1  # managed by dotfiles" | sudo tee -a /etc/ssh/sshd_config >/dev/null
     sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
 fi
+
+# Install kitty terminfo for SSH clients connecting from kitty terminal
+TERMINFO_SRC="$SYSTEM_DIR/templates/xterm-kitty.terminfo"
+if [[ ! -f "$TERMINFO_SRC" ]]; then
+    print_warning "Kitty terminfo: source not found ($TERMINFO_SRC)"
+elif [[ ! -f "$HOME/.terminfo/78/xterm-kitty" ]]; then
+    tic -x -o "$HOME/.terminfo" "$TERMINFO_SRC"
+    print_status "Kitty terminfo: installed"
+else
+    print_status "Kitty terminfo: already installed"
+fi
