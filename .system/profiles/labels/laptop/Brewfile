@@ -21,6 +21,9 @@ brew "yamllint"                 # YAML linter
 # Applications (Casks)
 # =============================================================================
 
+# Remote Access
+cask "tailscale-app"            # Mesh VPN (GUI — includes CLI via Settings > Install CLI integration)
+
 # Browsers
 cask "orion"                    # WebKit-based browser
 

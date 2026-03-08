@@ -1,0 +1,51 @@
+# =============================================================================
+# Taps
+# =============================================================================
+tap "bastionzero/tap"
+tap "fairwindsops/tap"
+tap "incident-io/taps"
+tap "namespacelabs/namespace"
+tap "pinginc/homebrew-lrl"
+tap "signadot/tap"
+tap "spacelift-io/spacelift"
+
+# =============================================================================
+# DevOps Tools
+# =============================================================================
+brew "argocd"                              # Kubernetes CD
+brew "awscli"                              # AWS CLI
+brew "bastionzero/tap/zli"                 # Secure access
+brew "circleci"                            # CI runner
+brew "docker-compose"                      # Docker CLI
+brew "fairwindsops/tap/pluto"              # Kubernetes API deprecation finder
+brew "incident-io/taps/catalog-importer"   # Incident management
+brew "mongodb-atlas-cli"                   # Database CLI
+brew "namespacelabs/namespace/nsc"         # Ephemeral environments
+brew "opa"                                 # Open Policy Agent
+brew "signadot/tap/signadot-cli"           # Sandbox Environments
+brew "terraform-docs"                      # Terraform documentation
+brew "tflint"                              # Terraform linter
+brew "trivy"                               # Security scanner
+
+# =============================================================================
+# Applications (Casks)
+# =============================================================================
+
+# Cloud Storage
+cask "google-drive"             # Google Drive sync
+
+# Communication
+cask "granola"                  # Meeting notes
+cask "microsoft-teams"          # Team collaboration
+
+# Development
+cask "mongodb-compass"                     # MongoDB GUI
+cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
+cask "powershell"                          # PowerShell
+
+# Internal Tools
+cask "lrl"                      # Internal CLI
+
+# Productivity
+cask "microsoft-excel"          # Spreadsheets
+cask "microsoft-word"           # Word processor

@@ -283,14 +283,6 @@ check_secrets() {
             all_configured=false
         fi
 
-        # Check Work CLI Brewfile
-        if [[ -f "$SENSITIVE_DIR/Brewfile.work" ]]; then
-            print_status "Work CLI Brewfile: configured"
-        else
-            print_warning "Work CLI Brewfile: not configured"
-            all_configured=false
-        fi
-
         # Check clone function
         if [[ -f "$DOTFILES/fish/functions/clone.fish" ]]; then
             print_status "Clone function: configured"
@@ -318,7 +310,7 @@ check_secrets() {
             all_configured=false
         fi
     else
-        print_info "$MACHINE_HOSTNAME: work-only secrets not checked (zli, ci-identity, Brewfile.work, clone, claude skills)"
+        print_info "$MACHINE_HOSTNAME: work-only secrets not checked (zli, ci-identity, clone, claude skills)"
     fi
 
     # Secrets for all machines
@@ -362,6 +354,23 @@ check_secrets() {
     else
         print_warning "Sketchybar LaunchAgent: not configured"
         all_configured=false
+    fi
+
+    # Server-specific checks
+    if is_machine_in_group "$MACHINE_HOSTNAME" "server"; then
+        if [[ -f "$SENSITIVE_DIR/rustdesk-password" ]]; then
+            print_status "RustDesk password: configured"
+        else
+            print_warning "RustDesk password: not configured"
+            all_configured=false
+        fi
+
+        if command -v tailscale &>/dev/null && tailscale status &>/dev/null; then
+            print_status "Tailscale: authenticated"
+        else
+            print_warning "Tailscale: not authenticated (run 'tailscale up')"
+            all_configured=false
+        fi
     fi
 
     # Check Atuin sync status
@@ -426,12 +435,6 @@ inject_secrets() {
             inject_template "$TEMPLATES_DIR/ci-identity.tpl" "$SENSITIVE_DIR/ci-identity" "CI identity" "$OP_PERSONAL_ACCOUNT"
         fi
 
-        # Inject Work CLI additions for Brewfile
-        if [[ -f "$TEMPLATES_DIR/Brewfile.tpl" ]]; then
-            inject_template "$TEMPLATES_DIR/Brewfile.tpl" "$SENSITIVE_DIR/Brewfile.work" "Work CLI Brewfile" "$OP_WORK_ACCOUNT"
-            echo "  Note: Run 'brew bundle --file=$SENSITIVE_DIR/Brewfile.work' to install work tools"
-        fi
-
         # Inject clone.fish with work org
         if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
             inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function" "$OP_PERSONAL_ACCOUNT"
@@ -452,7 +455,14 @@ inject_secrets() {
             "Claude Code telemetry" \
             "$OP_WORK_ACCOUNT"
     else
-        print_info "$MACHINE_HOSTNAME: skipping work-only secrets (zli, ci-identity, Brewfile.work, clone, claude skills)"
+        print_info "$MACHINE_HOSTNAME: skipping work-only secrets (zli, ci-identity, clone, claude skills)"
+    fi
+
+    # RustDesk permanent password (server machines)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "server"; then
+        if [[ -f "$TEMPLATES_DIR/rustdesk-password.tpl" ]]; then
+            inject_template "$TEMPLATES_DIR/rustdesk-password.tpl" "$SENSITIVE_DIR/rustdesk-password" "RustDesk password" "$OP_PERSONAL_ACCOUNT"
+        fi
     fi
 
     # Secrets for all machines

@@ -18,19 +18,19 @@
   "buffer_font_family": "Maple Mono NF",
   "buffer_font_features": {
     "calt": true,
-    "liga": true,
+    "liga": true
   },
   "ui_font_family": "Maple Mono NF",
   "title_bar": {
-    "show_branch_icon": true,
+    "show_branch_icon": true
   },
   "show_whitespaces": "all",
   "which_key": {
-    "enabled": true,
+    "enabled": true
   },
   "autosave": "on_focus_change",
   "session": {
-    "trust_all_worktrees": true,
+    "trust_all_worktrees": true
   },
   "on_last_window_closed": "quit_app",
   "when_closing_with_no_tabs": "close_window",
@@ -43,14 +43,14 @@
     "font_family": "Maple Mono NF",
     "font_size": 12,
     "font_weight": 500,
-    "line_height": "comfortable",
+    "line_height": "comfortable"
   },
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "Catppuccin Frappe (Blur)",
+    "dark": "Catppuccin Frappe (Blur)"
   },
   "search": {
-    "include_ignored": false,
-  },
+    "include_ignored": false
+  }
 }

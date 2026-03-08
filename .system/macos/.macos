@@ -3,6 +3,10 @@
 # macOS configuration script
 # Run: chmod +x .macos && ./.macos
 
+DOTFILES="${DOTFILES:-$HOME/.config}"
+SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
+source "$SYSTEM_DIR/setup/lib/profiles.sh"
+
 # Close any open System Settings panes to prevent overriding changes
 osascript -e 'tell application "System Settings" to quit'
 
@@ -256,6 +260,35 @@ check_full_disk_access() {
 
 # Run the check
 check_full_disk_access
+
+###############################################################################
+# Remote Access (server only)                                                 #
+###############################################################################
+
+if is_machine_in_group "$HOSTNAME" "server"; then
+    # Enable Remote Login (SSH) — allows standard SSH access
+    sudo launchctl enable system/com.openssh.sshd
+    sudo launchctl bootstrap system /System/Library/LaunchDaemons/ssh.plist 2>/dev/null || true
+
+    # Enable macOS Application Firewall (stealth mode — no response to probes)
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+    sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+
+    # Allowlist RustDesk for incoming connections (prevents re-prompting after updates)
+    if [[ -d "/Applications/RustDesk.app" ]]; then
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /Applications/RustDesk.app/Contents/MacOS/RustDesk
+        sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /Applications/RustDesk.app/Contents/MacOS/RustDesk
+    fi
+
+    # SSH ListenAddress restriction is handled in tailscale.sh (after Tailscale is confirmed running)
+fi
+
+# RustDesk requires manual approval in System Settings > Privacy & Security:
+#   - Accessibility
+#   - Screen Recording
+#   - Input Monitoring
+# These cannot be granted programmatically without MDM.
+# RustDesk will prompt the user on first launch.
 
 ###############################################################################
 # Kill affected applications                                                  #

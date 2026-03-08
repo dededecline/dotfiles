@@ -1,0 +1,8 @@
+[athena]
+groups = ["all", "laptop", "personal"]
+
+[hera]
+groups = ["all", "infra", "laptop", "work"]
+
+[nyx]
+groups = ["all", "infra", "personal", "server"]

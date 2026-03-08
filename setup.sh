@@ -9,8 +9,8 @@
 #   ./setup.sh --macos              # Apply macOS preferences only
 #   ./setup.sh --help               # Show usage
 #
-# Supported machines: defined by .system/profiles/individual/ directory names
-# Machine groups: defined by .system/profiles/shared/*/hostnames files
+# Supported machines: defined by .system/profiles/profiles.toml
+# Machine groups: defined by .system/profiles/profiles.toml (hostname → group list)
 #
 # For fresh installs from a new machine:
 #   curl -fsSL https://raw.githubusercontent.com/dededecline/dotfiles/main/setup.sh | bash
@@ -176,7 +176,7 @@ detect_and_validate_hostname() {
 }
 
 # Preprocess JSONC files with machine markers (// @machine:X / // @end:X)
-# Markers accept hostnames or group names (e.g., @machine:hera, @machine:laptops)
+# Markers accept hostnames or group names (e.g., @machine:hera, @machine:laptop)
 # Strips comments, fixes trailing commas, and formats as valid JSON via jq
 # Usage: preprocess_jsonc_machines <input_file> <output_file>
 preprocess_jsonc_machines() {
@@ -322,27 +322,20 @@ prepare_brewfile() {
 
     # Includes hostname in groups which has no shared Brewfile, handled by individual section below
     for group in $groups; do
-        local shared_brewfile="$SYSTEM_DIR/profiles/shared/$group/Brewfile"
-        if [[ -f "$shared_brewfile" ]]; then
+        local label_brewfile="$SYSTEM_DIR/profiles/labels/$group/Brewfile"
+        if [[ -f "$label_brewfile" ]]; then
             echo "" >> "$combined"
-            echo "# shared/$group" >> "$combined"
-            cat "$shared_brewfile" >> "$combined"
+            echo "# labels/$group" >> "$combined"
+            cat "$label_brewfile" >> "$combined"
         fi
     done
 
-    # Append individual machine Brewfile
-    local individual_brewfile="$SYSTEM_DIR/profiles/individual/$MACHINE_HOSTNAME/Brewfile"
-    if [[ -f "$individual_brewfile" ]]; then
+    # Append machine-specific Brewfile
+    local machine_brewfile="$SYSTEM_DIR/profiles/machines/$MACHINE_HOSTNAME/Brewfile"
+    if [[ -f "$machine_brewfile" ]]; then
         echo "" >> "$combined"
-        echo "# individual/$MACHINE_HOSTNAME" >> "$combined"
-        cat "$individual_brewfile" >> "$combined"
-    fi
-
-    # Append work Brewfile if it exists (work group machines only)
-    if is_machine_in_group "$MACHINE_HOSTNAME" "work" && [[ -f "$SYSTEM_DIR/sensitive/Brewfile.work" ]]; then
-        echo "" >> "$combined"
-        echo "# Work additions (from 1Password)" >> "$combined"
-        cat "$SYSTEM_DIR/sensitive/Brewfile.work" >> "$combined"
+        echo "# machines/$MACHINE_HOSTNAME" >> "$combined"
+        cat "$machine_brewfile" >> "$combined"
     fi
 
     echo "$combined"
@@ -443,21 +436,8 @@ cleanup_undeclared_taps() {
 run_brew_sync() {
     print_header "Syncing Homebrew Packages ($MACHINE_HOSTNAME)"
 
-    # Inject Brewfile.work and set GitHub token from 1Password if authenticated (work group only)
+    # Set GitHub token for private Homebrew taps (work group only)
     if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null && op vault list --account my.1password.com &>/dev/null 2>&1; then
-        # Read work account domain (Brewfile.tpl references op://Employee vault on work account)
-        local work_account
-        work_account=$(op read "op://Private/1password-work-account/domain" --account my.1password.com 2>/dev/null) || true
-
-        if [[ -n "$work_account" ]] && [[ -f "$SYSTEM_DIR/templates/Brewfile.tpl" ]]; then
-            print_info "Injecting work Brewfile from 1Password..."
-            mkdir -p "$SYSTEM_DIR/sensitive"
-            op inject -f -i "$SYSTEM_DIR/templates/Brewfile.tpl" \
-                      -o "$SYSTEM_DIR/sensitive/Brewfile.work" \
-                      --account "$work_account" 2>/dev/null || true
-        fi
-
-        # Set GitHub token for private Homebrew taps
         local gh_token
         if gh_token=$(op read "op://Private/Github Token/password" --account my.1password.com 2>/dev/null); then
             export HOMEBREW_GITHUB_API_TOKEN="$gh_token"
@@ -497,6 +477,16 @@ run_brew_sync() {
         fi
     done < "$brewfile"
 
+    # Phase 1: Install mas apps first
+    local mas_brewfile="${brewfile}.mas"
+    grep -E '^mas ' "$brewfile" > "$mas_brewfile" || true
+    if [[ -s "$mas_brewfile" ]]; then
+        print_info "Installing Mac App Store apps..."
+        brew bundle --file="$mas_brewfile" --verbose || print_warning "Some mas apps may have failed"
+    fi
+    rm -f "$mas_brewfile"
+
+    # Phase 2: Full sync (mas apps already installed, will be skipped)
     print_info "Installing packages and cleaning up..."
     if brew bundle --file="$brewfile" --cleanup --verbose; then
         print_status "Homebrew packages synced"
@@ -737,6 +727,26 @@ setup_wallpaper() {
     print_status "Wallpaper: $(basename "$wallpaper") applied to all desktops"
 }
 
+setup_docker() {
+    local docker_dir="$HOME/.docker"
+    local config_file="$docker_dir/config.json"
+    local plugins_dir="/opt/homebrew/lib/docker/cli-plugins"
+
+    mkdir -p "$docker_dir"
+
+    if [[ -f "$config_file" ]]; then
+        local tmp
+        tmp=$(jq --arg dir "$plugins_dir" \
+            '.cliPluginsExtraDirs = ((.cliPluginsExtraDirs // []) + [$dir] | unique)' \
+            "$config_file")
+        echo "$tmp" > "$config_file"
+    else
+        jq -n --arg dir "$plugins_dir" \
+            '{"cliPluginsExtraDirs": [$dir]}' > "$config_file"
+    fi
+    print_status "Docker: CLI plugins directory configured"
+}
+
 setup_default_browser() {
     # Only set default browser if Waterfox is installed (which happens during brew sync)
     if [[ ! -d "/Applications/Waterfox.app" ]]; then
@@ -797,11 +807,14 @@ run_setup() {
     # This must run before Homebrew sync to ensure terminal has required permissions
     apply_macos_defaults
 
-    # Inject secrets (needed for Brewfile.work) - hostname-aware
+    # Inject secrets from 1Password - hostname-aware
     inject_secrets
 
     # Declarative Homebrew sync
     run_brew_sync
+
+    # Configure Docker CLI plugins directory
+    setup_docker
 
     # Set default browser (after Waterfox and defaultbrowser are installed via brew)
     setup_default_browser
@@ -820,6 +833,12 @@ run_setup() {
     setup_sketchybar
     setup_display_monitor
     setup_spotlight_shortcuts
+
+    # Configure remote access tools (server machines)
+    if is_machine_in_group "$MACHINE_HOSTNAME" "server"; then
+        source "$DOTFILES/.system/setup/rustdesk.sh"
+        source "$DOTFILES/.system/setup/tailscale.sh"
+    fi
 
     # Set wallpaper
     setup_wallpaper
@@ -855,13 +874,12 @@ run_brew() {
 
     cd "$DOTFILES"
 
-    # Try to inject Brewfile.work if 1Password is available (work group only)
+    # Prompt for 1Password sign-in if needed (GitHub token for private taps)
     if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null; then
         if ! op vault list --account my.1password.com &>/dev/null 2>&1; then
-            # Skip prompt in non-interactive mode
             if [[ -t 0 ]]; then
                 echo ""
-                read -p "Sign in to 1Password for work tools? (y/n) " -n 1 -r
+                read -p "Sign in to 1Password for private tap access? (y/n) " -n 1 -r
                 echo ""
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     eval "$(op signin 2>/dev/null)" || true
@@ -871,6 +889,9 @@ run_brew() {
     fi
 
     run_brew_sync
+
+    # Configure Docker CLI plugins directory
+    setup_docker
 
     # Set default browser after brew sync
     setup_default_browser
@@ -935,16 +956,15 @@ Full Setup:
   - Applies macOS system preferences
 
 Homebrew Sync (--brew):
-  Combines Brewfiles from .system/profiles/shared/ and .system/profiles/individual/
+  Combines Brewfiles from .system/profiles/labels/ and .system/profiles/machines/
   based on machine groups. Installs packages and removes unlisted ones.
 
 macOS Preferences (--macos):
   Applies system preferences: UI, input, sound, Finder, screenshots, etc.
 
 1Password Integration (work group machines):
-  Work tools from .system/templates/Brewfile.tpl require 1Password authentication.
-  The script will prompt to sign in if needed, or you can skip and run
-  'secrets' later.
+  Private Homebrew taps require a GitHub token from 1Password.
+  The script will prompt to sign in if needed, or you can skip.
 
 EOF
 }

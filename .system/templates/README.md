@@ -69,83 +69,17 @@ To create:
 Note: Unlike other secrets, Atuin uses `op read` directly instead of template injection,
 since it requires running `atuin login` rather than writing a config file.
 
-### Work CLI (`Brewfile.tpl`, `clone.fish.tpl`)
+### Work CLI (`clone.fish.tpl`)
 - **Vault:** Private (or your preferred vault)
 - **Item name:** work-cli
 - **Fields:**
   - org (contains the GitHub organization name)
-  - tap (contains the Homebrew tap, e.g., `org/repo`)
-  - formula (contains the formula name, e.g., `org/repo/cli`)
 
 To create:
 1. Create a new item in 1Password:
    ```
-   op item create --category=login --title="work-cli" --vault="Private" org="your-org" tap="org/repo" formula="org/repo/cli"
+   op item create --category=login --title="work-cli" --vault="Private" org="your-org"
    ```
-
-### Work Brew Tools (`Brewfile.tpl`)
-
-The following 1Password items store Homebrew tap/formula references for work tools.
-Item names are anonymized to avoid revealing specific tooling in the dotfiles repo.
-
-All items are stored in the **work 1Password account** (`Employee` vault). Replace
-`your-work.1password.com` with your actual work account domain.
-
-#### Infrastructure CD (`brew-infra-cd`)
-```bash
-op item create --category=login --title="brew-infra-cd" --vault="Employee" \
-  --account your-work.1password.com \
-  tap="<tap>" formula="<formula>"
-```
-
-#### Secure Access (`brew-secure-access`)
-```bash
-op item create --category=login --title="brew-secure-access" --vault="Employee" \
-  --account your-work.1password.com \
-  tap="<tap>" formula="<formula>"
-```
-
-#### Ephemeral Environments (`brew-ephemeral-env`)
-```bash
-op item create --category=login --title="brew-ephemeral-env" --vault="Employee" \
-  --account your-work.1password.com \
-  tap="<tap>" formula="<formula>"
-```
-
-#### Internal CLI (`brew-internal-cli`)
-```bash
-op item create --category=login --title="brew-internal-cli" --vault="Employee" \
-  --account your-work.1password.com \
-  tap="<tap>" cask="<cask>"
-```
-
-#### Kubernetes CD (`brew-k8s-cd`)
-```bash
-op item create --category=login --title="brew-k8s-cd" --vault="Employee" \
-  --account your-work.1password.com \
-  formula="<formula>"
-```
-
-#### CI Tool (`brew-ci-tool`)
-```bash
-op item create --category=login --title="brew-ci-tool" --vault="Employee" \
-  --account your-work.1password.com \
-  formula="<formula>"
-```
-
-#### Database CLI (`brew-db-cli`)
-```bash
-op item create --category=login --title="brew-db-cli" --vault="Employee" \
-  --account your-work.1password.com \
-  formula="<formula>"
-```
-
-#### Incident Management (`brew-incident-mgmt`)
-```bash
-op item create --category=login --title="brew-incident-mgmt" --vault="Employee" \
-  --account your-work.1password.com \
-  tap="<tap>" formula="<formula>"
-```
 
 ### Display Monitor (`display-monitor.plist.tpl`)
 - **Vault:** Private
@@ -179,6 +113,18 @@ additional setup needed.
 The script waits 10 seconds after login for macOS to finish its boot-time shortcut
 restoration, then applies the `defaults write` commands and activates the settings.
 Logs to `~/.config/logs/spotlight-shortcuts.log`.
+
+### RustDesk Password (`rustdesk-password.tpl`)
+- **Vault:** Private
+- **Item name:** RustDesk
+- **Field:** password (permanent password for unattended access)
+
+Used on server machines for remote desktop access over Tailscale.
+
+To create:
+```bash
+op item create --category=login --title="RustDesk" --vault="Private" password="your_secure_password"
+```
 
 ### Work-Specific Claude Skills (1Password Documents)
 
