@@ -9,8 +9,9 @@ Personal dotfiles managed as a git repository in `~/.config`.
 
 ### Fresh Install (New Machine)
 
+Installs Xcode CLT and Homebrew if needed:
+
 ```bash
-# One-liner (installs Xcode CLT and Homebrew if needed)
 curl -fsSL https://raw.githubusercontent.com/dededecline/dotfiles/main/setup.sh | bash
 ```
 

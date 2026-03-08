@@ -115,7 +115,7 @@ detect_and_validate_hostname() {
 
         if ! is_known_hostname "$MACHINE_HOSTNAME"; then
             # Non-interactive mode — can't prompt
-            if [[ ! -t 0 ]]; then
+            if [[ ! -t 3 ]]; then
                 print_error "Unknown hostname: $MACHINE_HOSTNAME"
                 print_info "Known hosts: $(get_known_hosts --csv)"
                 print_info "Override with: ./setup.sh --hostname <name>"
@@ -123,7 +123,7 @@ detect_and_validate_hostname() {
             fi
 
             print_warning "Unknown hostname: $MACHINE_HOSTNAME"
-            read -p "  Set up this machine under an existing hostname? (y/n) " -n 1 -r
+            read -p "  Set up this machine under an existing hostname? (y/n) " -n 1 -r <&3
             echo ""
 
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -147,7 +147,7 @@ detect_and_validate_hostname() {
             echo ""
 
             local choice
-            read -p "  Enter selection [1-$((${#hosts[@]} + 1))]: " choice
+            read -p "  Enter selection [1-$((${#hosts[@]} + 1))]: " choice <&3
 
             if ! [[ "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#hosts[@]} + 1 )); then
                 print_error "Invalid selection"
@@ -274,13 +274,13 @@ ensure_1password_auth() {
     fi
 
     # Skip prompt in non-interactive mode
-    if [[ ! -t 0 ]]; then
+    if [[ ! -t 3 ]]; then
         print_info "Non-interactive mode: skipping 1Password sign-in"
         print_info "Run 'op signin' and then 'secrets' later"
         return 1
     fi
 
-    read -p "Press Enter to retry after signing in (or 'skip' to continue without secrets): " -r
+    read -p "Press Enter to retry after signing in (or 'skip' to continue without secrets): " -r <&3
     if [[ "$REPLY" == "skip" ]]; then
         print_info "Skipping 1Password authentication"
         return 1
@@ -791,6 +791,15 @@ apply_macos_defaults() {
     print_status "macOS preferences applied"
 }
 
+# Open /dev/tty on fd 3 for interactive prompts (preserves pipe on fd 0)
+setup_interactive_fd() {
+    if [[ ! -t 0 ]] && [[ -e /dev/tty ]]; then
+        exec 3</dev/tty
+    else
+        exec 3<&0
+    fi
+}
+
 # =============================================================================
 # Workflow Functions
 # =============================================================================
@@ -806,10 +815,8 @@ run_setup() {
     # Source profiles now that dotfiles repo is available
     ensure_profiles_loaded
 
-    # Restore interactive stdin when running via curl pipe (e.g., curl ... | bash)
-    if [[ ! -t 0 ]] && [[ -e /dev/tty ]]; then
-        exec < /dev/tty
-    fi
+    # Set up fd 3 for interactive prompts
+    setup_interactive_fd
 
     # Detect hostname (uses profiles.sh functions)
     detect_and_validate_hostname
@@ -858,8 +865,13 @@ run_setup() {
 
     # Reload window manager configs
     if command -v aerospace &>/dev/null; then
-        aerospace reload-config 2>/dev/null || true
-        print_status "Aerospace: config reloaded"
+        if pgrep -q AeroSpace; then
+            aerospace reload-config 2>/dev/null || true
+            print_status "Aerospace: config reloaded"
+        else
+            open -a AeroSpace
+            print_status "Aerospace: launched"
+        fi
     fi
     if command -v sketchybar &>/dev/null; then
         sketchybar --reload 2>/dev/null || true
@@ -888,6 +900,7 @@ run_brew() {
     print_header "Homebrew Sync"
 
     ensure_profiles_loaded
+    setup_interactive_fd
     detect_and_validate_hostname
 
     cd "$DOTFILES"
@@ -895,9 +908,9 @@ run_brew() {
     # Prompt for 1Password sign-in if needed (GitHub token for private taps)
     if is_machine_in_group "$MACHINE_HOSTNAME" "work" && command -v op &>/dev/null; then
         if ! op vault list --account my.1password.com &>/dev/null < /dev/null; then
-            if [[ -t 0 ]]; then
+            if [[ -t 3 ]]; then
                 echo ""
-                read -p "Sign in to 1Password for private tap access? (y/n) " -n 1 -r
+                read -p "Sign in to 1Password for private tap access? (y/n) " -n 1 -r <&3
                 echo ""
                 if [[ $REPLY =~ ^[Yy]$ ]]; then
                     eval "$(op signin 2>/dev/null)" || true
@@ -921,6 +934,7 @@ run_macos() {
     print_header "macOS Preferences"
 
     ensure_profiles_loaded
+    setup_interactive_fd
     detect_and_validate_hostname
 
     cd "$DOTFILES"
