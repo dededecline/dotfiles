@@ -228,7 +228,7 @@ ensure_homebrew() {
     fi
 
     print_info "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/tty
 
     # Add Homebrew to PATH for this session
     local prefix
