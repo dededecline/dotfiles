@@ -798,9 +798,9 @@ run_setup() {
     # Source profiles now that dotfiles repo is available
     ensure_profiles_loaded
 
-    # Re-exec local copy with tty stdin when running via curl pipe
-    if [[ ! -t 0 ]] && [[ -f "$DOTFILES/setup.sh" ]]; then
-        exec bash "$DOTFILES/setup.sh" < /dev/tty
+    # Restore interactive stdin when running via curl pipe (e.g., curl ... | bash)
+    if [[ ! -t 0 ]] && [[ -e /dev/tty ]]; then
+        exec < /dev/tty
     fi
 
     # Detect hostname (uses profiles.sh functions)
