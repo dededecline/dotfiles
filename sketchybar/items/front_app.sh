@@ -6,6 +6,7 @@
 
 source "$CONFIG_DIR/colors.sh"
 
+# shellcheck disable=SC2206
 front_app=(
   icon.drawing=on
   icon.font="sketchybar-app-font:Regular:16.0"

@@ -10,7 +10,7 @@ if [ "$PERCENTAGE" = "" ]; then
 fi
 
 case "${PERCENTAGE}" in
-  9[0-9]|100)
+  9[0-9] | 100)
     ICON="󰁹"
     COLOR=$GREEN
     ;;

@@ -20,16 +20,16 @@ THEME_FILE="$THEMES_DIR/theme.toml"
 
 # Source output utilities
 if [[ -f "$SYSTEM_DIR/setup/lib/output.sh" ]]; then
-    source "$SYSTEM_DIR/setup/lib/output.sh"
+  source "$SYSTEM_DIR/setup/lib/output.sh"
 else
-    GREEN='\033[0;32m'
-    YELLOW='\033[0;33m'
-    BLUE='\033[0;34m'
-    NC='\033[0m'
-    print_header() { echo -e "\n${BLUE}===========================================================${NC}\n${BLUE}  $1${NC}\n${BLUE}===========================================================${NC}\n"; }
-    print_status() { echo -e "${GREEN}✓${NC} $1"; }
-    print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
-    print_info() { echo -e "  $1"; }
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m'
+  print_header() { echo -e "\n${BLUE}===========================================================${NC}\n${BLUE}  $1${NC}\n${BLUE}===========================================================${NC}\n"; }
+  print_status() { echo -e "${GREEN}✓${NC} $1"; }
+  print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
+  print_info() { echo -e "  $1"; }
 fi
 
 # =============================================================================
@@ -37,14 +37,14 @@ fi
 # =============================================================================
 
 if [[ ! -f "$THEME_FILE" ]]; then
-    print_warning "Theme file not found: $THEME_FILE. Skipping theme sync"
-    exit 0
+  print_warning "Theme file not found: $THEME_FILE. Skipping theme sync"
+  exit 0
 fi
 
 # Parse a key = "value" from a TOML file
 parse_toml_value() {
-    local file="$1" key="$2"
-    grep "^${key} *= *\"" "$file" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/'
+  local file="$1" key="$2"
+  grep "^${key} *= *\"" "$file" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/'
 }
 
 FLAVOR=$(parse_toml_value "$THEME_FILE" "flavor")
@@ -54,22 +54,22 @@ NAME=$(parse_toml_value "$THEME_FILE" "name")
 PALETTE_FILE="$THEMES_DIR/catppuccin-${FLAVOR}/palette.toml"
 
 if [[ ! -f "$PALETTE_FILE" ]]; then
-    print_warning "Palette file not found: $PALETTE_FILE. Skipping theme sync"
-    exit 0
+  print_warning "Palette file not found: $PALETTE_FILE. Skipping theme sync"
+  exit 0
 fi
 
 # Helper: look up a color from palette.toml [colors] section
 # Returns hex value with # (e.g., "#ca9ee6")
 c() {
-    local key="$1"
-    sed -n '/^\[colors\]/,/^\[/p' "$PALETTE_FILE" | grep "^${key} *= *\"" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/'
+  local key="$1"
+  sed -n '/^\[colors\]/,/^\[/p' "$PALETTE_FILE" | grep "^${key} *= *\"" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/'
 }
 
 # Helper: look up a color and strip the # prefix (e.g., "ca9ee6")
 ch() {
-    local val
-    val=$(c "$1")
-    echo "${val#\#}"
+  local val
+  val=$(c "$1")
+  echo "${val#\#}"
 }
 
 # Helper: strip # from hex color
@@ -77,24 +77,24 @@ strip_hash() { echo "${1#\#}"; }
 
 # Helper: convert #RRGGBB to R;G;B decimal (for ANSI escape codes)
 hex_to_rgb() {
-    local hex="${1#\#}"
-    printf "%d;%d;%d" "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"
+  local hex="${1#\#}"
+  printf "%d;%d;%d" "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"
 }
 
 # Helper: capitalize first letter
 capitalize() {
-    local first rest
-    first=$(printf '%s' "${1:0:1}" | tr '[:lower:]' '[:upper:]')
-    rest="${1:1}"
-    echo "${first}${rest}"
+  local first rest
+  first=$(printf '%s' "${1:0:1}" | tr '[:lower:]' '[:upper:]')
+  rest="${1:1}"
+  echo "${first}${rest}"
 }
 
 # Helper: flavor display name (Frappé has accent, others plain)
 flavor_display_name() {
-    case "$1" in
+  case "$1" in
     frappe) echo "Frappé" ;;
     *) capitalize "$1" ;;
-    esac
+  esac
 }
 
 # =============================================================================
@@ -102,15 +102,15 @@ flavor_display_name() {
 # =============================================================================
 
 replace_theme_section() {
-    local file="$1"
-    local new_content="$2"
+  local file="$1"
+  local new_content="$2"
 
-    local tmpfile content_file
-    tmpfile=$(mktemp)
-    content_file=$(mktemp)
-    printf '%s\n' "$new_content" > "$content_file"
+  local tmpfile content_file
+  tmpfile=$(mktemp)
+  content_file=$(mktemp)
+  printf '%s\n' "$new_content" >"$content_file"
 
-    awk -v cfile="$content_file" '
+  awk -v cfile="$content_file" '
         /@theme:start/ {
             print
             while ((getline line < cfile) > 0) print line
@@ -119,10 +119,10 @@ replace_theme_section() {
         }
         /@theme:end/ { skip=0; print; next }
         !skip { print }
-    ' "$file" > "$tmpfile"
+    ' "$file" >"$tmpfile"
 
-    mv "$tmpfile" "$file"
-    rm -f "$content_file"
+  mv "$tmpfile" "$file"
+  rm -f "$content_file"
 }
 
 # =============================================================================
@@ -130,11 +130,11 @@ replace_theme_section() {
 # =============================================================================
 
 generate_sketchybar_colors() {
-    local file="$DOTFILES/sketchybar/colors.sh"
-    local accent_hex
-    accent_hex=$(c "$ACCENT")
+  local file="$DOTFILES/sketchybar/colors.sh"
+  local accent_hex
+  accent_hex=$(c "$ACCENT")
 
-    cat > "$file" << EOF
+  cat >"$file" <<EOF
 #!/bin/bash
 # Auto-generated by .system/setup/sync-theme.sh from .system/themes/theme.toml
 # Run .system/setup/sync-theme.sh to regenerate
@@ -201,13 +201,13 @@ export BATTERY_LOW=\$RED
 export BATTERY_CHARGING=\$GREEN
 EOF
 
-    print_status "sketchybar/colors.sh: generated"
+  print_status "sketchybar/colors.sh: generated"
 }
 
 generate_lsd_colors() {
-    local file="$DOTFILES/lsd/colors.yaml"
+  local file="$DOTFILES/lsd/colors.yaml"
 
-    cat > "$file" << EOF
+  cat >"$file" <<EOF
 # Auto-generated by .system/setup/sync-theme.sh from .system/themes/theme.toml
 # Run .system/setup/sync-theme.sh to regenerate
 #
@@ -255,18 +255,18 @@ git-status:
   conflicted: $(ch red)
 EOF
 
-    print_status "lsd/colors.yaml: generated"
+  print_status "lsd/colors.yaml: generated"
 }
 
 generate_atuin_theme() {
-    local dir="$DOTFILES/atuin/themes"
-    local file="$dir/${NAME}.toml"
-    local accent_hex
-    accent_hex=$(c "$ACCENT")
+  local dir="$DOTFILES/atuin/themes"
+  local file="$dir/${NAME}.toml"
+  local accent_hex
+  accent_hex=$(c "$ACCENT")
 
-    mkdir -p "$dir"
+  mkdir -p "$dir"
 
-    cat > "$file" << EOF
+  cat >"$file" <<EOF
 # Auto-generated by .system/setup/sync-theme.sh from .system/themes/theme.toml
 # Run .system/setup/sync-theme.sh to regenerate
 
@@ -284,7 +284,7 @@ Important = "$(c red)"
 Title = "${accent_hex}"
 EOF
 
-    print_status "atuin/themes/${NAME}.toml: generated"
+  print_status "atuin/themes/${NAME}.toml: generated"
 }
 
 # =============================================================================
@@ -292,11 +292,11 @@ EOF
 # =============================================================================
 
 sync_starship() {
-    local file="$DOTFILES/starship/starship.toml"
-    [[ -f "$file" ]] || return 0
+  local file="$DOTFILES/starship/starship.toml"
+  [[ -f "$file" ]] || return 0
 
-    local content
-    content="[palettes.catppuccin_${FLAVOR}]
+  local content
+  content="[palettes.catppuccin_${FLAVOR}]
 rosewater = \"$(c rosewater)\"
 flamingo = \"$(c flamingo)\"
 pink = \"$(c pink)\"
@@ -324,128 +324,128 @@ base = \"$(c base)\"
 mantle = \"$(c mantle)\"
 crust = \"$(c crust)\""
 
-    replace_theme_section "$file" "$content"
+  replace_theme_section "$file" "$content"
 
-    # Also update the palette name reference
-    sed -i '' "s/palette = \"catppuccin_.*\"/palette = \"catppuccin_${FLAVOR}\"/" "$file"
+  # Also update the palette name reference
+  sed -i '' "s/palette = \"catppuccin_.*\"/palette = \"catppuccin_${FLAVOR}\"/" "$file"
 
-    print_status "starship.toml: updated palette"
+  print_status "starship.toml: updated palette"
 }
 
 sync_fish_config() {
-    local file="$DOTFILES/fish/config.fish"
-    [[ -f "$file" ]] || return 0
+  local file="$DOTFILES/fish/config.fish"
+  [[ -f "$file" ]] || return 0
 
-    local content
-    content="# FZF Catppuccin $(capitalize "$FLAVOR") colors
+  local content
+  content="# FZF Catppuccin $(capitalize "$FLAVOR") colors
 set -gx FZF_DEFAULT_OPTS \"\\
 --color=bg+:$(c surface0),bg:$(c base),spinner:$(c rosewater),hl:$(c red) \\
 --color=fg:$(c text),header:$(c red),info:$(c mauve),pointer:$(c rosewater) \\
 --color=marker:$(c rosewater),fg+:$(c text),prompt:$(c mauve),hl+:$(c red)\""
 
-    replace_theme_section "$file" "$content"
-    print_status "fish/config.fish: updated FZF colors"
+  replace_theme_section "$file" "$content"
+  print_status "fish/config.fish: updated FZF colors"
 }
 
 sync_fastfetch() {
-    local file="$DOTFILES/fastfetch/config.jsonc"
-    [[ -f "$file" ]] || return 0
+  local file="$DOTFILES/fastfetch/config.jsonc"
+  [[ -f "$file" ]] || return 0
 
-    local lavender_rgb rosewater_rgb flamingo_rgb maroon_rgb red_rgb mauve_rgb blue_rgb overlay2_rgb
-    lavender_rgb="38;2;$(hex_to_rgb "$(c lavender)")"
-    rosewater_rgb="38;2;$(hex_to_rgb "$(c rosewater)")"
-    flamingo_rgb="38;2;$(hex_to_rgb "$(c flamingo)")"
-    maroon_rgb="38;2;$(hex_to_rgb "$(c maroon)")"
-    red_rgb="38;2;$(hex_to_rgb "$(c red)")"
-    mauve_rgb="38;2;$(hex_to_rgb "$(c mauve)")"
-    blue_rgb="38;2;$(hex_to_rgb "$(c blue)")"
-    overlay2_rgb="38;2;$(hex_to_rgb "$(c overlay2)")"
+  local lavender_rgb rosewater_rgb flamingo_rgb maroon_rgb red_rgb mauve_rgb blue_rgb overlay2_rgb
+  lavender_rgb="38;2;$(hex_to_rgb "$(c lavender)")"
+  rosewater_rgb="38;2;$(hex_to_rgb "$(c rosewater)")"
+  flamingo_rgb="38;2;$(hex_to_rgb "$(c flamingo)")"
+  maroon_rgb="38;2;$(hex_to_rgb "$(c maroon)")"
+  red_rgb="38;2;$(hex_to_rgb "$(c red)")"
+  mauve_rgb="38;2;$(hex_to_rgb "$(c mauve)")"
+  blue_rgb="38;2;$(hex_to_rgb "$(c blue)")"
+  overlay2_rgb="38;2;$(hex_to_rgb "$(c overlay2)")"
 
-    # Update color reference comment between markers
-    local content
-    content="  // Lavender: ${lavender_rgb} | Rosewater: ${rosewater_rgb} | Flamingo: ${flamingo_rgb} | Maroon: ${maroon_rgb} | Red: ${red_rgb} | Mauve: ${mauve_rgb} | Blue: ${blue_rgb}"
-    replace_theme_section "$file" "$content"
+  # Update color reference comment between markers
+  local content
+  content="  // Lavender: ${lavender_rgb} | Rosewater: ${rosewater_rgb} | Flamingo: ${flamingo_rgb} | Maroon: ${maroon_rgb} | Red: ${red_rgb} | Mauve: ${mauve_rgb} | Blue: ${blue_rgb}"
+  replace_theme_section "$file" "$content"
 
-    # Update logo color (lavender)
-    sed -i '' "s|\"1\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"1\": \"${lavender_rgb}\"|" "$file"
+  # Update logo color (lavender)
+  sed -i '' "s|\"1\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"1\": \"${lavender_rgb}\"|" "$file"
 
-    # Update separator color (overlay2)
-    sed -i '' "s|\"separator\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"separator\": \"${overlay2_rgb}\"|" "$file"
+  # Update separator color (overlay2)
+  sed -i '' "s|\"separator\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"separator\": \"${overlay2_rgb}\"|" "$file"
 
-    # Check for unknown color patterns (from old flavor)
-    local old_patterns
-    old_patterns=$(grep -oE '38;2;[0-9]+;[0-9]+;[0-9]+' "$file" | sort -u)
+  # Check for unknown color patterns (from old flavor)
+  local old_patterns
+  old_patterns=$(grep -oE '38;2;[0-9]+;[0-9]+;[0-9]+' "$file" | sort -u)
 
-    for old_rgb in $old_patterns; do
-        if [[ "$old_rgb" == "$lavender_rgb" || "$old_rgb" == "$rosewater_rgb" ||
-            "$old_rgb" == "$flamingo_rgb" || "$old_rgb" == "$maroon_rgb" ||
-            "$old_rgb" == "$red_rgb" || "$old_rgb" == "$mauve_rgb" ||
-            "$old_rgb" == "$blue_rgb" || "$old_rgb" == "$overlay2_rgb" ]]; then
-            continue
-        fi
-        print_warning "fastfetch: unknown color pattern ${old_rgb}. Manual update may be needed"
-    done
+  for old_rgb in $old_patterns; do
+    if [[ "$old_rgb" == "$lavender_rgb" || "$old_rgb" == "$rosewater_rgb" ||
+      "$old_rgb" == "$flamingo_rgb" || "$old_rgb" == "$maroon_rgb" ||
+      "$old_rgb" == "$red_rgb" || "$old_rgb" == "$mauve_rgb" ||
+      "$old_rgb" == "$blue_rgb" || "$old_rgb" == "$overlay2_rgb" ]]; then
+      continue
+    fi
+    print_warning "fastfetch: unknown color pattern ${old_rgb}. Manual update may be needed"
+  done
 
-    print_status "fastfetch/config.jsonc: updated color reference"
+  print_status "fastfetch/config.jsonc: updated color reference"
 }
 
 sync_git_config() {
-    local file="$SYSTEM_DIR/templates/git-config.tpl"
-    [[ -f "$file" ]] || return 0
+  local file="$SYSTEM_DIR/templates/git-config.tpl"
+  [[ -f "$file" ]] || return 0
 
-    local cap_flavor
-    cap_flavor=$(capitalize "$FLAVOR")
+  local cap_flavor
+  cap_flavor=$(capitalize "$FLAVOR")
 
-    # Delta blend colors are from the upstream catppuccin-delta theme
-    # These are pre-computed per flavor and not derivable from palette alone
-    local minus_emph_bg minus_bg plus_emph_bg plus_bg
-    local map_purple map_blue map_cyan map_yellow
+  # Delta blend colors are from the upstream catppuccin-delta theme
+  # These are pre-computed per flavor and not derivable from palette alone
+  local minus_emph_bg minus_bg plus_emph_bg plus_bg
+  local map_purple map_blue map_cyan map_yellow
 
-    case "$FLAVOR" in
+  case "$FLAVOR" in
     frappe)
-        minus_emph_bg="#704f5c"
-        minus_bg="#544452"
-        plus_emph_bg="#596b5e"
-        plus_bg="#475453"
-        map_purple="#66597e"
-        map_blue="#505d81"
-        map_cyan="#546b7a"
-        map_yellow="#6f6860"
-        ;;
+      minus_emph_bg="#704f5c"
+      minus_bg="#544452"
+      plus_emph_bg="#596b5e"
+      plus_bg="#475453"
+      map_purple="#66597e"
+      map_blue="#505d81"
+      map_cyan="#546b7a"
+      map_yellow="#6f6860"
+      ;;
     latte)
-        minus_emph_bg="#eec5cb"
-        minus_bg="#ece0e0"
-        plus_emph_bg="#c5dbbe"
-        plus_bg="#dee8db"
-        map_purple="#d2c3e6"
-        map_blue="#c3d0ed"
-        map_cyan="#c2dde3"
-        map_yellow="#ddd6c2"
-        ;;
+      minus_emph_bg="#eec5cb"
+      minus_bg="#ece0e0"
+      plus_emph_bg="#c5dbbe"
+      plus_bg="#dee8db"
+      map_purple="#d2c3e6"
+      map_blue="#c3d0ed"
+      map_cyan="#c2dde3"
+      map_yellow="#ddd6c2"
+      ;;
     macchiato)
-        minus_emph_bg="#6b4152"
-        minus_bg="#523948"
-        plus_emph_bg="#4f6b58"
-        plus_bg="#3d5049"
-        map_purple="#5d4e78"
-        map_blue="#475879"
-        map_cyan="#4a6570"
-        map_yellow="#665d57"
-        ;;
+      minus_emph_bg="#6b4152"
+      minus_bg="#523948"
+      plus_emph_bg="#4f6b58"
+      plus_bg="#3d5049"
+      map_purple="#5d4e78"
+      map_blue="#475879"
+      map_cyan="#4a6570"
+      map_yellow="#665d57"
+      ;;
     mocha)
-        minus_emph_bg="#6b3a3e"
-        minus_bg="#52333a"
-        plus_emph_bg="#456551"
-        plus_bg="#374a42"
-        map_purple="#574270"
-        map_blue="#434f73"
-        map_cyan="#425c65"
-        map_yellow="#5f5450"
-        ;;
-    esac
+      minus_emph_bg="#6b3a3e"
+      minus_bg="#52333a"
+      plus_emph_bg="#456551"
+      plus_bg="#374a42"
+      map_purple="#574270"
+      map_blue="#434f73"
+      map_cyan="#425c65"
+      map_yellow="#5f5450"
+      ;;
+  esac
 
-    local content
-    content="[delta \"catppuccin-${FLAVOR}\"]
+  local content
+  content="[delta \"catppuccin-${FLAVOR}\"]
     blame-palette = \"$(c base) $(c mantle) $(c crust) $(c surface0) $(c surface1)\"
     commit-decoration-style = \"$(c overlay0)\" bold box ul
     dark = true
@@ -467,12 +467,12 @@ sync_git_config() {
     map-styles = bold purple => syntax \"${map_purple}\", bold blue => syntax \"${map_blue}\", bold cyan => syntax \"${map_cyan}\", bold yellow => syntax \"${map_yellow}\"
     syntax-theme = Catppuccin ${cap_flavor}"
 
-    replace_theme_section "$file" "$content"
+  replace_theme_section "$file" "$content"
 
-    # Also update the delta features line
-    sed -i '' "s/features = catppuccin-.*/features = catppuccin-${FLAVOR}/" "$file"
+  # Also update the delta features line
+  sed -i '' "s/features = catppuccin-.*/features = catppuccin-${FLAVOR}/" "$file"
 
-    print_status ".system/templates/git-config.tpl: updated delta theme"
+  print_status ".system/templates/git-config.tpl: updated delta theme"
 }
 
 # =============================================================================
@@ -480,61 +480,61 @@ sync_git_config() {
 # =============================================================================
 
 sync_flavor_strings() {
-    local cap_flavor
-    cap_flavor=$(capitalize "$FLAVOR")
+  local cap_flavor
+  cap_flavor=$(capitalize "$FLAVOR")
 
-    # nvim: flavour = 'frappe'
-    local file="$DOTFILES/nvim/lua/plugins/theme.lua"
-    if [[ -f "$file" ]]; then
-        sed -i '' "s/flavour = '.*'/flavour = '${FLAVOR}'/" "$file"
-        print_status "nvim/lua/plugins/theme.lua: flavor → ${FLAVOR}"
-    fi
+  # nvim: flavour = 'frappe'
+  local file="$DOTFILES/nvim/lua/plugins/theme.lua"
+  if [[ -f "$file" ]]; then
+    sed -i '' "s/flavour = '.*'/flavour = '${FLAVOR}'/" "$file"
+    print_status "nvim/lua/plugins/theme.lua: flavor → ${FLAVOR}"
+  fi
 
-    # tmux: @catppuccin_flavor "frappe"
-    file="$DOTFILES/tmux/tmux.conf"
-    if [[ -f "$file" ]]; then
-        sed -i '' "s/@catppuccin_flavor \".*\"/@catppuccin_flavor \"${FLAVOR}\"/" "$file"
-        print_status "tmux/tmux.conf: flavor → ${FLAVOR}"
-    fi
+  # tmux: @catppuccin_flavor "frappe"
+  file="$DOTFILES/tmux/tmux.conf"
+  if [[ -f "$file" ]]; then
+    sed -i '' "s/@catppuccin_flavor \".*\"/@catppuccin_flavor \"${FLAVOR}\"/" "$file"
+    print_status "tmux/tmux.conf: flavor → ${FLAVOR}"
+  fi
 
-    # bat: --theme="Catppuccin Frappe"
-    file="$DOTFILES/bat/config"
-    if [[ -f "$file" ]]; then
-        sed -i '' "s/--theme=\"Catppuccin .*\"/--theme=\"Catppuccin ${cap_flavor}\"/" "$file"
-        bat cache --build --source "$DOTFILES/bat" > /dev/null 2>&1 || true
-        print_status "bat/config: theme → Catppuccin ${cap_flavor}"
-    fi
+  # bat: --theme="Catppuccin Frappe"
+  file="$DOTFILES/bat/config"
+  if [[ -f "$file" ]]; then
+    sed -i '' "s/--theme=\"Catppuccin .*\"/--theme=\"Catppuccin ${cap_flavor}\"/" "$file"
+    bat cache --build --source "$DOTFILES/bat" >/dev/null 2>&1 || true
+    print_status "bat/config: theme → Catppuccin ${cap_flavor}"
+  fi
 
-    # atuin config: name = "catppuccin-frappe-lavender"
-    file="$DOTFILES/atuin/config.toml"
-    if [[ -f "$file" ]]; then
-        sed -i '' "s/name = \"catppuccin-.*\"/name = \"${NAME}\"/" "$file"
-        print_status "atuin/config.toml: theme → ${NAME}"
-    fi
+  # atuin config: name = "catppuccin-frappe-lavender"
+  file="$DOTFILES/atuin/config.toml"
+  if [[ -f "$file" ]]; then
+    sed -i '' "s/name = \"catppuccin-.*\"/name = \"${NAME}\"/" "$file"
+    print_status "atuin/config.toml: theme → ${NAME}"
+  fi
 
-    # kitty: include ../.system/themes/catppuccin-frappe/kitty.conf
-    file="$DOTFILES/kitty/kitty.conf"
-    if [[ -f "$file" ]]; then
-        sed -i '' "s|include ../.system/themes/catppuccin-.*/kitty.conf|include ../.system/themes/catppuccin-${FLAVOR}/kitty.conf|" "$file"
-        print_status "kitty/kitty.conf: include → catppuccin-${FLAVOR}"
-    fi
+  # kitty: include ../.system/themes/catppuccin-frappe/kitty.conf
+  file="$DOTFILES/kitty/kitty.conf"
+  if [[ -f "$file" ]]; then
+    sed -i '' "s|include ../.system/themes/catppuccin-.*/kitty.conf|include ../.system/themes/catppuccin-${FLAVOR}/kitty.conf|" "$file"
+    print_status "kitty/kitty.conf: include → catppuccin-${FLAVOR}"
+  fi
 
-    # zed: icon_theme and dark theme name
-    file="$DOTFILES/zed/settings.json"
-    if [[ -f "$file" ]]; then
-        local display_flavor
-        display_flavor=$(flavor_display_name "$FLAVOR")
-        sed -i '' "s/\"icon_theme\": \"Catppuccin [^\"]*\"/\"icon_theme\": \"Catppuccin ${display_flavor}\"/" "$file"
-        sed -i '' "s/\"dark\": \"Catppuccin [^\"]*\"/\"dark\": \"Catppuccin ${cap_flavor} (Blur)\"/" "$file"
-        print_status "zed/settings.json: theme → Catppuccin ${display_flavor}"
-    fi
+  # zed: icon_theme and dark theme name
+  file="$DOTFILES/zed/settings.json"
+  if [[ -f "$file" ]]; then
+    local display_flavor
+    display_flavor=$(flavor_display_name "$FLAVOR")
+    sed -i '' "s/\"icon_theme\": \"Catppuccin [^\"]*\"/\"icon_theme\": \"Catppuccin ${display_flavor}\"/" "$file"
+    sed -i '' "s/\"dark\": \"Catppuccin [^\"]*\"/\"dark\": \"Catppuccin ${cap_flavor} (Blur)\"/" "$file"
+    print_status "zed/settings.json: theme → Catppuccin ${display_flavor}"
+  fi
 
-    # glow: style path in template
-    file="$SYSTEM_DIR/templates/glow.yml.tpl"
-    if [[ -f "$file" ]]; then
-        sed -i '' "s|glow/catppuccin-.*\.json|glow/catppuccin-${FLAVOR}.json|" "$file"
-        print_status ".system/templates/glow.yml.tpl: style → catppuccin-${FLAVOR}"
-    fi
+  # glow: style path in template
+  file="$SYSTEM_DIR/templates/glow.yml.tpl"
+  if [[ -f "$file" ]]; then
+    sed -i '' "s|glow/catppuccin-.*\.json|glow/catppuccin-${FLAVOR}.json|" "$file"
+    print_status ".system/templates/glow.yml.tpl: style → catppuccin-${FLAVOR}"
+  fi
 }
 
 # =============================================================================
@@ -542,34 +542,34 @@ sync_flavor_strings() {
 # =============================================================================
 
 check_upstream_themes() {
-    local upstream_files_system=(
-        ".system/themes/catppuccin-${FLAVOR}/kitty.conf"
-        ".system/themes/catppuccin-${FLAVOR}/bat.tmTheme"
-    )
-    local upstream_files_dotfiles=(
-        "glow/catppuccin-${FLAVOR}.json"
-        "zed/themes/catppuccin-${FLAVOR}-blur.json"
-    )
+  local upstream_files_system=(
+    ".system/themes/catppuccin-${FLAVOR}/kitty.conf"
+    ".system/themes/catppuccin-${FLAVOR}/bat.tmTheme"
+  )
+  local upstream_files_dotfiles=(
+    "glow/catppuccin-${FLAVOR}.json"
+    "zed/themes/catppuccin-${FLAVOR}-blur.json"
+  )
 
-    local missing=()
-    for f in "${upstream_files_system[@]}"; do
-        if [[ ! -f "$DOTFILES/$f" ]]; then
-            missing+=("$f")
-        fi
-    done
-    for f in "${upstream_files_dotfiles[@]}"; do
-        if [[ ! -f "$DOTFILES/$f" ]]; then
-            missing+=("$f")
-        fi
-    done
-
-    if [[ ${#missing[@]} -gt 0 ]]; then
-        echo ""
-        print_warning "Upstream theme files missing (manual download needed if switching flavors):"
-        for f in "${missing[@]}"; do
-            print_info "  $f"
-        done
+  local missing=()
+  for f in "${upstream_files_system[@]}"; do
+    if [[ ! -f "$DOTFILES/$f" ]]; then
+      missing+=("$f")
     fi
+  done
+  for f in "${upstream_files_dotfiles[@]}"; do
+    if [[ ! -f "$DOTFILES/$f" ]]; then
+      missing+=("$f")
+    fi
+  done
+
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    echo ""
+    print_warning "Upstream theme files missing (manual download needed if switching flavors):"
+    for f in "${missing[@]}"; do
+      print_info "  $f"
+    done
+  fi
 }
 
 # =============================================================================
@@ -577,29 +577,29 @@ check_upstream_themes() {
 # =============================================================================
 
 main() {
-    print_header "Syncing Theme: ${NAME}"
-    print_info "Flavor: ${FLAVOR} | Accent: ${ACCENT}"
-    echo ""
+  print_header "Syncing Theme: ${NAME}"
+  print_info "Flavor: ${FLAVOR} | Accent: ${ACCENT}"
+  echo ""
 
-    # Category 1: Generate files
-    generate_sketchybar_colors
-    generate_lsd_colors
-    generate_atuin_theme
+  # Category 1: Generate files
+  generate_sketchybar_colors
+  generate_lsd_colors
+  generate_atuin_theme
 
-    # Category 2: Replace sections between markers
-    sync_starship
-    sync_fish_config
-    sync_fastfetch
-    sync_git_config
+  # Category 2: Replace sections between markers
+  sync_starship
+  sync_fish_config
+  sync_fastfetch
+  sync_git_config
 
-    # Category 3: Flavor string replacement
-    sync_flavor_strings
+  # Category 3: Flavor string replacement
+  sync_flavor_strings
 
-    # Category 4: Check upstream files
-    check_upstream_themes
+  # Category 4: Check upstream files
+  check_upstream_themes
 
-    echo ""
-    print_status "Theme sync complete"
+  echo ""
+  print_status "Theme sync complete"
 }
 
 main "$@"

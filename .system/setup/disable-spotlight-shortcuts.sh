@@ -8,7 +8,7 @@ LOG_FILE="$HOME/.config/logs/spotlight-shortcuts.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 
 log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >>"$LOG_FILE"
 }
 
 log_message "Waiting for macOS to finish boot-time shortcut restoration..."
@@ -20,21 +20,21 @@ PLIST="$HOME/Library/Preferences/com.apple.symbolichotkeys.plist"
 PB=/usr/libexec/PlistBuddy
 
 disable_shortcut() {
-    local key="$1" p1="$2" p2="$3" p3="$4"
-    local base=":AppleSymbolicHotKeys:${key}"
+  local key="$1" p1="$2" p2="$3" p3="$4"
+  local base=":AppleSymbolicHotKeys:${key}"
 
-    # Remove existing entry to avoid type conflicts
-    "$PB" -c "Delete ${base}" "$PLIST" 2>/dev/null
+  # Remove existing entry to avoid type conflicts
+  "$PB" -c "Delete ${base}" "$PLIST" 2>/dev/null
 
-    # Recreate with correct types
-    "$PB" -c "Add ${base} dict" "$PLIST"
-    "$PB" -c "Add ${base}:enabled bool false" "$PLIST"
-    "$PB" -c "Add ${base}:value dict" "$PLIST"
-    "$PB" -c "Add ${base}:value:type string standard" "$PLIST"
-    "$PB" -c "Add ${base}:value:parameters array" "$PLIST"
-    "$PB" -c "Add ${base}:value:parameters: integer ${p1}" "$PLIST"
-    "$PB" -c "Add ${base}:value:parameters: integer ${p2}" "$PLIST"
-    "$PB" -c "Add ${base}:value:parameters: integer ${p3}" "$PLIST"
+  # Recreate with correct types
+  "$PB" -c "Add ${base} dict" "$PLIST"
+  "$PB" -c "Add ${base}:enabled bool false" "$PLIST"
+  "$PB" -c "Add ${base}:value dict" "$PLIST"
+  "$PB" -c "Add ${base}:value:type string standard" "$PLIST"
+  "$PB" -c "Add ${base}:value:parameters array" "$PLIST"
+  "$PB" -c "Add ${base}:value:parameters: integer ${p1}" "$PLIST"
+  "$PB" -c "Add ${base}:value:parameters: integer ${p2}" "$PLIST"
+  "$PB" -c "Add ${base}:value:parameters: integer ${p3}" "$PLIST"
 }
 
 # Spotlight Search: Cmd+Space (key 64)

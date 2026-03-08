@@ -10,16 +10,16 @@ SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
 source "$SYSTEM_DIR/setup/lib/output.sh"
 
 if ! command -v tailscale &>/dev/null; then
-    print_warning "Tailscale not installed, skipping"
-    return 0 2>/dev/null || exit 0
+  print_warning "Tailscale not installed, skipping"
+  return 0 2>/dev/null || exit 0
 fi
 
 # Check if tailscaled is running
 if ! tailscale status &>/dev/null; then
-    print_info "Starting tailscaled service..."
-    sudo brew services start tailscale
-    print_warning "Run 'tailscale up' to authenticate (SSH will be enabled on next setup run)"
-    return 0 2>/dev/null || exit 0
+  print_info "Starting tailscaled service..."
+  sudo brew services start tailscale
+  print_warning "Run 'tailscale up' to authenticate (SSH will be enabled on next setup run)"
+  return 0 2>/dev/null || exit 0
 fi
 
 # Enable Tailscale SSH server (idempotent)
@@ -36,24 +36,24 @@ print_status "Tailscale SSH: enabled (verify ACLs at https://login.tailscale.com
 sudo sed -i '' '/^ListenAddress/{ /# managed by dotfiles$/!s/^/# /; }' /etc/ssh/sshd_config
 TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || true)
 if [[ -n "$TAILSCALE_IP" ]] && [[ "$TAILSCALE_IP" =~ ^100\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    sudo sed -i '' '/# managed by dotfiles$/d' /etc/ssh/sshd_config
-    echo "ListenAddress $TAILSCALE_IP  # managed by dotfiles" | sudo tee -a /etc/ssh/sshd_config >/dev/null
-    sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
-    print_status "SSH restricted to Tailscale interface ($TAILSCALE_IP)"
+  sudo sed -i '' '/# managed by dotfiles$/d' /etc/ssh/sshd_config
+  echo "ListenAddress $TAILSCALE_IP  # managed by dotfiles" | sudo tee -a /etc/ssh/sshd_config >/dev/null
+  sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
+  print_status "SSH restricted to Tailscale interface ($TAILSCALE_IP)"
 else
-    print_warning "Tailscale IP not found, restricting SSH to localhost"
-    sudo sed -i '' '/# managed by dotfiles$/d' /etc/ssh/sshd_config
-    echo "ListenAddress 127.0.0.1  # managed by dotfiles" | sudo tee -a /etc/ssh/sshd_config >/dev/null
-    sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
+  print_warning "Tailscale IP not found, restricting SSH to localhost"
+  sudo sed -i '' '/# managed by dotfiles$/d' /etc/ssh/sshd_config
+  echo "ListenAddress 127.0.0.1  # managed by dotfiles" | sudo tee -a /etc/ssh/sshd_config >/dev/null
+  sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
 fi
 
 # Install kitty terminfo for SSH clients connecting from kitty terminal
 TERMINFO_SRC="$SYSTEM_DIR/templates/xterm-kitty.terminfo"
 if [[ ! -f "$TERMINFO_SRC" ]]; then
-    print_warning "Kitty terminfo: source not found ($TERMINFO_SRC)"
+  print_warning "Kitty terminfo: source not found ($TERMINFO_SRC)"
 elif [[ ! -f "$HOME/.terminfo/78/xterm-kitty" ]]; then
-    tic -x -o "$HOME/.terminfo" "$TERMINFO_SRC"
-    print_status "Kitty terminfo: installed"
+  tic -x -o "$HOME/.terminfo" "$TERMINFO_SRC"
+  print_status "Kitty terminfo: installed"
 else
-    print_status "Kitty terminfo: already installed"
+  print_status "Kitty terminfo: already installed"
 fi

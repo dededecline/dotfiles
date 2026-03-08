@@ -30,7 +30,7 @@ while IFS= read -r line; do
       secondary_workspaces="$secondary_workspaces $ws"
     fi
   fi
-done < "$aerospace_config"
+done <"$aerospace_config"
 
 for sid in $all_workspaces; do
   # Use parsed mapping; default to display 1; skip lookup on single display
@@ -41,26 +41,26 @@ for sid in $all_workspaces; do
 
   sketchybar --add item space.$sid left \
     --set space.$sid \
-      display="$display_id" \
-      drawing=on \
-      background.color=$ITEM_BG_COLOR \
-      background.corner_radius=5 \
-      background.drawing=on \
-      background.border_color=$OVERLAY0 \
-      background.border_width=0 \
-      background.height=26 \
-      icon="$sid" \
-      icon.color=$TEXT \
-      icon.font="$NERD_FONT:Bold:14.0" \
-      icon.padding_left=10 \
-      icon.padding_right=6 \
-      label.font="sketchybar-app-font:Regular:14.0" \
-      label.color=$SUBTEXT0 \
-      label.padding_right=0 \
-      label.padding_left=0 \
-      label.y_offset=-1 \
-      click_script="aerospace workspace $sid" \
-      script="$PLUGIN_DIR/aerospace.sh $sid" \
+    display="$display_id" \
+    drawing=on \
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=5 \
+    background.drawing=on \
+    background.border_color=$OVERLAY0 \
+    background.border_width=0 \
+    background.height=26 \
+    icon="$sid" \
+    icon.color=$TEXT \
+    icon.font="$NERD_FONT:Bold:14.0" \
+    icon.padding_left=10 \
+    icon.padding_right=6 \
+    label.font="sketchybar-app-font:Regular:14.0" \
+    label.color=$SUBTEXT0 \
+    label.padding_right=0 \
+    label.padding_left=0 \
+    label.y_offset=-1 \
+    click_script="aerospace workspace $sid" \
+    script="$PLUGIN_DIR/aerospace.sh $sid" \
     --subscribe space.$sid aerospace_workspace_change
 done
 

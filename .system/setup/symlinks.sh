@@ -9,54 +9,54 @@ TEMPLATES_DIR="$SYSTEM_DIR/templates"
 
 # Function to process a template with environment variable substitution
 process_template() {
-    local template="$1"
-    local output="$2"
+  local template="$1"
+  local output="$2"
 
-    if [[ ! -f "$template" ]]; then
-        echo "  Skipped: $template (not found)"
-        return 1
-    fi
+  if [[ ! -f "$template" ]]; then
+    echo "  Skipped: $template (not found)"
+    return 1
+  fi
 
-    mkdir -p "$(dirname "$output")"
-    envsubst < "$template" > "$output"
-    echo "  Generated: $output"
+  mkdir -p "$(dirname "$output")"
+  envsubst <"$template" >"$output"
+  echo "  Generated: $output"
 }
 
 # Function to create symlink safely
 create_symlink() {
-    local source="$1"
-    local target="$2"
+  local source="$1"
+  local target="$2"
 
-    # Skip if source doesn't exist
-    if [[ ! -e "$source" ]]; then
-        echo "  Skipped: $source (not found)"
-        return
-    fi
+  # Skip if source doesn't exist
+  if [[ ! -e "$source" ]]; then
+    echo "  Skipped: $source (not found)"
+    return
+  fi
 
-    # If target is already a symlink pointing to the right place, skip
-    if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$source" ]]; then
-        echo "  OK: $target"
-        return
-    fi
+  # If target is already a symlink pointing to the right place, skip
+  if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$source" ]]; then
+    echo "  OK: $target"
+    return
+  fi
 
-    # Remove existing symlink
-    if [[ -L "$target" ]]; then
-        rm "$target"
-    # Backup existing file
-    elif [[ -f "$target" ]]; then
-        echo "  Backing up: $target -> ${target}.backup"
-        mv "$target" "${target}.backup"
-    fi
+  # Remove existing symlink
+  if [[ -L "$target" ]]; then
+    rm "$target"
+  # Backup existing file
+  elif [[ -f "$target" ]]; then
+    echo "  Backing up: $target -> ${target}.backup"
+    mv "$target" "${target}.backup"
+  fi
 
-    ln -s "$source" "$target"
-    echo "  Created: $target -> $source"
+  ln -s "$source" "$target"
+  echo "  Created: $target -> $source"
 }
 
 # Parse theme flavor for bat theme symlink
 THEME_FILE="$SYSTEM_DIR/themes/theme.toml"
 if [[ -f "$THEME_FILE" ]]; then
-    FLAVOR=$(grep '^flavor *= *"' "$THEME_FILE" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/')
-    CAP_FLAVOR="$(tr '[:lower:]' '[:upper:]' <<< "${FLAVOR:0:1}")${FLAVOR:1}"
+  FLAVOR=$(grep '^flavor *= *"' "$THEME_FILE" | head -1 | sed 's/.*= *"\([^"]*\)".*/\1/')
+  CAP_FLAVOR="$(tr '[:lower:]' '[:upper:]' <<<"${FLAVOR:0:1}")${FLAVOR:1}"
 fi
 
 echo "Creating symlinks..."
@@ -85,37 +85,37 @@ mkdir -p "$HOME/Library/LaunchAgents"
 
 # Bat syntax theme
 if [[ -n "${FLAVOR:-}" ]]; then
-    mkdir -p "$DOTFILES/bat/themes"
-    create_symlink "$SYSTEM_DIR/themes/catppuccin-${FLAVOR}/bat.tmTheme" "$DOTFILES/bat/themes/Catppuccin ${CAP_FLAVOR}.tmTheme"
-    if command -v bat &> /dev/null; then
-        bat cache --build --source "$DOTFILES/bat" > /dev/null 2>&1
-        echo "  Rebuilt bat theme cache"
-    fi
+  mkdir -p "$DOTFILES/bat/themes"
+  create_symlink "$SYSTEM_DIR/themes/catppuccin-${FLAVOR}/bat.tmTheme" "$DOTFILES/bat/themes/Catppuccin ${CAP_FLAVOR}.tmTheme"
+  if command -v bat &>/dev/null; then
+    bat cache --build --source "$DOTFILES/bat" >/dev/null 2>&1
+    echo "  Rebuilt bat theme cache"
+  fi
 fi
 
 # Work-specific Claude skills (conditional on hostname)
 # Source hostname detection if not already available
 if [[ -f "$SYSTEM_DIR/setup/lib/profiles.sh" ]]; then
-    source "$SYSTEM_DIR/setup/lib/profiles.sh"
-    MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
+  source "$SYSTEM_DIR/setup/lib/profiles.sh"
+  MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
 fi
 
-if type -t is_machine_in_group &> /dev/null && is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
-    echo "Work machine detected. Linking work-specific Claude skills..."
-    WORK_SKILLS_DIR="$SYSTEM_DIR/sensitive/claude-skills"
-    if [[ -d "$WORK_SKILLS_DIR" ]]; then
-        for skill_dir in "$WORK_SKILLS_DIR"/*/; do
-            if [[ -d "$skill_dir" ]]; then
-                skill_name=$(basename "$skill_dir")
-                create_symlink "$skill_dir" "$DOTFILES/claude/skills/$skill_name"
-            fi
-        done
-    else
-        echo "  Work skills directory not found: $WORK_SKILLS_DIR"
-        echo "  Run 'secrets' to retrieve skills from 1Password"
-    fi
+if type -t is_machine_in_group &>/dev/null && is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
+  echo "Work machine detected. Linking work-specific Claude skills..."
+  WORK_SKILLS_DIR="$SYSTEM_DIR/sensitive/claude-skills"
+  if [[ -d "$WORK_SKILLS_DIR" ]]; then
+    for skill_dir in "$WORK_SKILLS_DIR"/*/; do
+      if [[ -d "$skill_dir" ]]; then
+        skill_name=$(basename "$skill_dir")
+        create_symlink "$skill_dir" "$DOTFILES/claude/skills/$skill_name"
+      fi
+    done
+  else
+    echo "  Work skills directory not found: $WORK_SKILLS_DIR"
+    echo "  Run 'secrets' to retrieve skills from 1Password"
+  fi
 else
-    echo "$MACHINE_HOSTNAME detected, skipping work-specific Claude skills"
+  echo "$MACHINE_HOSTNAME detected, skipping work-specific Claude skills"
 fi
 
 echo "Symlinks complete!"

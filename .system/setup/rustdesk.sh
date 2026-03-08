@@ -12,8 +12,8 @@ source "$SYSTEM_DIR/setup/lib/output.sh"
 RUSTDESK="/Applications/RustDesk.app/Contents/MacOS/RustDesk"
 
 if [[ ! -f "$RUSTDESK" ]]; then
-    print_warning "RustDesk not installed, skipping configuration"
-    return 0 2>/dev/null || exit 0
+  print_warning "RustDesk not installed, skipping configuration"
+  return 0 2>/dev/null || exit 0
 fi
 
 # Ensure root config directory exists (RustDesk doesn't auto-create it)
@@ -31,9 +31,9 @@ sudo "$RUSTDESK" --option approve-mode password &>/dev/null
 
 # Apply permanent password from 1Password if available
 if [[ -f "$SYSTEM_DIR/sensitive/rustdesk-password" ]]; then
-    # RustDesk CLI does not support stdin or file-based password input.
-    sudo "$RUSTDESK" --password "$(tr -d '\n' < "$SYSTEM_DIR/sensitive/rustdesk-password")" &>/dev/null
-    print_status "RustDesk: configured with permanent password"
+  # RustDesk CLI does not support stdin or file-based password input.
+  sudo "$RUSTDESK" --password "$(tr -d '\n' <"$SYSTEM_DIR/sensitive/rustdesk-password")" &>/dev/null
+  print_status "RustDesk: configured with permanent password"
 else
-    print_warning "RustDesk: configured (set permanent password manually or via 'secrets')"
+  print_warning "RustDesk: configured (set permanent password manually or via 'secrets')"
 fi

@@ -114,7 +114,9 @@
       "Bash(killall:*)",
       "Bash(ln:*)",
       "Bash(chmod:*)",
-      "Bash(mise:*)"
+      "Bash(mise:*)",
+      "Bash(shellcheck:*)",
+      "Bash(shfmt:*)"
     ],
     "deny": [
       "Bash(git push:*)",
@@ -207,6 +209,17 @@
           {
             "type": "command",
             "command": "afplay /System/Library/Sounds/glass.aiff"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.config/claude/assets/scripts/check-shell.sh"
           }
         ]
       }
