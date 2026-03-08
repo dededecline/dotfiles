@@ -255,11 +255,9 @@
   **Manual steps — laptops (hera, athena):**
   - Tailscale: Allow Network Extension when prompted, Settings > Install CLI integration
 
-  **Claude Code over SSH:** A Fish wrapper (`fish/functions/claude.fish`)
-  detects SSH sessions and unlocks the macOS Keychain before launching Claude
-  Code. This is needed because Claude Code stores OAuth tokens in the Keychain,
-  which is locked in SSH sessions. The wrapper prompts for the keychain password
-  once per session; subsequent runs are a no-op.
+  **Claude Code auth:** API key is set globally via `fish/conf.d/anthropic.fish`
+  from a 1Password-injected secret (`ANTHROPIC_API_KEY`), so auth works in both
+  local and SSH sessions without OAuth or Keychain access.
 
   ### Fish Functions                                                          
                                                                               
@@ -272,7 +270,6 @@
   • empty - Create empty commit with CI identity for triggering pipelines     
   • z - Connect to k8s clusters via ZLI (work, requires secrets)                                  
   • awsall - Run AWS CLI command across all profiles
-  • claude - Wrapper that unlocks Keychain in SSH sessions before running Claude Code                          
                                                                               
   ### Key Aliases                                                             
                                                                               

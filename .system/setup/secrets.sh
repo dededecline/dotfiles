@@ -369,6 +369,14 @@ check_secrets() {
         fi
     fi
 
+    # Check Anthropic API key
+    if [[ -f "$SENSITIVE_DIR/anthropic-api-key" ]]; then
+        print_status "Anthropic API key: configured"
+    else
+        print_warning "Anthropic API key: not configured"
+        all_configured=false
+    fi
+
     # Check Atuin sync status
     if command -v atuin &>/dev/null; then
         if atuin status 2>/dev/null | grep -q "^Username:"; then
@@ -462,6 +470,11 @@ inject_secrets() {
     fi
 
     # Secrets for all machines
+    # Inject Anthropic API key
+    if [[ -f "$TEMPLATES_DIR/anthropic-api-key.tpl" ]]; then
+        inject_template "$TEMPLATES_DIR/anthropic-api-key.tpl" "$SENSITIVE_DIR/anthropic-api-key" "Anthropic API key" "$OP_PERSONAL_ACCOUNT"
+    fi
+
     # Symlink fastfetch logo based on hostname
     local logo_target="logo_${MACHINE_HOSTNAME}.txt"
     ln -sf "$DOTFILES/fastfetch/$logo_target" "$DOTFILES/fastfetch/logo.txt"
