@@ -562,6 +562,9 @@ function icon_map() {
   "Rio")
     icon_result=":rio:"
     ;;
+  "RustDesk")
+    icon_result=":rustdesk:"
+    ;;
   "Royal TSX")
     icon_result=":royaltsx:"
     ;;

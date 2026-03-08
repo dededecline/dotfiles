@@ -240,7 +240,7 @@ run = "move-node-to-workspace 6"
 if.app-id = "com.apple.journal"
 run = "move-node-to-workspace 6"
 
-# Workspace 7: News, Vial, Music
+# Workspace 7: News, Vial, Music, RustDesk
 [[on-window-detected]]
 if.app-id = 'com.apple.news'
 run = 'move-node-to-workspace 7'
@@ -251,6 +251,10 @@ run = 'move-node-to-workspace 7'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Music'
+run = 'move-node-to-workspace 7'
+
+[[on-window-detected]]
+if.app-id = 'com.carriez.rustdesk'
 run = 'move-node-to-workspace 7'
 
 # Workspace 8: Davinci Resolve, Steam, Ableton, Infuse (secondary monitor)
