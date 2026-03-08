@@ -7,10 +7,36 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "file_types": {
+    "Fish": ["*.fish.tpl"]
+  },
   "languages": {
     "JSONC": {
       "prettier": {
         "trailingComma": "none"
+      }
+    },
+    "Fish": {
+      "formatter": {
+        "external": {
+          "command": "fish_indent"
+        }
+      }
+    },
+    "Shell Script": {
+      "format_on_save": "on",
+      "formatter": {
+        "external": {
+          "command": "shfmt",
+          "arguments": [
+            "--filename",
+            "{buffer_path}",
+            "--indent",
+            "4",
+            "--binary-next-line",
+            "--space-redirects"
+          ]
+        }
       }
     }
   },
@@ -54,6 +80,7 @@
     "include_ignored": false
   },
   "auto_install_extensions": {
+    "basher": true,
     "catppuccin-icons": true,
     "csv": true,
     "dockerfile": true,

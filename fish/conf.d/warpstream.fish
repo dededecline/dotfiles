@@ -1,3 +1,2 @@
-
 # WarpStream
-export PATH="/Users/dani/.warpstream:$PATH"
+fish_add_path $HOME/.warpstream

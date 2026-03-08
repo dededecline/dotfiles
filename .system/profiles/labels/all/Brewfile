@@ -43,6 +43,8 @@ brew "jsonnet"                  # JSON templating
 brew "node"                     # Node.js
 brew "pipx"                     # Python package installer
 brew "pyenv"                    # Python version manager
+brew "shellcheck"               # Shell script linter
+brew "shfmt"                    # Shell script formatter
 
 # =============================================================================
 # Development Tools

@@ -7,9 +7,9 @@ function awsall --description "Run AWS command across all regions"
     end
 
     for region in (aws ec2 describe-regions --query "Regions[].RegionName" --output text | tr '\t' '\n' | sort -r)
-        echo "------"
+        echo ------
         echo $region
-        echo "------"
+        echo ------
         echo
         aws $argv --region $region
         sleep 2

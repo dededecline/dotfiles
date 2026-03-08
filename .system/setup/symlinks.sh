@@ -67,6 +67,8 @@ create_symlink "$DOTFILES/git/config" "$HOME/.gitconfig"
 # Hush login (suppress "Last login:" message)
 create_symlink "$DOTFILES/fish/hushlogin" "$HOME/.hushlogin"
 
+create_symlink "$DOTFILES/shellcheck/shellcheckrc" "$HOME/.shellcheckrc"
+
 # Sensitive files (if they exist)
 create_symlink "$SYSTEM_DIR/sensitive/.npmrc" "$HOME/.npmrc"
 
@@ -85,8 +87,8 @@ mkdir -p "$HOME/Library/LaunchAgents"
 if [[ -n "${FLAVOR:-}" ]]; then
     mkdir -p "$DOTFILES/bat/themes"
     create_symlink "$SYSTEM_DIR/themes/catppuccin-${FLAVOR}/bat.tmTheme" "$DOTFILES/bat/themes/Catppuccin ${CAP_FLAVOR}.tmTheme"
-    if command -v bat &>/dev/null; then
-        bat cache --build --source "$DOTFILES/bat" >/dev/null 2>&1
+    if command -v bat &> /dev/null; then
+        bat cache --build --source "$DOTFILES/bat" > /dev/null 2>&1
         echo "  Rebuilt bat theme cache"
     fi
 fi
@@ -98,7 +100,7 @@ if [[ -f "$SYSTEM_DIR/setup/lib/profiles.sh" ]]; then
     MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
 fi
 
-if type -t is_machine_in_group &>/dev/null && is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
+if type -t is_machine_in_group &> /dev/null && is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
     echo "Work machine detected. Linking work-specific Claude skills..."
     WORK_SKILLS_DIR="$SYSTEM_DIR/sensitive/claude-skills"
     if [[ -d "$WORK_SKILLS_DIR" ]]; then

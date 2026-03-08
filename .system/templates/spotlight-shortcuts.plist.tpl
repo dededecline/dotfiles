@@ -7,16 +7,16 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/{{ op://Private/git-identity/name }}/.config/.system/setup/disable-spotlight-shortcuts.sh</string>
+        <string>$HOME/.config/.system/setup/disable-spotlight-shortcuts.sh</string>
     </array>
 
     <key>RunAtLoad</key>
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/Users/{{ op://Private/git-identity/name }}/.config/logs/spotlight-shortcuts.log</string>
+    <string>$HOME/.config/logs/spotlight-shortcuts.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/{{ op://Private/git-identity/name }}/.config/logs/spotlight-shortcuts-error.log</string>
+    <string>$HOME/.config/logs/spotlight-shortcuts-error.log</string>
 </dict>
 </plist>

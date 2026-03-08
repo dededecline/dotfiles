@@ -34,13 +34,13 @@ MACHINE_HOSTNAME="${MACHINE_HOSTNAME:-$(hostname -s)}"
 
 # Check if 1Password CLI is installed and authenticated
 check_op() {
-    if ! command -v op &>/dev/null; then
+    if ! command -v op &> /dev/null; then
         print_error "1Password CLI (op) is not installed"
         echo "  Install with: brew install 1password-cli"
         exit 1
     fi
 
-    if ! op vault list --account "$OP_PERSONAL_ACCOUNT" &>/dev/null < /dev/null; then
+    if ! op vault list --account "$OP_PERSONAL_ACCOUNT" &> /dev/null < /dev/null; then
         print_error "Not signed in to 1Password ($OP_PERSONAL_ACCOUNT)"
         echo "  Sign in with: op signin --account $OP_PERSONAL_ACCOUNT"
         exit 1
@@ -73,6 +73,7 @@ inject_template() {
     fi
 
     if op inject "${op_args[@]}"; then
+        envsubst '$HOME' < "$output" > "${output}.tmp" && mv "${output}.tmp" "$output"
         chmod 600 "$output"
         print_status "$description configured"
     else
@@ -83,13 +84,13 @@ inject_template() {
 
 # Login to Atuin sync using 1Password credentials
 inject_atuin() {
-    if ! command -v atuin &>/dev/null; then
+    if ! command -v atuin &> /dev/null; then
         print_warning "Atuin is not installed, skipping sync setup"
         return 0
     fi
 
     # Check if already logged in (username present in status output)
-    if atuin status 2>/dev/null | grep -q "^Username:"; then
+    if atuin status 2> /dev/null | grep -q "^Username:"; then
         print_status "Atuin: already logged in"
         return 0
     fi
@@ -97,23 +98,23 @@ inject_atuin() {
     echo "  Logging into Atuin sync..."
 
     local username password key
-    username=$(op read "op://Private/Atuin/username" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null) || {
+    username=$(op read "op://Private/Atuin/username" --account "$OP_PERSONAL_ACCOUNT" 2> /dev/null) || {
         print_warning "Atuin credentials not found in 1Password (Private/Atuin)"
         return 1
     }
-    password=$(op read "op://Private/Atuin/password" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null) || {
+    password=$(op read "op://Private/Atuin/password" --account "$OP_PERSONAL_ACCOUNT" 2> /dev/null) || {
         print_error "Failed to read Atuin password from 1Password"
         return 1
     }
-    key=$(op read "op://Private/Atuin/key" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null) || {
+    key=$(op read "op://Private/Atuin/key" --account "$OP_PERSONAL_ACCOUNT" 2> /dev/null) || {
         print_error "Failed to read Atuin key from 1Password"
         return 1
     }
 
-    if atuin login -u "$username" -p "$password" -k "$key" 2>/dev/null; then
+    if atuin login -u "$username" -p "$password" -k "$key" 2> /dev/null; then
         print_status "Atuin sync configured"
         # Trigger initial sync
-        atuin sync 2>/dev/null || true
+        atuin sync 2> /dev/null || true
     else
         print_error "Failed to login to Atuin"
         return 1
@@ -141,7 +142,7 @@ inject_claude_skills() {
         temp_file=$(mktemp)
 
         # Download from 1Password to temp file (--force avoids op's built-in prompt)
-        if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
+        if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2> /dev/null; then
             rm -f "$temp_file"
             print_warning "  $skill_name skill not found in 1Password (document: $doc_title)"
             continue
@@ -156,7 +157,7 @@ inject_claude_skills() {
         fi
 
         # Compare files
-        if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
+        if diff -q "$output_file" "$temp_file" > /dev/null 2>&1; then
             # Files are identical, skip
             rm -f "$temp_file"
             print_status "  $skill_name skill unchanged"
@@ -177,20 +178,20 @@ inject_claude_skills() {
         read -rp "Action [l/r]: " choice
 
         case "$choice" in
-            r|R)
-                mv "$temp_file" "$output_file"
-                chmod 600 "$output_file"
-                print_status "  $skill_name skill updated from 1Password"
-                ;;
-            l|L|*)
-                rm -f "$temp_file"
-                # Push local version back to 1Password
-                if op document edit "$doc_title" --file-path "$output_file" --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
-                    print_status "  $skill_name skill: local version pushed to 1Password"
-                else
-                    print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
-                fi
-                ;;
+        r | R)
+            mv "$temp_file" "$output_file"
+            chmod 600 "$output_file"
+            print_status "  $skill_name skill updated from 1Password"
+            ;;
+        l | L | *)
+            rm -f "$temp_file"
+            # Push local version back to 1Password
+            if op document edit "$doc_title" --file-path "$output_file" --account "$OP_WORK_ACCOUNT" 2> /dev/null; then
+                print_status "  $skill_name skill: local version pushed to 1Password"
+            else
+                print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
+            fi
+            ;;
         esac
     done
 }
@@ -206,7 +207,7 @@ inject_claude_skill_archive() {
     temp_file=$(mktemp)
 
     # Download tarball from 1Password
-    if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
+    if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2> /dev/null; then
         rm -f "$temp_file"
         print_warning "  $skill_name skill archive not found in 1Password (document: $doc_title)"
         return 1
@@ -216,8 +217,8 @@ inject_claude_skill_archive() {
     if [[ -d "$output_dir" ]]; then
         local temp_extract
         temp_extract=$(mktemp -d)
-        if tar xf "$temp_file" -C "$temp_extract" 2>/dev/null; then
-            if diff -rq "$output_dir" "$temp_extract" >/dev/null 2>&1; then
+        if tar xf "$temp_file" -C "$temp_extract" 2> /dev/null; then
+            if diff -rq "$output_dir" "$temp_extract" > /dev/null 2>&1; then
                 rm -rf "$temp_extract" "$temp_file"
                 print_status "  $skill_name skill archive unchanged"
                 return 0
@@ -233,7 +234,7 @@ inject_claude_skill_archive() {
     # Extract tarball to output directory (clean first to remove stale files)
     rm -rf "$output_dir"
     mkdir -p "$output_dir"
-    if tar xf "$temp_file" -C "$output_dir" 2>/dev/null; then
+    if tar xf "$temp_file" -C "$output_dir" 2> /dev/null; then
         find "$output_dir" -type d -exec chmod 700 {} \;
         find "$output_dir" -type f -exec chmod 600 {} \;
         rm -f "$temp_file"
@@ -320,7 +321,7 @@ check_secrets() {
     fi
 
     # Check Git identity
-    if grep -q "email = ." "$DOTFILES/git/config" 2>/dev/null && ! grep -q "email = $" "$DOTFILES/git/config" 2>/dev/null; then
+    if grep -q "email = ." "$DOTFILES/git/config" 2> /dev/null && ! grep -q "email = $" "$DOTFILES/git/config" 2> /dev/null; then
         print_status "Git identity: configured"
     else
         print_warning "Git identity: not configured"
@@ -360,7 +361,7 @@ check_secrets() {
             all_configured=false
         fi
 
-        if command -v tailscale &>/dev/null && tailscale status &>/dev/null; then
+        if command -v tailscale &> /dev/null && tailscale status &> /dev/null; then
             print_status "Tailscale: authenticated"
         else
             print_warning "Tailscale: not authenticated (run 'tailscale up')"
@@ -377,8 +378,8 @@ check_secrets() {
     fi
 
     # Check Atuin sync status
-    if command -v atuin &>/dev/null; then
-        if atuin status 2>/dev/null | grep -q "^Username:"; then
+    if command -v atuin &> /dev/null; then
+        if atuin status 2> /dev/null | grep -q "^Username:"; then
             print_status "Atuin sync: logged in"
         else
             print_warning "Atuin sync: not logged in"
@@ -511,19 +512,19 @@ inject_secrets() {
 
 # Parse arguments
 case "${1:-}" in
-    --check|-c)
-        check_secrets
-        ;;
-    --help|-h)
-        echo "Usage: $0 [--check|--help]"
-        echo ""
-        echo "Options:"
-        echo "  --check, -c    Check which secrets are configured"
-        echo "  --help, -h     Show this help message"
-        echo ""
-        echo "Without arguments, injects all secrets from 1Password."
-        ;;
-    *)
-        inject_secrets
-        ;;
+--check | -c)
+    check_secrets
+    ;;
+--help | -h)
+    echo "Usage: $0 [--check|--help]"
+    echo ""
+    echo "Options:"
+    echo "  --check, -c    Check which secrets are configured"
+    echo "  --help, -h     Show this help message"
+    echo ""
+    echo "Without arguments, injects all secrets from 1Password."
+    ;;
+*)
+    inject_secrets
+    ;;
 esac

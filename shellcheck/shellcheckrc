@@ -1,0 +1,5 @@
+# Global shellcheck configuration
+# Per-project .shellcheckrc files override these settings
+
+# Don't follow sourced files (paths are often dynamic at runtime)
+disable=SC1091

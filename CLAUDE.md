@@ -255,9 +255,13 @@
   **Manual steps — laptops (hera, athena):**
   - Tailscale: Allow Network Extension when prompted, Settings > Install CLI integration
 
-  **Claude Code auth:** API key is set globally via `fish/conf.d/anthropic.fish`
-  from a 1Password-injected secret (`ANTHROPIC_API_KEY`), so auth works in both
-  local and SSH sessions without OAuth or Keychain access.
+  **Claude Code auth:** Uses `apiKeyHelper` in `~/.claude/settings.json` to read
+  the API key via a helper script. No env var or OAuth needed — works in both
+  local and SSH sessions without Keychain access.
+  - Helper script: `~/.config/.system/sensitive/claude-api-key-helper.sh`
+    (reads `anthropic-api-key` from the same sensitive directory)
+  - Config: `"apiKeyHelper"` in `claude/settings.jsonc` (source of truth;
+    `setup.sh` generates `claude/settings.json` from it; does NOT work in `~/.claude.json`)
 
   ### Fish Functions                                                          
                                                                               

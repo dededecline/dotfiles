@@ -7,7 +7,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/{{ op://Private/git-identity/name }}/.config/.system/setup/monitor-watcher.sh</string>
+        <string>$HOME/.config/.system/setup/monitor-watcher.sh</string>
     </array>
 
     <key>StartInterval</key>
@@ -17,9 +17,9 @@
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/Users/{{ op://Private/git-identity/name }}/.config/logs/display-monitor.log</string>
+    <string>$HOME/.config/logs/display-monitor.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/Users/{{ op://Private/git-identity/name }}/.config/logs/display-monitor-error.log</string>
+    <string>$HOME/.config/logs/display-monitor-error.log</string>
 </dict>
 </plist>

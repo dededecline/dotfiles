@@ -531,11 +531,12 @@ configure_claude() {
 
     if ! command -v jq &>/dev/null; then
         print_warning "jq not installed, copying Claude settings as-is"
-        grep -v '^\s*//' "$base" > "$output"
+        grep -v '^\s*//' "$base" | envsubst '$HOME' > "$output"
         return 0
     fi
 
     preprocess_jsonc_machines "$base" "$output"
+    envsubst '$HOME' < "$output" > "${output}.tmp" && mv "${output}.tmp" "$output"
     print_status "Claude settings: configured ($MACHINE_HOSTNAME)"
 }
 

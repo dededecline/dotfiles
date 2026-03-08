@@ -22,7 +22,10 @@ THEME_FILE="$THEMES_DIR/theme.toml"
 if [[ -f "$SYSTEM_DIR/setup/lib/output.sh" ]]; then
     source "$SYSTEM_DIR/setup/lib/output.sh"
 else
-    GREEN='\033[0;32m'; YELLOW='\033[0;33m'; BLUE='\033[0;34m'; NC='\033[0m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    BLUE='\033[0;34m'
+    NC='\033[0m'
     print_header() { echo -e "\n${BLUE}===========================================================${NC}\n${BLUE}  $1${NC}\n${BLUE}===========================================================${NC}\n"; }
     print_status() { echo -e "${GREEN}✓${NC} $1"; }
     print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
@@ -63,7 +66,11 @@ c() {
 }
 
 # Helper: look up a color and strip the # prefix (e.g., "ca9ee6")
-ch() { local val; val=$(c "$1"); echo "${val#\#}"; }
+ch() {
+    local val
+    val=$(c "$1")
+    echo "${val#\#}"
+}
 
 # Helper: strip # from hex color
 strip_hash() { echo "${1#\#}"; }
@@ -85,8 +92,8 @@ capitalize() {
 # Helper: flavor display name (Frappé has accent, others plain)
 flavor_display_name() {
     case "$1" in
-        frappe) echo "Frappé" ;;
-        *)      capitalize "$1" ;;
+    frappe) echo "Frappé" ;;
+    *) capitalize "$1" ;;
     esac
 }
 
@@ -370,10 +377,10 @@ sync_fastfetch() {
     old_patterns=$(grep -oE '38;2;[0-9]+;[0-9]+;[0-9]+' "$file" | sort -u)
 
     for old_rgb in $old_patterns; do
-        if [[ "$old_rgb" == "$lavender_rgb" || "$old_rgb" == "$rosewater_rgb" || \
-              "$old_rgb" == "$flamingo_rgb" || "$old_rgb" == "$maroon_rgb" || \
-              "$old_rgb" == "$red_rgb" || "$old_rgb" == "$mauve_rgb" || \
-              "$old_rgb" == "$blue_rgb" || "$old_rgb" == "$overlay2_rgb" ]]; then
+        if [[ "$old_rgb" == "$lavender_rgb" || "$old_rgb" == "$rosewater_rgb" ||
+            "$old_rgb" == "$flamingo_rgb" || "$old_rgb" == "$maroon_rgb" ||
+            "$old_rgb" == "$red_rgb" || "$old_rgb" == "$mauve_rgb" ||
+            "$old_rgb" == "$blue_rgb" || "$old_rgb" == "$overlay2_rgb" ]]; then
             continue
         fi
         print_warning "fastfetch: unknown color pattern ${old_rgb}. Manual update may be needed"
@@ -395,26 +402,46 @@ sync_git_config() {
     local map_purple map_blue map_cyan map_yellow
 
     case "$FLAVOR" in
-        frappe)
-            minus_emph_bg="#704f5c"; minus_bg="#544452"
-            plus_emph_bg="#596b5e"; plus_bg="#475453"
-            map_purple="#66597e"; map_blue="#505d81"; map_cyan="#546b7a"; map_yellow="#6f6860"
-            ;;
-        latte)
-            minus_emph_bg="#eec5cb"; minus_bg="#ece0e0"
-            plus_emph_bg="#c5dbbe"; plus_bg="#dee8db"
-            map_purple="#d2c3e6"; map_blue="#c3d0ed"; map_cyan="#c2dde3"; map_yellow="#ddd6c2"
-            ;;
-        macchiato)
-            minus_emph_bg="#6b4152"; minus_bg="#523948"
-            plus_emph_bg="#4f6b58"; plus_bg="#3d5049"
-            map_purple="#5d4e78"; map_blue="#475879"; map_cyan="#4a6570"; map_yellow="#665d57"
-            ;;
-        mocha)
-            minus_emph_bg="#6b3a3e"; minus_bg="#52333a"
-            plus_emph_bg="#456551"; plus_bg="#374a42"
-            map_purple="#574270"; map_blue="#434f73"; map_cyan="#425c65"; map_yellow="#5f5450"
-            ;;
+    frappe)
+        minus_emph_bg="#704f5c"
+        minus_bg="#544452"
+        plus_emph_bg="#596b5e"
+        plus_bg="#475453"
+        map_purple="#66597e"
+        map_blue="#505d81"
+        map_cyan="#546b7a"
+        map_yellow="#6f6860"
+        ;;
+    latte)
+        minus_emph_bg="#eec5cb"
+        minus_bg="#ece0e0"
+        plus_emph_bg="#c5dbbe"
+        plus_bg="#dee8db"
+        map_purple="#d2c3e6"
+        map_blue="#c3d0ed"
+        map_cyan="#c2dde3"
+        map_yellow="#ddd6c2"
+        ;;
+    macchiato)
+        minus_emph_bg="#6b4152"
+        minus_bg="#523948"
+        plus_emph_bg="#4f6b58"
+        plus_bg="#3d5049"
+        map_purple="#5d4e78"
+        map_blue="#475879"
+        map_cyan="#4a6570"
+        map_yellow="#665d57"
+        ;;
+    mocha)
+        minus_emph_bg="#6b3a3e"
+        minus_bg="#52333a"
+        plus_emph_bg="#456551"
+        plus_bg="#374a42"
+        map_purple="#574270"
+        map_blue="#434f73"
+        map_cyan="#425c65"
+        map_yellow="#5f5450"
+        ;;
     esac
 
     local content
@@ -474,7 +501,7 @@ sync_flavor_strings() {
     file="$DOTFILES/bat/config"
     if [[ -f "$file" ]]; then
         sed -i '' "s/--theme=\"Catppuccin .*\"/--theme=\"Catppuccin ${cap_flavor}\"/" "$file"
-        bat cache --build --source "$DOTFILES/bat" >/dev/null 2>&1 || true
+        bat cache --build --source "$DOTFILES/bat" > /dev/null 2>&1 || true
         print_status "bat/config: theme → Catppuccin ${cap_flavor}"
     fi
 

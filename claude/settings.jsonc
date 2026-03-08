@@ -241,5 +241,6 @@
     "hookify@claude-plugins-official": true,
     "slack@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "apiKeyHelper": "$HOME/.config/.system/sensitive/claude-api-key-helper.sh"
 }

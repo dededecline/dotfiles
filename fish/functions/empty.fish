@@ -9,6 +9,6 @@ function empty --description "Create empty commit for CI"
     set -l ci_name (head -1 "$ci_file")
     set -l ci_email (tail -1 "$ci_file")
 
-    git -c user.name="$ci_name" -c user.email="$ci_email" commit -m 'empty' --allow-empty
+    git -c user.name="$ci_name" -c user.email="$ci_email" commit -m empty --allow-empty
     git push
 end
