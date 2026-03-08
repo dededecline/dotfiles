@@ -29,14 +29,7 @@ The setup script is fully idempotent. Run it anytime to ensure everything is con
 
 ## Multi-Machine Support
 
-The setup supports multiple machines with hostname-based configuration:
-
-| Hostname | Type | Brew Groups |
-|----------|------|-------------|
-| hera | Work laptop | all + laptop + work + infra + hera |
-| athena | Personal laptop | all + laptop + personal + athena |
-| nyx | Personal server | all + infra + personal + server + nyx |
-
+The setup supports multiple machines with hostname-based configuration.
 Hostname is auto-detected. Override with `--hostname <name>`.
 
 ### Machine-Specific Packages
