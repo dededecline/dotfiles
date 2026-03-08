@@ -80,7 +80,7 @@ brew "felixkratz/formulae/sketchybar" # Custom macOS menu bar
 cask "kitty"                    # Terminal emulator
 
 # Browsers
-cask "waterfox"                 # Firefox-based browser
+cask "orion"                    # WebKit-based browser
 
 # Productivity
 cask "raycast"                  # Launcher

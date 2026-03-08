@@ -8,7 +8,7 @@ with actual values from 1Password.
 
 Create these items in your 1Password vault:
 
-### Work 1Password Account (no template - uses `op read`)
+### Work 1Password Account (uses `op read`)
 - **Vault:** Private
 - **Item name:** 1password-work-account
 - **Field:** domain (the work 1Password account domain)
@@ -50,7 +50,7 @@ To create:
    op item create --category=login --title="argocd-akuity" --vault="Private" server="your.argocd.server" auth-token="your_jwt_token_here"
    ```
 
-### Atuin Sync (no template - uses `op read`)
+### Atuin Sync (uses `op read`)
 - **Vault:** Private
 - **Item name:** Atuin
 - **Fields:**
@@ -133,12 +133,12 @@ because the tool names themselves are sensitive. These are retrieved using `op d
 and placed in `.system/sensitive/claude-skills/`, then symlinked to `claude/skills/`.
 
 **Document names in 1Password Private vault:**
-- `claude-skill-argocd` - GitOps deployment tool skill
-- `claude-skill-astro` - Airflow management tool skill
-- `claude-skill-bastion_zero` - Zero-trust access tool skill
-- `claude-skill-lrl-cli` - Database connection tool skill
-- `claude-skill-observe` - Observability platform skill
-- `claude-skill-spacectl` - Infrastructure-as-code tool skill
+- `claude-skill-argocd` | GitOps deployment tool skill
+- `claude-skill-astro` | Airflow management tool skill
+- `claude-skill-bastion_zero` | Zero-trust access tool skill
+- `claude-skill-lrl-cli` | Database connection tool skill
+- `claude-skill-observe` | Observability platform skill
+- `claude-skill-spacectl` | Infrastructure-as-code tool skill
 
 To update a skill:
 ```bash

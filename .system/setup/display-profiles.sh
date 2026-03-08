@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# display-profiles.sh - Display configuration profiles using displayplacer
-#
+# Display configuration profiles using displayplacer
 # Manages display resolution, refresh rate, and arrangement based on
 # connected monitors. Called by reload-display-config.sh when display
 # count changes.
@@ -59,7 +58,7 @@ get_macbook_id() {
 # Check if displayplacer is available
 check_displayplacer() {
     if ! command -v displayplacer &>/dev/null; then
-        echo "displayplacer not found - skipping display configuration"
+        echo "displayplacer not found, skipping display configuration"
         return 1
     fi
     return 0
@@ -115,7 +114,7 @@ apply_display_profile() {
     if $has_builtin; then
         local builtin_arg
         builtin_arg=$(build_dp_arg builtin "(0,0)") || {
-            echo "Could not detect MacBook built-in display - skipping display configuration"
+            echo "Could not detect MacBook built-in display, skipping display configuration"
             return 1
         }
         args+=("$builtin_arg")
@@ -123,7 +122,7 @@ apply_display_profile() {
 
     if [[ ${#externals[@]} -eq 0 ]]; then
         if ! $has_builtin; then
-            echo "No displays connected - skipping display configuration"
+            echo "No displays connected, skipping display configuration"
             return 0
         fi
         # builtin-only: args already has the builtin entry

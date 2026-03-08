@@ -1,8 +1,8 @@
 # Bat Configuration
 
-# Theme - managed by symlinks.sh from .system/themes/
+# Theme managed by symlinks.sh from .system/themes/
 # Run `bat cache --build` after changes
 --theme="Catppuccin Frappe"
 
-# Disable pager - output full file directly
+# Disable pager and output full file directly
 --paging=never

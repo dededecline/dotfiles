@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# setup.sh - Unified dotfiles setup script (idempotent)
+# Unified dotfiles setup script (idempotent)
 #
 # Usage:
 #   ./setup.sh                      # Run full setup (auto-detect from hostname)
@@ -64,7 +64,7 @@ ensure_profiles_loaded() {
         source "$SYSTEM_DIR/setup/lib/profiles.sh"
         _PROFILES_LOADED=true
     else
-        print_error "profiles.sh not found - dotfiles repo may not be cloned"
+        print_error "profiles.sh not found, dotfiles repo may not be cloned"
         print_info "Expected at: $SYSTEM_DIR/setup/lib/profiles.sh"
         exit 1
     fi
@@ -101,7 +101,7 @@ get_fish_path() {
 # Sets global MACHINE_HOSTNAME variable
 detect_and_validate_hostname() {
     if [[ -n "$HOSTNAME_OVERRIDE" ]]; then
-        # Hostname override provided - validate it
+        # Hostname override provided, must validate it
         if ! is_known_hostname "$HOSTNAME_OVERRIDE"; then
             print_error "Unknown hostname: $HOSTNAME_OVERRIDE"
             print_info "Known hosts: $(get_known_hosts --csv)"
@@ -114,7 +114,7 @@ detect_and_validate_hostname() {
         MACHINE_HOSTNAME=$(hostname -s)
 
         if ! is_known_hostname "$MACHINE_HOSTNAME"; then
-            # Non-interactive mode — can't prompt
+            # Non-interactive mode
             if [[ ! -t 3 ]]; then
                 print_error "Unknown hostname: $MACHINE_HOSTNAME"
                 print_info "Known hosts: $(get_known_hosts --csv)"
@@ -516,7 +516,7 @@ sync_theme() {
     elif [[ -f "$SYSTEM_DIR/setup/sync-theme.sh" ]]; then
         bash "$SYSTEM_DIR/setup/sync-theme.sh"
     else
-        print_warning "sync-theme.sh not found - skipping theme sync"
+        print_warning "sync-theme.sh not found, skipping theme sync"
     fi
 }
 
@@ -525,12 +525,12 @@ configure_claude() {
     local output="$DOTFILES/claude/settings.json"
 
     if [[ ! -f "$base" ]]; then
-        print_warning "Claude settings source not found - skipping"
+        print_warning "Claude settings source not found, skipping"
         return 0
     fi
 
     if ! command -v jq &>/dev/null; then
-        print_warning "jq not installed - copying Claude settings as-is"
+        print_warning "jq not installed, copying Claude settings as-is"
         grep -v '^\s*//' "$base" > "$output"
         return 0
     fi
@@ -611,7 +611,7 @@ setup_tmux_plugins() {
 
 setup_sketchybar() {
     if ! command -v sketchybar &>/dev/null; then
-        print_warning "Sketchybar not installed - skipping"
+        print_warning "Sketchybar not installed, skipping"
         return 0
     fi
 
@@ -631,13 +631,13 @@ setup_sketchybar() {
         launchctl load "$plist"
         print_status "Sketchybar: loaded (starts at login)"
     else
-        print_warning "Sketchybar plist not found - run secrets first"
+        print_warning "Sketchybar plist not found, run secrets first"
     fi
 }
 
 setup_display_monitor() {
     if ! command -v aerospace &>/dev/null || ! command -v sketchybar &>/dev/null; then
-        print_warning "Aerospace or Sketchybar not installed - skipping display monitor"
+        print_warning "Aerospace or Sketchybar not installed, skipping display monitor"
         return 0
     fi
 
@@ -658,7 +658,7 @@ setup_display_monitor() {
         launchctl load "$plist"
         print_status "Display monitor: loaded (starts at login)"
     else
-        print_warning "Display monitor plist not found - run 'secrets' first"
+        print_warning "Display monitor plist not found, run 'secrets' first"
     fi
 
     # Apply display profile now (the watcher only triggers on count changes)
@@ -684,14 +684,14 @@ setup_spotlight_shortcuts() {
         launchctl load "$plist"
         print_status "Spotlight shortcuts: loaded (runs at login)"
     else
-        print_warning "Spotlight shortcuts plist not found - run 'secrets' first"
+        print_warning "Spotlight shortcuts plist not found, run 'secrets' first"
     fi
 }
 
 setup_wallpaper() {
     local theme_file="$SYSTEM_DIR/themes/theme.toml"
     if [[ ! -f "$theme_file" ]]; then
-        print_warning "Theme file not found - skipping wallpaper"
+        print_warning "Theme file not found, skipping wallpaper"
         return 0
     fi
 
@@ -725,7 +725,7 @@ setup_wallpaper() {
         if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#wallpapers[@]} )); then
             wallpaper="${wallpapers[$((choice - 1))]}"
         else
-            print_warning "Invalid selection - skipping wallpaper"
+            print_warning "Invalid selection, skipping wallpaper"
             return 0
         fi
     fi
@@ -756,26 +756,26 @@ setup_docker() {
 }
 
 setup_default_browser() {
-    # Only set default browser if Waterfox is installed (which happens during brew sync)
-    if [[ ! -d "/Applications/Waterfox.app" ]]; then
-        print_warning "Waterfox not installed - skipping default browser setup"
+    # Only set default browser if Orion is installed (which happens during brew sync)
+    if [[ ! -d "/Applications/Orion.app" ]]; then
+        print_warning "Orion not installed, skipping browser setup"
         return 0
     fi
 
     # Check if defaultbrowser is available
     if ! command -v defaultbrowser &>/dev/null; then
-        print_warning "defaultbrowser command not found - skipping default browser setup"
+        print_warning "defaultbrowser command not found, skipping default browser setup"
         print_info "Run 'brew install defaultbrowser' and re-run setup"
         return 0
     fi
 
-    print_info "Setting Waterfox as default browser..."
+    print_info "Setting Orion as default browser..."
 
-    # Set Waterfox as the default browser
-    if defaultbrowser waterfox 2>/dev/null; then
-        print_status "Waterfox set as default browser"
+    # Set Orion as the default browser
+    if defaultbrowser kagimacos 2>/dev/null; then
+        print_status "Orion set as default browser"
     else
-        print_warning "Could not set Waterfox as default browser"
+        print_warning "Could not set Orion as default browser"
         print_info "You can set it manually in System Settings > Desktop & Dock > Default web browser"
     fi
 }
@@ -827,7 +827,6 @@ run_setup() {
     # This must run before Homebrew sync to ensure terminal has required permissions
     apply_macos_defaults
 
-    # Inject secrets from 1Password - hostname-aware
     inject_secrets
 
     # Declarative Homebrew sync
@@ -836,7 +835,7 @@ run_setup() {
     # Configure Docker CLI plugins directory
     setup_docker
 
-    # Set default browser (after Waterfox and defaultbrowser are installed via brew)
+    # Set default browser (after Orion and defaultbrowser are installed via brew)
     setup_default_browser
 
     # Sync theme colors to all tool configs

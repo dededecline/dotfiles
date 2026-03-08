@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# symlinks.sh - Create symlinks from ~ to ~/.config
+# Create symlinks from ~ to ~/.config
 #
 
 DOTFILES="${DOTFILES:-$HOME/.config}"
@@ -99,7 +99,7 @@ if [[ -f "$SYSTEM_DIR/setup/lib/profiles.sh" ]]; then
 fi
 
 if type -t is_machine_in_group &>/dev/null && is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
-    echo "Work machine detected - linking work-specific Claude skills..."
+    echo "Work machine detected. Linking work-specific Claude skills..."
     WORK_SKILLS_DIR="$SYSTEM_DIR/sensitive/claude-skills"
     if [[ -d "$WORK_SKILLS_DIR" ]]; then
         for skill_dir in "$WORK_SKILLS_DIR"/*/; do
@@ -113,7 +113,7 @@ if type -t is_machine_in_group &>/dev/null && is_machine_in_group "$MACHINE_HOST
         echo "  Run 'secrets' to retrieve skills from 1Password"
     fi
 else
-    echo "$MACHINE_HOSTNAME - skipping work-specific Claude skills"
+    echo "$MACHINE_HOSTNAME detected, skipping work-specific Claude skills"
 fi
 
 echo "Symlinks complete!"

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Front app item - shows currently focused application
+# Front app item
+# Shows currently focused application
 # Styled with Catppuccin Frappe lavender accent
 
 source "$CONFIG_DIR/colors.sh"

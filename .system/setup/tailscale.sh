@@ -41,7 +41,7 @@ if [[ -n "$TAILSCALE_IP" ]] && [[ "$TAILSCALE_IP" =~ ^100\.[0-9]+\.[0-9]+\.[0-9]
     sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true
     print_status "SSH restricted to Tailscale interface ($TAILSCALE_IP)"
 else
-    print_warning "Tailscale IP not found — restricting SSH to localhost"
+    print_warning "Tailscale IP not found, restricting SSH to localhost"
     sudo sed -i '' '/# managed by dotfiles$/d' /etc/ssh/sshd_config
     echo "ListenAddress 127.0.0.1  # managed by dotfiles" | sudo tee -a /etc/ssh/sshd_config >/dev/null
     sudo launchctl kickstart -k system/com.openssh.sshd 2>/dev/null || true

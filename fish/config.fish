@@ -1,6 +1,7 @@
 # =============================================================================
 # Fish Shell Configuration
-# Main entry point - PATH and aliases are in conf.d/ for modularity
+# Main entry point
+# PATH and aliases are in conf.d/ for modularity
 # =============================================================================
 
 # Environment Variables

@@ -1,4 +1,4 @@
-# Sensitive files - NEVER commit these
+# Sensitive files to never commit
 .system/sensitive/*
 !.system/sensitive/.gitkeep
 *.local.fish

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# profiles.sh - Multi-machine hostname detection and configuration
-#
+# Multi-machine hostname detection and configuration
 # Single source of truth: .system/profiles/profiles.toml
 # Defines all known machines and their group memberships.
 

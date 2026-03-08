@@ -9,7 +9,7 @@ on-focused-monitor-changed = ["move-mouse monitor-lazy-center"]
 
 automatically-unhide-macos-hidden-apps = true
 
-# Sketchybar integration - update workspace indicators on change
+# Sketchybar integration updates workspace indicators on workspace change
 exec-on-workspace-change = [
   '/bin/bash', '-c',
   'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE && ~/.config/sketchybar/plugins/update_workspace_icons.sh'
@@ -52,6 +52,7 @@ ctrl-alt-cmd-5 = "workspace 5"
 ctrl-alt-cmd-6 = "workspace 6"
 ctrl-alt-cmd-7 = "workspace 7"
 ctrl-alt-cmd-8 = "workspace 8"
+ctrl-alt-cmd-9 = "workspace 9"
 
 ctrl-alt-cmd-shift-1 = "move-node-to-workspace 1 --focus-follows-window"
 ctrl-alt-cmd-shift-2 = "move-node-to-workspace 2 --focus-follows-window"
@@ -61,6 +62,7 @@ ctrl-alt-cmd-shift-5 = "move-node-to-workspace 5 --focus-follows-window"
 ctrl-alt-cmd-shift-6 = "move-node-to-workspace 6 --focus-follows-window"
 ctrl-alt-cmd-shift-7 = "move-node-to-workspace 7 --focus-follows-window"
 ctrl-alt-cmd-shift-8 = "move-node-to-workspace 8 --focus-follows-window"
+ctrl-alt-cmd-shift-9 = "move-node-to-workspace 9 --focus-follows-window"
 
 ctrl-alt-cmd-tab = "workspace-back-and-forth"
 ctrl-alt-cmd-shift-tab = "move-workspace-to-monitor --wrap-around next"
@@ -69,16 +71,15 @@ ctrl-alt-cmd-shift-semicolon = "mode service"
 
 [workspace-to-monitor-force-assignment]
 # Workspace to monitor assignment
-# When single display: all workspaces fallback to "main"
-# When multiple displays: 1,2,4,7 on main; 3,5,6,8 on secondary
 1 = "main"
 2 = "main"
-3 = ["secondary", "main"]  # Fallback to main if secondary unavailable
+3 = "main"
 4 = "main"
-5 = ["secondary", "main"]  # Fallback to main if secondary unavailable
-6 = ["secondary", "main"]  # Fallback to main if secondary unavailable
-7 = "main"
-8 = ["secondary", "main"]  # Fallback to main if secondary unavailable
+5 = "main"
+6 = ["secondary", "main"]
+7 = ["secondary", "main"]
+8 = ["secondary", "main"]
+9 = ["secondary", "main"]
 
 [mode.service.binding]
 esc = ["reload-config", "mode main"]
@@ -94,7 +95,7 @@ l = ["join-with right", "mode main"]
 # Floating apps
 [[on-window-detected]]
 if.app-id = "us.zoom.xos"
-run = ["layout floating", "move-node-to-workspace 8"]
+run = ["layout floating", "move-node-to-workspace 9"]
 
 [[on-window-detected]]
 if.app-id = "com.1password.1password"
@@ -138,7 +139,7 @@ run = "layout floating"
 
 [[on-window-detected]]
 if.app-id = "com.granola.app"
-run = "move-node-to-workspace 8"
+run = "move-node-to-workspace 9"
 
 [[on-window-detected]]
 if.app-id = "com.apple.ActivityMonitor"
@@ -172,7 +173,7 @@ run = "layout floating"
 if.app-id = "com.apple.Maps"
 run = "layout floating"
 
-# Workspace 1: Discord, Messages, Signal
+# Workspace 1: Personal messaging
 [[on-window-detected]]
 if.app-id = "com.hnc.Discord"
 run = "move-node-to-workspace 1"
@@ -185,13 +186,7 @@ run = "move-node-to-workspace 1"
 if.app-id = "org.whispersystems.signal-desktop"
 run = "move-node-to-workspace 1"
 
-# Workspace 2: Mail, Calendar, Slack
-# Compose windows (New Message, Reply, Forward) float on current workspace
-[[on-window-detected]]
-if.app-id = "com.apple.mail"
-if.window-title-regex-substring = "New Message"
-run = "layout floating"
-
+# Workspace 2: Official communication and calendar
 [[on-window-detected]]
 if.app-id = "com.apple.mail"
 run = "move-node-to-workspace 2"
@@ -204,7 +199,7 @@ run = "move-node-to-workspace 2"
 if.app-id = "com.tinyspeck.slackmacgap"
 run = "move-node-to-workspace 2"
 
-# Workspace 3: Linear, Sunsama
+# Workspace 3: Notes and organization
 [[on-window-detected]]
 if.app-id = "com.linear"
 run = "move-node-to-workspace 3"
@@ -213,11 +208,15 @@ run = "move-node-to-workspace 3"
 if.app-id = "com.sunsama.native-app"
 run = "move-node-to-workspace 3"
 
-# Workspace 4: Waterfox, Orion
 [[on-window-detected]]
-if.app-id = "net.waterfox.waterfox"
-run = "move-node-to-workspace 4"
+if.app-id = "notion.id"
+run = "move-node-to-workspace 3"
 
+[[on-window-detected]]
+if.app-id = "com.apple.journal"
+run = "move-node-to-workspace 3"
+
+# Workspace 4: Browser
 [[on-window-detected]]
 if.app-id = "com.kagi.kagimacOS"
 run = "move-node-to-workspace 4"

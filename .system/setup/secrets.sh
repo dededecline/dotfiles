@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# secrets.sh - Manage secrets using 1Password CLI
-#
+# Manage secrets using 1Password CLI
 # This script injects secrets from 1Password into local config files.
 # Template files use op:// references that get replaced with actual values.
 #
@@ -158,13 +157,13 @@ inject_claude_skills() {
 
         # Compare files
         if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
-            # Files are identical - skip
+            # Files are identical, skip
             rm -f "$temp_file"
             print_status "  $skill_name skill unchanged"
             continue
         fi
 
-        # Files differ - show diff and prompt
+        # Files differ, show diff and prompt
         echo ""
         print_warning "$skill_name skill has changed:"
         echo "─────────────────────────────────────────"
@@ -254,7 +253,7 @@ check_secrets() {
 
     local all_configured=true
 
-    # Check GitHub hosts (optional - gh auth login is preferred)
+    # Check GitHub hosts (optional, gh auth login is preferred)
     if [[ -f "$HOME/.config/gh/hosts.yml" ]]; then
         print_status "GitHub CLI: configured"
     else
@@ -422,7 +421,7 @@ inject_secrets() {
     mkdir -p "$SENSITIVE_DIR"
     mkdir -p "$TEMPLATES_DIR"
 
-    # Inject GitHub hosts (optional - usually use gh auth login instead)
+    # Inject GitHub hosts (optional, usually use gh auth login instead)
     if [[ -f "$TEMPLATES_DIR/gh-hosts.tpl" ]]; then
         inject_template "$TEMPLATES_DIR/gh-hosts.tpl" "$HOME/.config/gh/hosts.yml" "GitHub CLI credentials"
     fi

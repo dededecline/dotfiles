@@ -21,7 +21,7 @@ RUSTDESK_ROOT_CONFIG="/var/root/Library/Preferences/com.carriez.RustDesk"
 sudo mkdir -p "$RUSTDESK_ROOT_CONFIG"
 
 # Enable direct IP access (no relay server needed over Tailscale)
-# sudo is required — RustDesk service runs as root on macOS and reads config from root's preferences
+# sudo is required. RustDesk service runs as root on macOS and reads config from root's preferences
 sudo "$RUSTDESK" --option direct-server Y &>/dev/null
 # Clear any residual relay server config
 sudo "$RUSTDESK" --option custom-rendezvous-server "" &>/dev/null

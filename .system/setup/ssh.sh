@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# ssh.sh - Generate SSH key pair for GitHub
+# Generate SSH key pair for GitHub
 #
 
 echo "=========================================="

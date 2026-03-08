@@ -168,7 +168,7 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 MACOS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
 if [[ "$MACOS_VERSION" -ge 26 ]]; then
     # macOS 26+ uses opted_out_buddy key directly
-    # NOTE: Unverified key — no public documentation confirms this works on macOS 26.
+    # NOTE: Unverified key. No public documentation confirms this works on macOS 26.
     # If Apple Intelligence remains enabled, fall back to the DSID approach below.
     defaults write com.apple.CloudSubscriptionFeatures.optIn opted_out_buddy -bool true
     echo "Apple Intelligence disabled"
@@ -235,7 +235,7 @@ fi
 # Returns 0 if granted, 1 if not granted or unable to check
 # NOTE: Reading the system TCC.db requires the calling terminal to have Full Disk
 # Access. Without it, the query silently fails and reports "not granted" (safe false
-# positive — the user is always prompted, never silently skipped).
+# positive, the user is always prompted, never silently skipped).
 check_tcc_permission() {
     local service="$1" bundle_id="$2"
     local auth_value

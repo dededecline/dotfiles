@@ -69,7 +69,7 @@ color15 = "#a5adce"
 [semantic]
 foreground = "#c6d0f5"
 background = "#303446"
-accent = "#babbf1"  # lavender - used for cursor, selection, active elements
+accent = "#babbf1"  # lavender
 cursor = "#babbf1"
 cursor_text = "#303446"
 selection_foreground = "#303446"
