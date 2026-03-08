@@ -52,5 +52,25 @@
   },
   "search": {
     "include_ignored": false
+  },
+  "auto_install_extensions": {
+    "catppuccin-icons": true,
+    "csv": true,
+    "dockerfile": true,
+    "editorconfig": true,
+    "fish": true,
+    "git-firefly": true,
+    "go-snippets": true,
+    "html": true,
+    "jinja2": true,
+    "make": true,
+    "nextjs-react-snippets": true,
+    "python-snippets": true,
+    "rainbow-csv": true,
+    "react-typescript-snippets": true,
+    "sql": true,
+    "swift": true,
+    "terraform": true,
+    "toml": true
   }
 }
