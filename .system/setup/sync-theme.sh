@@ -420,26 +420,26 @@ sync_git_config() {
 
     local content
     content="[delta \"catppuccin-${FLAVOR}\"]
-	blame-palette = \"$(c base) $(c mantle) $(c crust) $(c surface0) $(c surface1)\"
-	commit-decoration-style = \"$(c overlay0)\" bold box ul
-	dark = true
-	file-decoration-style = \"$(c overlay0)\"
-	file-style = \"$(c text)\"
-	hunk-header-decoration-style = \"$(c overlay0)\" box ul
-	hunk-header-file-style = bold
-	hunk-header-line-number-style = bold \"$(c subtext0)\"
-	hunk-header-style = file line-number syntax
-	line-numbers-left-style = \"$(c overlay0)\"
-	line-numbers-minus-style = bold \"$(c red)\"
-	line-numbers-plus-style = bold \"$(c green)\"
-	line-numbers-right-style = \"$(c overlay0)\"
-	line-numbers-zero-style = \"$(c overlay0)\"
-	minus-emph-style = bold syntax \"${minus_emph_bg}\"
-	minus-style = syntax \"${minus_bg}\"
-	plus-emph-style = bold syntax \"${plus_emph_bg}\"
-	plus-style = syntax \"${plus_bg}\"
-	map-styles = bold purple => syntax \"${map_purple}\", bold blue => syntax \"${map_blue}\", bold cyan => syntax \"${map_cyan}\", bold yellow => syntax \"${map_yellow}\"
-	syntax-theme = Catppuccin ${cap_flavor}"
+    blame-palette = \"$(c base) $(c mantle) $(c crust) $(c surface0) $(c surface1)\"
+    commit-decoration-style = \"$(c overlay0)\" bold box ul
+    dark = true
+    file-decoration-style = \"$(c overlay0)\"
+    file-style = \"$(c text)\"
+    hunk-header-decoration-style = \"$(c overlay0)\" box ul
+    hunk-header-file-style = bold
+    hunk-header-line-number-style = bold \"$(c subtext0)\"
+    hunk-header-style = file line-number syntax
+    line-numbers-left-style = \"$(c overlay0)\"
+    line-numbers-minus-style = bold \"$(c red)\"
+    line-numbers-plus-style = bold \"$(c green)\"
+    line-numbers-right-style = \"$(c overlay0)\"
+    line-numbers-zero-style = \"$(c overlay0)\"
+    minus-emph-style = bold syntax \"${minus_emph_bg}\"
+    minus-style = syntax \"${minus_bg}\"
+    plus-emph-style = bold syntax \"${plus_emph_bg}\"
+    plus-style = syntax \"${plus_bg}\"
+    map-styles = bold purple => syntax \"${map_purple}\", bold blue => syntax \"${map_blue}\", bold cyan => syntax \"${map_cyan}\", bold yellow => syntax \"${map_yellow}\"
+    syntax-theme = Catppuccin ${cap_flavor}"
 
     replace_theme_section "$file" "$content"
 

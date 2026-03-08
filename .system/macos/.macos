@@ -167,22 +167,22 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 # Disable Apple Intelligence
 MACOS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
 if [[ "$MACOS_VERSION" -ge 26 ]]; then
-	# macOS 26+ uses opted_out_buddy key directly
-	# NOTE: Unverified key — no public documentation confirms this works on macOS 26.
-	# If Apple Intelligence remains enabled, fall back to the DSID approach below.
-	defaults write com.apple.CloudSubscriptionFeatures.optIn opted_out_buddy -bool true
-	echo "Apple Intelligence disabled"
+    # macOS 26+ uses opted_out_buddy key directly
+    # NOTE: Unverified key — no public documentation confirms this works on macOS 26.
+    # If Apple Intelligence remains enabled, fall back to the DSID approach below.
+    defaults write com.apple.CloudSubscriptionFeatures.optIn opted_out_buddy -bool true
+    echo "Apple Intelligence disabled"
 else
-	# macOS 15.x uses DSID-keyed entry
-	# Assumes primary Apple Account is at index 0 (multi-account setups may differ)
-	DSID=$(/usr/libexec/PlistBuddy -c "print Accounts:0:AccountDSID" \
-		~/Library/Preferences/MobileMeAccounts.plist 2>/dev/null) || true
-	if [[ -n "$DSID" ]]; then
-		defaults write com.apple.CloudSubscriptionFeatures.optIn "$DSID" -bool false
-		echo "Apple Intelligence disabled for account $DSID"
-	else
-		echo "Apple Intelligence: no Apple Account DSID detected, skipping"
-	fi
+    # macOS 15.x uses DSID-keyed entry
+    # Assumes primary Apple Account is at index 0 (multi-account setups may differ)
+    DSID=$(/usr/libexec/PlistBuddy -c "print Accounts:0:AccountDSID" \
+        ~/Library/Preferences/MobileMeAccounts.plist 2>/dev/null) || true
+    if [[ -n "$DSID" ]]; then
+        defaults write com.apple.CloudSubscriptionFeatures.optIn "$DSID" -bool false
+        echo "Apple Intelligence disabled for account $DSID"
+    else
+        echo "Apple Intelligence: no Apple Account DSID detected, skipping"
+    fi
 fi
 
 ###############################################################################
@@ -218,10 +218,10 @@ defaults write com.apple.Siri UserHasDeclinedEnable -bool true
 # Enable Touch ID for sudo authentication (survives macOS updates)
 SUDO_LOCAL="/etc/pam.d/sudo_local"
 if ! grep -q "pam_tid.so" "$SUDO_LOCAL" 2>/dev/null; then
-	echo "auth       sufficient     pam_tid.so" | sudo tee -a "$SUDO_LOCAL" > /dev/null
-	echo "Touch ID for sudo enabled."
+    echo "auth       sufficient     pam_tid.so" | sudo tee -a "$SUDO_LOCAL" > /dev/null
+    echo "Touch ID for sudo enabled."
 else
-	echo "Touch ID for sudo already configured."
+    echo "Touch ID for sudo already configured."
 fi
 
 ###############################################################################
@@ -237,60 +237,81 @@ fi
 # Access. Without it, the query silently fails and reports "not granted" (safe false
 # positive — the user is always prompted, never silently skipped).
 check_tcc_permission() {
-	local service="$1" bundle_id="$2"
-	local auth_value
-	auth_value=$(sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
-		"SELECT auth_value FROM access WHERE service='$service' AND client='$bundle_id';" 2>/dev/null) || return 1
-	[[ "$auth_value" == "2" ]]
+    local service="$1" bundle_id="$2"
+    local auth_value
+    auth_value=$(sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
+        "SELECT auth_value FROM access WHERE service='$service' AND client='$bundle_id';" 2>/dev/null) || return 1
+    [[ "$auth_value" == "2" ]]
 }
 
 PERMISSIONS_NEEDED=()
 
 # AeroSpace
 if [[ -d "/Applications/AeroSpace.app" ]] || command -v aerospace &>/dev/null; then
-	if ! check_tcc_permission kTCCServiceAccessibility "bobko.aerospace"; then
-		PERMISSIONS_NEEDED+=("AeroSpace -> Accessibility")
-	fi
+    if ! check_tcc_permission kTCCServiceAccessibility "bobko.aerospace"; then
+        PERMISSIONS_NEEDED+=("AeroSpace -> Accessibility")
+    fi
 fi
 
 # Raycast
 if [[ -d "/Applications/Raycast.app" ]]; then
-	if ! check_tcc_permission kTCCServiceAccessibility "com.raycast.macos"; then
-		PERMISSIONS_NEEDED+=("Raycast -> Accessibility")
-	fi
-	if ! check_tcc_permission kTCCServiceSystemPolicyAllFiles "com.raycast.macos"; then
-		PERMISSIONS_NEEDED+=("Raycast -> Full Disk Access")
-	fi
+    if ! check_tcc_permission kTCCServiceAccessibility "com.raycast.macos"; then
+        PERMISSIONS_NEEDED+=("Raycast -> Accessibility")
+    fi
+    if ! check_tcc_permission kTCCServiceSystemPolicyAllFiles "com.raycast.macos"; then
+        PERMISSIONS_NEEDED+=("Raycast -> Full Disk Access")
+    fi
 fi
 
 # Kitty
 if [[ -d "/Applications/kitty.app" ]]; then
-	if ! check_tcc_permission kTCCServiceSystemPolicyAllFiles "net.kovidgoyal.kitty"; then
-		PERMISSIONS_NEEDED+=("Kitty -> Full Disk Access")
-	fi
+    if ! check_tcc_permission kTCCServiceSystemPolicyAllFiles "net.kovidgoyal.kitty"; then
+        PERMISSIONS_NEEDED+=("Kitty -> Full Disk Access")
+    fi
 
-	# Trigger Automation consent dialog for System Events
-	osascript -e 'tell application "System Events" to return name of first process' &>/dev/null || true
+    # Trigger Automation consent dialog for System Events
+    osascript -e 'tell application "System Events" to return name of first process' &>/dev/null || true
 fi
 
 # Print consolidated summary if any permissions may be needed
 if [[ ${#PERMISSIONS_NEEDED[@]} -gt 0 ]]; then
-	echo ""
-	echo "==========================================================================="
-	echo "  Manual Permissions Required"
-	echo "==========================================================================="
-	echo ""
-	echo "  The following permissions must be granted in"
-	echo "  System Settings > Privacy & Security:"
-	echo ""
-	for perm in "${PERMISSIONS_NEEDED[@]}"; do
-		echo "    * $perm"
-	done
-	echo ""
-	echo "  Opening Privacy & Security..."
-	echo "==========================================================================="
-	echo ""
-	open "x-apple.systempreferences:com.apple.preference.security?Privacy"
+    echo ""
+    echo "==========================================================================="
+    echo "  Manual Permissions Required"
+    echo "==========================================================================="
+    echo ""
+    echo "  The following permissions must be granted in"
+    echo "  System Settings > Privacy & Security:"
+    echo ""
+    for perm in "${PERMISSIONS_NEEDED[@]}"; do
+        echo "    * $perm"
+    done
+    echo ""
+    echo "  Opening Privacy & Security..."
+    echo "==========================================================================="
+    echo ""
+    open "x-apple.systempreferences:com.apple.preference.security?Privacy"
+fi
+
+###############################################################################
+# Power Management (server only)                                              #
+###############################################################################
+
+if is_machine_in_group "$HOSTNAME" "server"; then
+    # Prevent system, display, and disk sleep on AC power
+    sudo pmset -c sleep 0 displaysleep 0 disksleep 0
+
+    # Disable standby (deep sleep)
+    sudo pmset -c standby 0
+
+    # Wake on network access
+    sudo pmset -c womp 1
+
+    # Auto-restart after power failure
+    sudo pmset -c autorestart 1
+
+    # Disable Power Nap
+    sudo pmset -c powernap 0
 fi
 
 ###############################################################################
@@ -327,10 +348,10 @@ fi
 ###############################################################################
 
 for app in "ControlCenter" \
-	"Finder" \
-	"SystemUIServer" \
-	"cfprefsd"; do
-	killall "${app}" &> /dev/null
+    "Finder" \
+    "SystemUIServer" \
+    "cfprefsd"; do
+    killall "${app}" &> /dev/null
 done
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
