@@ -871,8 +871,13 @@ run_setup() {
     echo "Next steps:"
     echo "  1. Restart your terminal to use Fish shell"
     echo "  2. Run 'tmux' and press prefix + I to install tmux plugins"
+    local next_step=3
+    if command -v gh &>/dev/null && ! gh auth status &>/dev/null; then
+        echo "  ${next_step}. Authenticate GitHub CLI: gh auth login"
+        next_step=$((next_step + 1))
+    fi
     if ! command -v op &>/dev/null || ! op vault list --account my.1password.com &>/dev/null < /dev/null; then
-        echo "  3. Set up secrets from 1Password:"
+        echo "  ${next_step}. Set up secrets from 1Password:"
         echo "     - Sign in: op signin"
         echo "     - Run: secrets"
     fi

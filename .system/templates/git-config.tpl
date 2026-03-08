@@ -8,8 +8,13 @@
 [push]
 	autoSetupRemote = true
 
-[credential]
-	helper = manager
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
 
 [core]
 	excludesFile = ~/.config/git/ignore
