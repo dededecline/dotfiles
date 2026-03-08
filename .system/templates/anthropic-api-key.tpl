@@ -1,1 +1,1 @@
-{{ op://Private/anthropic-claude-api/credential }}
+{{ op://Private/anthropic-claude-api/password }}
