@@ -73,6 +73,7 @@ inject_template() {
   fi
 
   if op inject "${op_args[@]}"; then
+    # shellcheck disable=SC2016
     envsubst '$HOME' <"$output" >"${output}.tmp" && mv "${output}.tmp" "$output"
     chmod 600 "$output"
     print_status "$description configured"
@@ -178,20 +179,20 @@ inject_claude_skills() {
     read -rp "Action [l/r]: " choice
 
     case "$choice" in
-      r | R)
-        mv "$temp_file" "$output_file"
-        chmod 600 "$output_file"
-        print_status "  $skill_name skill updated from 1Password"
-        ;;
-      l | L | *)
-        rm -f "$temp_file"
-        # Push local version back to 1Password
-        if op document edit "$doc_title" --file-path "$output_file" --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
-          print_status "  $skill_name skill: local version pushed to 1Password"
-        else
-          print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
-        fi
-        ;;
+    r | R)
+      mv "$temp_file" "$output_file"
+      chmod 600 "$output_file"
+      print_status "  $skill_name skill updated from 1Password"
+      ;;
+    l | L | *)
+      rm -f "$temp_file"
+      # Push local version back to 1Password
+      if op document edit "$doc_title" --file-path "$output_file" --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
+        print_status "  $skill_name skill: local version pushed to 1Password"
+      else
+        print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
+      fi
+      ;;
     esac
   done
 }
@@ -377,6 +378,14 @@ check_secrets() {
     all_configured=false
   fi
 
+  # Check Claude API key helper script
+  if [[ -x "$SENSITIVE_DIR/claude-api-key-helper.sh" ]]; then
+    print_status "Claude API key helper: configured"
+  else
+    print_warning "Claude API key helper: not configured"
+    all_configured=false
+  fi
+
   # Check Atuin sync status
   if command -v atuin &>/dev/null; then
     if atuin status 2>/dev/null | grep -q "^Username:"; then
@@ -473,6 +482,14 @@ inject_secrets() {
   # Inject Anthropic API key
   if [[ -f "$TEMPLATES_DIR/anthropic-api-key.tpl" ]]; then
     inject_template "$TEMPLATES_DIR/anthropic-api-key.tpl" "$SENSITIVE_DIR/anthropic-api-key" "Anthropic API key" "$OP_PERSONAL_ACCOUNT"
+
+    # Create API key helper script for Claude Code
+    cat >"$SENSITIVE_DIR/claude-api-key-helper.sh" <<'HELPER'
+#!/bin/bash
+cat ~/.config/.system/sensitive/anthropic-api-key
+HELPER
+    chmod 700 "$SENSITIVE_DIR/claude-api-key-helper.sh"
+    print_status "Claude API key helper script created"
   fi
 
   # Symlink fastfetch logo based on hostname
@@ -512,19 +529,19 @@ inject_secrets() {
 
 # Parse arguments
 case "${1:-}" in
-  --check | -c)
-    check_secrets
-    ;;
-  --help | -h)
-    echo "Usage: $0 [--check|--help]"
-    echo ""
-    echo "Options:"
-    echo "  --check, -c    Check which secrets are configured"
-    echo "  --help, -h     Show this help message"
-    echo ""
-    echo "Without arguments, injects all secrets from 1Password."
-    ;;
-  *)
-    inject_secrets
-    ;;
+--check | -c)
+  check_secrets
+  ;;
+--help | -h)
+  echo "Usage: $0 [--check|--help]"
+  echo ""
+  echo "Options:"
+  echo "  --check, -c    Check which secrets are configured"
+  echo "  --help, -h     Show this help message"
+  echo ""
+  echo "Without arguments, injects all secrets from 1Password."
+  ;;
+*)
+  inject_secrets
+  ;;
 esac
