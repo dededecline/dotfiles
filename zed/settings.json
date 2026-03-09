@@ -28,14 +28,7 @@
       "formatter": {
         "external": {
           "command": "shfmt",
-          "arguments": [
-            "--filename",
-            "{buffer_path}",
-            "--indent",
-            "4",
-            "--binary-next-line",
-            "--space-redirects"
-          ]
+          "arguments": ["--ci", "--filename", "{buffer_path}"]
         }
       }
     }

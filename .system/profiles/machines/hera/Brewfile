@@ -7,7 +7,7 @@ tap "incident-io/taps"
 tap "namespacelabs/namespace"
 tap "pinginc/homebrew-lrl"
 tap "signadot/tap"
-tap "spacelift-io/spacelift"
+# tap "spacelift-io/spacelift"
 
 # =============================================================================
 # DevOps Tools
@@ -40,7 +40,7 @@ cask "microsoft-teams"          # Team collaboration
 
 # Development
 cask "mongodb-compass"                     # MongoDB GUI
-cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
+# brew "spacelift-io/spacelift/spacectl"     # Infrastructure CD (broken)
 cask "powershell"                          # PowerShell
 
 # Internal Tools

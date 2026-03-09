@@ -302,5 +302,23 @@
   Catppuccin Frappe with Lavender Accents                                     
   • Always attempt the simplest possible coding output solutions to a problem 
                                                                               
-  • Always ensure that templated/protected files' generated output are        
+  • Always ensure that templated/protected files' generated output are
   excluded from commit in the gitignore
+
+  ### Shell Script Quality (shellcheck)
+
+  All shell scripts must pass shellcheck with zero warnings. Follow these
+  practices:
+
+  • **Quote variables**: Always double-quote `"$variable"` expansions to
+  prevent word splitting and globbing (SC2086)
+  • **Use `read -r`**: Always pass `-r` to `read` to prevent backslash
+  mangling (SC2162)
+  • **Group redirects**: When appending multiple commands to the same file,
+  use `{ cmd1; cmd2; } >> file` instead of individual redirects (SC2129)
+  • **Intentional single quotes**: When single quotes are correct (e.g.
+  `envsubst '$HOME'` where the literal string must reach the command), add
+  `# shellcheck disable=SC2016` with a brief explanation rather than
+  "fixing" the quote style
+  • **Disable directives**: Use inline `# shellcheck disable=SCXXXX` only
+  for genuine false positives, always with a comment explaining why
