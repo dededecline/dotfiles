@@ -130,7 +130,7 @@ inject_claude_skills() {
   echo "  Retrieving work-specific Claude skills from 1Password..."
 
   # Work skills: skill_name:doc_title pairs
-  local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro bastion_zero:claude-skill-bastion_zero lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
+  local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro bastion_zero:claude-skill-bastion_zero lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe signadot:claude-skill-signadot spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
 
   for pair in $work_skills; do
     local skill_name="${pair%%:*}"
@@ -289,7 +289,7 @@ check_secrets() {
     fi
 
     # Check work-specific Claude skills
-    local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
+    local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
     for skill in "${work_skills[@]}"; do
       if [[ -d "$DOTFILES/claude/skills/$skill" ]] || [[ -d "$SENSITIVE_DIR/claude-skills/$skill" ]]; then
         print_status "Claude skill: $skill configured"
