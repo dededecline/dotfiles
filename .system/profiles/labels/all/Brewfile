@@ -3,7 +3,6 @@
 # =============================================================================
 tap "felixkratz/formulae"
 tap "nikitabobko/tap"
-tap "sheeki03/tap"
 
 # =============================================================================
 # Core CLI Tools
@@ -52,7 +51,6 @@ brew "shfmt"                    # Shell script formatter
 brew "certbot"                  # Let's Encrypt client
 brew "neovim"                   # Editor
 brew "mise"                     # Dev tool version manager
-brew "sheeki03/tap/tirith"      # Terminal homograph attack defense
 brew "tmux"                     # Terminal multiplexer
 
 # =============================================================================

@@ -13,6 +13,7 @@
       "mcp__linear-server",
       "mcp__aws-knowledge-mcp-server",
       "mcp__Notion",
+      "mcp__signadot",
       "Bash(mkdir:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
@@ -255,5 +256,11 @@
     "slack@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "apiKeyHelper": "$HOME/.config/.system/sensitive/claude-api-key-helper.sh"
+  "apiKeyHelper": "$HOME/.config/.system/sensitive/claude-api-key-helper.sh",
+  "mcpServers": {
+    "signadot": {
+      "command": "signadot",
+      "args": ["mcp"]
+    }
+  }
 }
