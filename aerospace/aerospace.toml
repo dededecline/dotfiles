@@ -191,7 +191,7 @@ run = "move-node-to-workspace 3"
 
 # Workspace 4: Browsing
 [[on-window-detected]]
-if.app-id = "com.kagi.kagimacOS"
+if.app-id = "net.waterfox.waterfox"
 run = "move-node-to-workspace 4"
 
 [[on-window-detected]]
