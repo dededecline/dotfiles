@@ -263,6 +263,25 @@
   - Config: `"apiKeyHelper"` in `claude/settings.jsonc` (source of truth;
     `setup.sh` generates `claude/settings.json` from it; does NOT work in `~/.claude.json`)
 
+  ### Global Claude Instructions
+
+  `claude/CLAUDE.global.md` is symlinked to `~/.claude/CLAUDE.md` and applies
+  to all repos. It contains git workflow rules (no AI attribution, conventional
+  commits for work repos, feature branch enforcement).
+
+  ### Git Guard Hook
+
+  `claude/assets/scripts/git-guard.sh` is a PreToolUse hook that enforces git
+  workflow rules at the tool level:
+
+  • **All repos**: Blocks `Co-Authored-By` trailers and `--author` overrides
+  • **Pinginc repos**: Requires conventional commit format (`type: LINEAR-ID: description`)
+  • **Pinginc repos**: Blocks pushing directly to main/master
+
+  Pinginc repos are detected dynamically via `git remote -v`. The hook is
+  registered in `claude/settings.jsonc` with no `@machine:` marker since the
+  pinginc checks are runtime-gated.
+
   ### Fish Functions                                                          
                                                                               
   Custom functions in fish/functions/:                                        

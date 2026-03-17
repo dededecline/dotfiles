@@ -151,7 +151,7 @@ detect_and_validate_hostname() {
       echo ""
 
       local choice
-      read -p "  Enter selection [1-$((${#hosts[@]} + 1))]: " choice <&3
+      read -r -p "  Enter selection [1-$((${#hosts[@]} + 1))]: " choice <&3
 
       if ! [[ "$choice" =~ ^[0-9]+$ ]] || ((choice < 1 || choice > ${#hosts[@]} + 1)); then
         print_error "Invalid selection"
@@ -237,7 +237,7 @@ ensure_homebrew() {
   # Add Homebrew to PATH for this session
   local prefix
   prefix=$(detect_homebrew_prefix)
-  eval "$($prefix/bin/brew shellenv)"
+  eval "$("$prefix"/bin/brew shellenv)"
 
   print_status "Homebrew: installed"
 }
@@ -336,18 +336,22 @@ prepare_brewfile() {
   for group in $groups; do
     local label_brewfile="$SYSTEM_DIR/profiles/labels/$group/Brewfile"
     if [[ -f "$label_brewfile" ]]; then
-      echo "" >>"$combined"
-      echo "# labels/$group" >>"$combined"
-      cat "$label_brewfile" >>"$combined"
+      {
+        echo ""
+        echo "# labels/$group"
+        cat "$label_brewfile"
+      } >>"$combined"
     fi
   done
 
   # Append machine-specific Brewfile
   local machine_brewfile="$SYSTEM_DIR/profiles/machines/$MACHINE_HOSTNAME/Brewfile"
   if [[ -f "$machine_brewfile" ]]; then
-    echo "" >>"$combined"
-    echo "# machines/$MACHINE_HOSTNAME" >>"$combined"
-    cat "$machine_brewfile" >>"$combined"
+    {
+      echo ""
+      echo "# machines/$MACHINE_HOSTNAME"
+      cat "$machine_brewfile"
+    } >>"$combined"
   fi
 
   echo "$combined"
@@ -535,11 +539,15 @@ configure_claude() {
 
   if ! command -v jq &>/dev/null; then
     print_warning "jq not installed, copying Claude settings as-is"
+    # literal $HOME must reach envsubst
+    # shellcheck disable=SC2016
     grep -v '^\s*//' "$base" | envsubst '$HOME' >"$output"
     return 0
   fi
 
   preprocess_jsonc_machines "$base" "$output"
+  # literal $HOME must reach envsubst
+  # shellcheck disable=SC2016
   envsubst '$HOME' <"$output" >"${output}.tmp" && mv "${output}.tmp" "$output"
   print_status "Claude settings: configured ($MACHINE_HOSTNAME)"
 }
@@ -798,8 +806,8 @@ apply_macos_defaults() {
 
 # Open /dev/tty on fd 3 for interactive prompts (preserves pipe on fd 0)
 setup_interactive_fd() {
-  if [[ ! -t 0 ]] && [[ -e /dev/tty ]]; then
-    exec 3</dev/tty
+  if [[ ! -t 0 ]] && exec 3</dev/tty 2>/dev/null; then
+    : # fd 3 now points to /dev/tty
   else
     exec 3<&0
   fi

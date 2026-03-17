@@ -120,17 +120,6 @@
       "Bash(shfmt:*)"
     ],
     "deny": [
-      "Bash(git push:*)",
-      "Bash(git commit:*)",
-      "Bash(git add:*)",
-      "Bash(git merge:*)",
-      "Bash(git rebase:*)",
-      "Bash(git reset:*)",
-      "Bash(git revert:*)",
-      "Bash(git cherry-pick:*)",
-      "Bash(git clean:*)",
-      "Bash(git rm:*)",
-      "Bash(git restore:*)",
       "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)",
       "Bash(gh pr close:*)",
@@ -204,6 +193,18 @@
   "effortLevel": "high",
   "enableAllProjectMcpServers": true,
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.config/claude/assets/scripts/git-guard.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "permission_prompt",

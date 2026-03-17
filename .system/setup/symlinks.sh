@@ -69,6 +69,10 @@ create_symlink "$DOTFILES/fish/hushlogin" "$HOME/.hushlogin"
 
 create_symlink "$DOTFILES/shellcheck/shellcheckrc" "$HOME/.shellcheckrc"
 
+# Global Claude Code instructions (applies to all repos)
+mkdir -p "$HOME/.claude"
+create_symlink "$DOTFILES/claude/CLAUDE.global.md" "$HOME/.claude/CLAUDE.md"
+
 # Sensitive files (if they exist)
 create_symlink "$SYSTEM_DIR/sensitive/.npmrc" "$HOME/.npmrc"
 

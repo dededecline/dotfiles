@@ -7,7 +7,7 @@ tap "incident-io/taps"
 tap "namespacelabs/namespace"
 tap "pinginc/homebrew-lrl"
 tap "signadot/tap"
-# tap "spacelift-io/spacelift"
+tap "spacelift-io/spacelift"
 
 # =============================================================================
 # DevOps Tools
@@ -23,6 +23,7 @@ brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments
 brew "opa"                                 # Open Policy Agent
 brew "signadot/tap/signadot-cli"           # Sandbox Environments
+brew "stencil"                             # Template management
 brew "terraform-docs"                      # Terraform documentation
 brew "tflint"                              # Terraform linter
 brew "trivy"                               # Security scanner
@@ -40,7 +41,7 @@ cask "microsoft-teams"          # Team collaboration
 
 # Development
 cask "mongodb-compass"                     # MongoDB GUI
-# brew "spacelift-io/spacelift/spacectl"     # Infrastructure CD (broken)
+cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
 cask "powershell"                          # PowerShell
 
 # Internal Tools
