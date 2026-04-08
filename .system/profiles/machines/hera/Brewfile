@@ -1,6 +1,7 @@
 # =============================================================================
 # Taps
 # =============================================================================
+tap "auth0/auth0-cli"
 tap "bastionzero/tap"
 tap "fairwindsops/tap"
 tap "incident-io/taps"
@@ -12,6 +13,8 @@ tap "spacelift-io/spacelift"
 # =============================================================================
 # DevOps Tools
 # =============================================================================
+brew "agent-browser"                       # Agent Browser
+brew "auth0"                               # Auth0 CLI
 brew "argocd"                              # Kubernetes CD
 brew "awscli"                              # AWS CLI
 brew "bastionzero/tap/zli"                 # Secure access
@@ -22,6 +25,7 @@ brew "incident-io/taps/catalog-importer"   # Incident management
 brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments
 brew "opa"                                 # Open Policy Agent
+brew "pnpm"                                # NPM package manager
 brew "signadot/tap/signadot-cli"           # Sandbox Environments
 brew "stencil"                             # Template management
 brew "terraform-docs"                      # Terraform documentation
@@ -40,6 +44,7 @@ cask "granola"                  # Meeting notes
 cask "microsoft-teams"          # Team collaboration
 
 # Development
+cask "codex"                               # Codex CLI
 cask "mongodb-compass"                     # MongoDB GUI
 cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
 cask "powershell"                          # PowerShell
