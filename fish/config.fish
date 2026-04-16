@@ -11,6 +11,7 @@ set -gx VISUAL nvim
 set -gx DOTFILES $HOME/.config
 set -gx SHELL (command -s fish)
 set -gx CLAUDE_CONFIG_DIR $HOME/.config/claude
+set -gx NPM_TOKEN (security find-generic-password -a "$USER" -s "npm_token" -w)
 
 # @theme:start
 # FZF Catppuccin Frappe colors

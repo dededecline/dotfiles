@@ -552,6 +552,19 @@ configure_claude() {
   print_status "Claude settings: configured ($MACHINE_HOSTNAME)"
 }
 
+install_claude_code() {
+  export CLAUDE_CONFIG_DIR="$HOME/.config/claude"
+
+  if command -v claude &>/dev/null; then
+    print_status "Claude Code: already installed"
+    return 0
+  fi
+
+  print_info "Installing Claude Code..."
+  curl -fsSL https://claude.ai/install.sh | sh
+  print_status "Claude Code: installed"
+}
+
 create_symlinks() {
   print_info "Creating symlinks..."
   if [[ -x "$SYSTEM_DIR/setup/symlinks.sh" ]]; then
@@ -845,6 +858,9 @@ run_setup() {
   # Declarative Homebrew sync
   run_brew_sync
 
+  # Install Claude Code (after brew sync removes old cask)
+  install_claude_code
+
   # Configure Docker CLI plugins directory
   setup_docker
 
@@ -932,6 +948,9 @@ run_brew() {
   fi
 
   run_brew_sync
+
+  # Install Claude Code (after brew sync removes old cask)
+  install_claude_code
 
   # Configure Docker CLI plugins directory
   setup_docker

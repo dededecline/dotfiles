@@ -25,6 +25,8 @@ brew "incident-io/taps/catalog-importer"   # Incident management
 brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments
 brew "opa"                                 # Open Policy Agent
+brew "oxfmt"                               # Formatting
+brew "oxlint"                              # Linting
 brew "pnpm"                                # NPM package manager
 brew "signadot/tap/signadot-cli"           # Sandbox Environments
 brew "stencil"                             # Template management
@@ -50,7 +52,9 @@ cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
 cask "powershell"                          # PowerShell
 
 # Internal Tools
+cask "akuity"                   # Akuity (lrl dependency)
 cask "lrl"                      # Internal CLI
+cask "sdm"                      # StrongDM (lrl dependency)
 
 # Productivity
 cask "microsoft-excel"          # Spreadsheets
