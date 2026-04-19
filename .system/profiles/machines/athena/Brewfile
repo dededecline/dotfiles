@@ -18,6 +18,9 @@ cask "ableton-live-suite"       # Digital audio workstation
 cask "handbrake-app"            # Video encoder
 cask "obs"                      # Streaming/recording
 
+# Productivity
+cask "openoffice"               # Office suite
+
 # =============================================================================
 # Mac App Store
 # =============================================================================
