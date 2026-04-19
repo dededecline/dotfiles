@@ -108,8 +108,3 @@ cask "the-unarchiver"           # Archive utility
 # =============================================================================
 cask "font-maple-mono-nf"          # Maple Mono coding font (universal)
 cask "font-sketchybar-app-font"    # App icons (sketchybar workspaces)
-
-# =============================================================================
-# Mac App Store
-# =============================================================================
-mas "Yubico Authenticator", id: 1497506650 # YubiKey Authenticator
