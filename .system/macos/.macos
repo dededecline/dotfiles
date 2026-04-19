@@ -15,9 +15,12 @@ osascript -e 'tell application "System Settings" to quit'
 # if the default attempt fails (e.g. stdin is a curl pipe but a terminal exists).
 # If neither works (headless / no controlling tty), skip macOS preferences.
 if ! sudo -v 2>/dev/null; then
+    # Wrap the /dev/tty redirect in a block so bash's own "Device not
+    # configured" error (raised before the 2>/dev/null applies to sudo)
+    # is also swallowed. Same pattern as setup_interactive_fd in setup.sh.
     # SC2024: intentional — sudo reads the password from its stdin redirect
     # shellcheck disable=SC2024
-    if [[ -r /dev/tty ]] && sudo -v < /dev/tty 2>/dev/null; then
+    if [[ -r /dev/tty ]] && { sudo -v < /dev/tty; } 2>/dev/null; then
         :
     else
         echo "macOS preferences skipped: sudo unavailable (no tty)." >&2
