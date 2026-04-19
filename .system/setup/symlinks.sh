@@ -88,13 +88,11 @@ create_symlink "$DOTFILES/glow/glow.yml" "$HOME/Library/Preferences/glow/glow.ym
 mkdir -p "$HOME/Library/LaunchAgents"
 
 # Bat syntax theme
+# bat 0.25+ auto-discovers .tmTheme files in its config dir; no cache rebuild needed
+# (the old `bat cache --build` subcommand was removed).
 if [[ -n "${FLAVOR:-}" ]]; then
   mkdir -p "$DOTFILES/bat/themes"
   create_symlink "$SYSTEM_DIR/themes/catppuccin-${FLAVOR}/bat.tmTheme" "$DOTFILES/bat/themes/Catppuccin ${CAP_FLAVOR}.tmTheme"
-  if command -v bat &>/dev/null; then
-    bat cache --build --source "$DOTFILES/bat" >/dev/null 2>&1
-    echo "  Rebuilt bat theme cache"
-  fi
 fi
 
 # Work-specific Claude skills (conditional on hostname)

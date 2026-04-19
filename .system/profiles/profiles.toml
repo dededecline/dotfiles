@@ -1,5 +1,5 @@
 [athena]
-groups = ["all", "laptop", "personal"]
+groups = ["all", "laptop", "personal", "creative"]
 
 [hera]
 groups = ["all", "infra", "laptop", "work"]

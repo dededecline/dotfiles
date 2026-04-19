@@ -34,6 +34,7 @@ cask "slack"                    # Team communication
 cask "zoom"                     # Video conferencing
 
 # Development
+cask "claude"                   # Claude Desktop
 cask "lens"                     # Kubernetes IDE
 
 # Hardware & Peripherals

@@ -10,8 +10,22 @@ source "$SYSTEM_DIR/setup/lib/profiles.sh"
 # Close any open System Settings panes to prevent overriding changes
 osascript -e 'tell application "System Settings" to quit'
 
-# Ask for administrator password upfront
-sudo -v < /dev/tty
+# Ask for administrator password upfront.
+# `sudo -v` handles its own tty detection; only fall back to explicit /dev/tty
+# if the default attempt fails (e.g. stdin is a curl pipe but a terminal exists).
+# If neither works (headless / no controlling tty), skip macOS preferences.
+if ! sudo -v 2>/dev/null; then
+    # SC2024: intentional — sudo reads the password from its stdin redirect
+    # shellcheck disable=SC2024
+    if [[ -r /dev/tty ]] && sudo -v < /dev/tty 2>/dev/null; then
+        :
+    else
+        echo "macOS preferences skipped: sudo unavailable (no tty)." >&2
+        # SC2317: intentional dual-mode exit — `return` when sourced, `exit` when executed
+        # shellcheck disable=SC2317
+        return 0 2>/dev/null || exit 0
+    fi
+fi
 
 # Keep-alive: update existing sudo timestamp until script finishes
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
@@ -216,12 +230,20 @@ defaults write com.apple.Siri UserHasDeclinedEnable -bool true
 ###############################################################################
 
 # Enable Touch ID for sudo authentication (survives macOS updates)
+# macOS Sonoma+ ships /etc/pam.d/sudo_local.template with the directive commented
+# out. A naive `grep pam_tid.so` matches the commented line too, so require the
+# directive to be uncommented.
 SUDO_LOCAL="/etc/pam.d/sudo_local"
-if ! grep -q "pam_tid.so" "$SUDO_LOCAL" 2>/dev/null; then
+TID_ACTIVE_RE='^[[:space:]]*auth[[:space:]]+sufficient[[:space:]]+pam_tid\.so'
+TID_COMMENTED_RE='^[[:space:]]*#[[:space:]]*auth[[:space:]]+sufficient[[:space:]]+pam_tid\.so'
+if sudo grep -qE "$TID_ACTIVE_RE" "$SUDO_LOCAL" 2>/dev/null; then
+    echo "Touch ID for sudo already configured."
+elif sudo grep -qE "$TID_COMMENTED_RE" "$SUDO_LOCAL" 2>/dev/null; then
+    sudo sed -i '' -E "s|$TID_COMMENTED_RE|auth       sufficient     pam_tid.so|" "$SUDO_LOCAL"
+    echo "Touch ID for sudo: uncommented existing directive."
+else
     echo "auth       sufficient     pam_tid.so" | sudo tee -a "$SUDO_LOCAL" > /dev/null
     echo "Touch ID for sudo enabled."
-else
-    echo "Touch ID for sudo already configured."
 fi
 
 ###############################################################################

@@ -92,30 +92,43 @@
   ### Homebrew Management
 
   Homebrew packages are managed declaratively with brew bundle --cleanup.
-  Packages are organized under `.system/profiles/`:
+  `labels/` is the sole source of truth; `machines/<hostname>/Brewfile` is
+  **generated** at setup time by concatenating the label Brewfiles the
+  machine belongs to, then fed to `brew bundle`.
 
   ```
   .system/profiles/
   ├── profiles.toml            # Machine-to-group membership (sole source of truth)
-  ├── labels/
+  ├── labels/                  # Edit these — source of truth
   │   ├── all/Brewfile         # All machines
-  │   ├── laptop/Brewfile      # Laptop machines
-  │   ├── personal/Brewfile    # Personal machines
-  │   ├── infra/Brewfile       # Infrastructure machines
-  │   ├── server/Brewfile      # Server machines
-  │   └── work/Brewfile        # Work group
-  └── machines/
-      ├── hera/Brewfile        # hera only
-      ├── athena/Brewfile      # athena only
-      └── nyx/Brewfile         # nyx only
+  │   ├── laptop/Brewfile      # Laptop machines (athena, hera)
+  │   ├── personal/Brewfile    # Personal machines (athena, nyx)
+  │   ├── creative/Brewfile    # Gaming / DAWs (athena only)
+  │   ├── infra/Brewfile       # Infrastructure machines (hera, nyx)
+  │   ├── server/Brewfile      # Server machines (nyx only)
+  │   └── work/Brewfile        # Work group (hera only)
+  └── machines/                # Generated output — gitignored
+      └── <hostname>/Brewfile  # Written by setup.sh prepare_brewfile()
   ```
 
   Machine-to-group membership is defined in `.system/profiles/profiles.toml`
-  (TOML: `[hostname]` section with `groups = [...]`). Adding a new machine or
-  group requires only editing `profiles.toml` and optionally adding a
-  labels Brewfile directory.
+  (TOML: `[hostname]` section with `groups = [...]`). Adding a new machine
+  or group requires only editing `profiles.toml` and optionally adding a
+  labels Brewfile directory — the `machines/` output is regenerated on
+  every `setup.sh` or `setup.sh --brew` run.
 
-  `profiles.toml` is the sole source of truth for defining machines and machine groups. The `work` group gates 1Password work-account integration and work secrets. Work packages live in `machines/hera/Brewfile` since hera is the only work machine.
+  `profiles.toml` is the sole source of truth for defining machines and
+  machine groups. The `work` group gates 1Password work-account integration
+  and work secrets.
+
+  Notes on label assignments worth remembering:
+  • `creative` is athena-only (gaming + DAW content that shouldn't reach
+    hera or nyx).
+  • Claude Desktop (`cask "claude"`) lives in `laptop` — not `all` — so
+    the server (nyx) doesn't install a GUI app it can't use.
+  • Claude Code CLI is installed via the native installer (curl
+    `claude.ai/install.sh`), not Homebrew. See `install_claude_code` in
+    `setup.sh`.
                                                                               
   ### Secrets System                                                          
                                                                               
