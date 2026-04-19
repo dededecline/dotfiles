@@ -85,3 +85,7 @@ todos/
 session-env/
 shell-snapshots/
 history.jsonl
+
+observe.yaml
+ldcli/
+auth0/

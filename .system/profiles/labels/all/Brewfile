@@ -90,7 +90,7 @@ cask "raycast"                  # Launcher
 cask "rustdesk"                 # Remote desktop client
 
 # Development
-cask "claude-code"              # Code Assistant
+cask "claude"                   # Claude Desktop
 cask "docker-desktop"           # Docker Desktop
 cask "wireshark-app"            # Network analyzer
 cask "zed"                      # Code Editor

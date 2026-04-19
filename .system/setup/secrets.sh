@@ -370,6 +370,14 @@ check_secrets() {
     fi
   fi
 
+  # Check npm token
+  if [[ -f "$SENSITIVE_DIR/.npmrc" ]]; then
+    print_status "npm token: configured"
+  else
+    print_warning "npm token: not configured (run secrets to inject)"
+    all_configured=false
+  fi
+
   # Check Anthropic API key
   if [[ -f "$SENSITIVE_DIR/anthropic-api-key" ]]; then
     print_status "Anthropic API key: configured"
@@ -490,6 +498,17 @@ cat ~/.config/.system/sensitive/anthropic-api-key
 HELPER
     chmod 700 "$SENSITIVE_DIR/claude-api-key-helper.sh"
     print_status "Claude API key helper script created"
+  fi
+
+  # Inject npm token from Keychain
+  local npm_token
+  npm_token=$(security find-generic-password -a "$USER" -s "npm_token" -w 2>/dev/null || true)
+  if [[ -n "$npm_token" ]]; then
+    printf '//registry.npmjs.org/:_authToken=%s\n' "$npm_token" >"$SENSITIVE_DIR/.npmrc"
+    chmod 600 "$SENSITIVE_DIR/.npmrc"
+    print_status "npm token → .npmrc"
+  else
+    print_warning "npm_token not found in Keychain — skipping .npmrc"
   fi
 
   # Symlink fastfetch logo based on hostname

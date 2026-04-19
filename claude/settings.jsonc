@@ -121,8 +121,6 @@
     ],
     "deny": [
       "Bash(gh pr create:*)",
-      "Bash(gh pr merge:*)",
-      "Bash(gh pr close:*)",
       "Bash(gh pr edit:*)",
       "Bash(gh pr comment:*)",
       "Bash(gh pr review:*)",
@@ -189,8 +187,8 @@
     ],
     "defaultMode": "plan"
   },
-  "model": "claude-opus-4-6",
-  "effortLevel": "high",
+  "model": "claude-opus-4-7",
+  "effortLevel": "xhigh",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "PreToolUse": [
