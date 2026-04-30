@@ -17,6 +17,7 @@ brew "agent-browser"                       # Agent Browser
 brew "auth0"                               # Auth0 CLI
 brew "argocd"                              # Kubernetes CD
 brew "awscli"                              # AWS CLI
+brew "azure-cli"                           # Azure CLI
 brew "bastionzero/tap/zli"                 # Secure access
 brew "circleci"                            # CI runner
 brew "docker-compose"                      # Docker CLI

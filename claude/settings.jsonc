@@ -120,10 +120,6 @@
       "Bash(shfmt:*)"
     ],
     "deny": [
-      "Bash(gh pr create:*)",
-      "Bash(gh pr edit:*)",
-      "Bash(gh pr comment:*)",
-      "Bash(gh pr review:*)",
       "Bash(gh issue create:*)",
       "Bash(gh issue close:*)",
       "Bash(gh issue edit:*)",

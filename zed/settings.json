@@ -7,7 +7,20 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "project_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "git_panel": {
+    "dock": "left"
+  },
   "agent": {
+    "dock": "right",
     "default_model": {
       "provider": "anthropic",
       "model": "claude-opus-4-6-thinking-latest",
@@ -50,7 +63,7 @@
   },
   "ui_font_family": "Maple Mono NF",
   "title_bar": {
-    "show_branch_icon": true
+    "show_branch_status_icon": true
   },
   "show_whitespaces": "all",
   "which_key": {
