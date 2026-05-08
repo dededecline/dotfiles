@@ -129,7 +129,17 @@
   • Claude Code CLI is installed via the native installer (curl
     `claude.ai/install.sh`), not Homebrew. See `install_claude_code` in
     `setup.sh`.
-                                                                              
+
+  Keep entries alphabetized within each subsection of every
+  `labels/*/Brewfile`. A subsection is the contiguous block under a `#`
+  comment header (both the `# ===...===` major sections and the minor
+  `# Category` headers inside `# Applications (Casks)`). Sort
+  case-insensitively by the first quoted identifier (e.g. `brew "atuin"`
+  → `atuin`, `cask "nikitabobko/tap/aerospace"` →
+  `nikitabobko/tap/aerospace`, `mas "Infuse", id: …` → `Infuse`).
+  `brew` / `cask` / `tap` / `mas` lines in the same subsection sort
+  together by name — do not pre-group by type.
+
   ### Secrets System                                                          
                                                                               
   The secrets system uses 1Password CLI (op inject) to populate sensitive     

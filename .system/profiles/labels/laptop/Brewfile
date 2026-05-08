@@ -24,6 +24,9 @@ brew "yamllint"                 # YAML linter
 # Remote Access
 cask "tailscale-app"            # Mesh VPN
 
+# Browsers
+cask "ungoogled-chromium"       # Chromium with Google integration removed
+
 # Communication
 cask "discord"                  # Chat platform
 cask "element"                  # Matrix client
@@ -59,7 +62,7 @@ cask "wifiman"                  # Network scanner
 # =============================================================================
 # Mac App Store
 # =============================================================================
-mas "Infuse", id: 1136220934            # Media player
-mas "Parcel", id: 375589283             # Delivery tracking
-mas "Reeder Classic", id: 1529448980    # RSS reader
 mas "1Password for Safari", id: 1569813296  # Browser extension
+mas "Infuse", id: 1136220934                # Media player
+mas "Parcel", id: 375589283                 # Delivery tracking
+mas "Reeder Classic", id: 1529448980        # RSS reader
