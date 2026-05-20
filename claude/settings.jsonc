@@ -193,7 +193,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.config/claude/assets/scripts/git-guard.sh",
+            "command": "~/.config/.system/hooks/git-guard.sh",
             "timeout": 10
           }
         ]
@@ -216,7 +216,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.config/claude/assets/scripts/check-shell.sh"
+            "command": "~/.config/.system/hooks/check-shell.sh"
           }
         ]
       }
@@ -227,7 +227,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.config/claude/assets/scripts/session-start.sh"
+            "command": "~/.config/.system/hooks/session-start.sh"
           }
         ]
       }

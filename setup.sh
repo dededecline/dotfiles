@@ -179,31 +179,38 @@ detect_and_validate_hostname() {
   export MACHINE_HOSTNAME
 }
 
-# Preprocess JSONC files with machine markers (// @machine:X / // @end:X)
-# Markers accept hostnames or group names (e.g., @machine:hera, @machine:laptop)
-# Strips comments, fixes trailing commas, and formats as valid JSON via jq
-# Usage: preprocess_jsonc_machines <input_file> <output_file>
-preprocess_jsonc_machines() {
+# Preprocess files with machine markers, e.g. `// @machine:hera` / `// @end:hera`
+# (JSONC) or `# @machine:hera` / `# @end:hera` (TOML / shell).
+# Tags accept hostnames or group names (laptop, work, server, ...).
+#
+# Filters the input by the current machine's group membership and writes the
+# result to <output>. Non-marker comments are preserved; format-specific
+# cleanup (e.g. JSON validation) is the caller's responsibility.
+#
+# Usage: preprocess_machine_markers <input> <output> [<comment_prefix>]
+#   comment_prefix defaults to "//"
+preprocess_machine_markers() {
   local input="$1"
   local output="$2"
+  local comment_prefix="${3:-//}"
   local groups
   groups=$(get_machine_groups "$MACHINE_HOSTNAME")
-  local tmp="${output}.tmp"
 
-  awk -v groups=" $groups " '
-        /^[[:space:]]*\/\/ @machine:/ {
+  # Escape regex specials so prefixes like "//" are matched literally
+  local re_prefix
+  re_prefix=$(printf '%s' "$comment_prefix" | sed 's/[]\/$*.^|[\\]/\\&/g')
+
+  awk -v groups=" $groups " -v prefix="$re_prefix" '
+        $0 ~ ("^[[:space:]]*" prefix " @machine:") {
             tag = $0
             sub(/.*@machine:/, "", tag)
             sub(/[[:space:]].*/, "", tag)
             if (index(groups, " " tag " ") == 0) skip=1
             next
         }
-        /^[[:space:]]*\/\/ @end:/ { skip=0; next }
+        $0 ~ ("^[[:space:]]*" prefix " @end:") { skip=0; next }
         skip==0 { print }
-    ' "$input" >"$tmp"
-
-  sed -E 's/,([[:space:]]*[]{}])/\1/g' "$tmp" | jq . >"$output"
-  rm -f "$tmp"
+    ' "$input" >"$output"
 }
 
 # =============================================================================
@@ -520,11 +527,32 @@ configure_claude() {
     return 0
   fi
 
-  preprocess_jsonc_machines "$base" "$output"
-  # literal $HOME must reach envsubst
+  local tmp="${output}.tmp"
+  preprocess_machine_markers "$base" "$tmp" "//"
+  # Strip trailing commas, drop comments via jq, then expand $HOME.
   # shellcheck disable=SC2016
-  envsubst '$HOME' <"$output" >"${output}.tmp" && mv "${output}.tmp" "$output"
+  sed -E 's/,([[:space:]]*[]{}])/\1/g' "$tmp" | jq . | envsubst '$HOME' >"$output"
+  rm -f "$tmp"
   print_status "Claude settings: configured ($MACHINE_HOSTNAME)"
+}
+
+configure_codex() {
+  local base="$DOTFILES/codex/config.source.toml"
+  local output="$DOTFILES/codex/config.toml"
+
+  if [[ ! -f "$base" ]]; then
+    print_warning "Codex config source not found, skipping"
+    return 0
+  fi
+
+  local tmp="${output}.tmp"
+  preprocess_machine_markers "$base" "$tmp" "#"
+  # TOML keeps non-marker comments; just expand $HOME if any.
+  # shellcheck disable=SC2016
+  envsubst '$HOME' <"$tmp" >"$output"
+  rm -f "$tmp"
+  chmod 600 "$output"
+  print_status "Codex config: configured ($MACHINE_HOSTNAME)"
 }
 
 install_claude_code() {
@@ -872,6 +900,9 @@ run_setup() {
 
   # Generate Claude settings based on hostname
   configure_claude
+
+  # Generate Codex config based on hostname
+  configure_codex
 
   # Shell and environment
   create_symlinks

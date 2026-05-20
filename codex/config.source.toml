@@ -1,0 +1,105 @@
+# Codex CLI configuration (source of truth).
+#
+# Generated to codex/config.toml by setup.sh per machine, with
+# `# @machine:<tag>` / `# @end:<tag>` blocks filtered for the host.
+# Tags accept hostnames or group names (hera, athena, nyx, laptop,
+# personal, work, infra, server, creative, all).
+#
+# Codex reads this from $CODEX_HOME/config.toml. CODEX_HOME is set to
+# $HOME/.config/codex in fish/config.fish so this dir is canonical.
+
+# -----------------------------------------------------------------------------
+# Model & runtime defaults
+# -----------------------------------------------------------------------------
+model = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+file_opener = "vscode"
+
+# Sandbox / approvals: workspace-write with on-request approvals mirrors
+# Claude's Plan-mode default plus the curated allow/deny in settings.jsonc.
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+# Persist credentials to disk so `codex login` carries across sessions
+# without macOS Keychain prompts (matches the secret-helper UX in Claude).
+cli_auth_credentials_store = "file"
+
+# -----------------------------------------------------------------------------
+# Shell environment policy
+# -----------------------------------------------------------------------------
+# Pass through the inherited shell env but scrub anything that smells like a
+# token or key, so MCP servers and shell tools can't accidentally see them.
+[shell_environment_policy]
+inherit = "core"
+exclude = ["*_TOKEN", "*_SECRET", "*_KEY", "*_PASSWORD"]
+
+# -----------------------------------------------------------------------------
+# Hooks (lifecycle scripts)
+# -----------------------------------------------------------------------------
+# Hook handlers are defined in $CODEX_HOME/hooks.json (Claude-compatible
+# format). The feature flag below enables Codex's hook subsystem.
+[features]
+codex_hooks = true
+
+# -----------------------------------------------------------------------------
+# MCP servers
+# -----------------------------------------------------------------------------
+# Mirrors Claude's mcpServers block plus enabled plugin-provided servers.
+[mcp_servers.signadot]
+command = "signadot"
+args = ["mcp"]
+
+# @machine:athena
+# [mcp_servers.linear]
+# url = "https://mcp.linear.app/mcp"
+#
+# [mcp_servers.notion]
+# url = "https://mcp.notion.com/mcp"
+# @end:athena
+
+# @machine:hera
+# Claude's Laurel plugin uses Linear's SSE endpoint; Codex uses Linear's
+# streamable HTTP endpoint.
+[mcp_servers.linear-server]
+url = "https://mcp.linear.app/mcp"
+
+[mcp_servers.launchdarkly]
+url = "https://mcp.launchdarkly.com/mcp/fm"
+
+[mcp_servers.launchdarkly-ai-configs]
+url = "https://mcp.launchdarkly.com/mcp/aiconfigs"
+
+[mcp_servers.incidentio]
+url = "https://mcp.incident.io/mcp"
+
+[mcp_servers.notion]
+url = "https://mcp.notion.com/mcp"
+
+[mcp_servers.lucidchart]
+url = "https://mcp.lucid.app/mcp"
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+
+[mcp_servers.granola]
+url = "https://mcp.granola.ai/mcp"
+
+# @end:hera
+
+# -----------------------------------------------------------------------------
+# Trusted projects
+# -----------------------------------------------------------------------------
+[projects."/private/tmp"]
+trust_level = "trusted"
+
+[projects."/Users/dani/.config"]
+trust_level = "trusted"
+
+[projects."/Users/dani/Documents/Repos/webapps"]
+trust_level = "trusted"
+
+[projects."/Users/dani/Documents/Repos/test-tmp"]
+trust_level = "trusted"
+
+[projects."/Users/dani/Documents/Repos/test-tmp/homebrew-lrl"]
+trust_level = "trusted"

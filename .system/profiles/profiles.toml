@@ -5,4 +5,4 @@ groups = ["all", "laptop", "personal", "creative"]
 groups = ["all", "infra", "laptop", "work"]
 
 [nyx]
-groups = ["all", "infra", "personal", "server"]
+groups = ["all", "infra", "server"]

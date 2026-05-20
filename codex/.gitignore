@@ -1,0 +1,10 @@
+# Ignore everything by default
+*
+
+# Track configuration
+!.gitignore
+!config.source.toml
+!AGENTS.md
+!hooks.json
+!prompts/
+!prompts/**

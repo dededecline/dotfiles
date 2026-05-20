@@ -25,16 +25,13 @@ brew "yamllint"                 # YAML linter
 cask "tailscale-app"            # Mesh VPN
 
 # Communication
-cask "discord"                  # Chat platform
-cask "element"                  # Matrix client
-cask "proton-mail"              # Encrypted email
 cask "proton-mail-bridge"       # Email bridge
-cask "signal"                   # E2EE Communication
 cask "slack"                    # Team communication
 cask "zoom"                     # Video conferencing
 
 # Development
 cask "claude"                   # Claude Desktop
+cask "codex"                    # OpenAI Codex CLI
 cask "lens"                     # Kubernetes IDE
 
 # Hardware & Peripherals

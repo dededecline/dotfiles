@@ -73,6 +73,15 @@ create_symlink "$DOTFILES/shellcheck/shellcheckrc" "$HOME/.shellcheckrc"
 mkdir -p "$HOME/.claude"
 create_symlink "$DOTFILES/claude/CLAUDE.global.md" "$HOME/.claude/CLAUDE.md"
 
+# Global Codex instructions and prompts (applies to all repos)
+# CODEX_HOME is set to $HOME/.config/codex in fish/config.fish so that's the
+# canonical location; we also link into ~/.codex/ as a fallback for tools
+# that read the default path.
+mkdir -p "$HOME/.codex"
+create_symlink "$DOTFILES/codex/config.toml" "$HOME/.codex/config.toml"
+create_symlink "$DOTFILES/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
+create_symlink "$DOTFILES/codex/prompts" "$HOME/.codex/prompts"
+
 # Sensitive files (if they exist)
 create_symlink "$SYSTEM_DIR/sensitive/.npmrc" "$HOME/.npmrc"
 
