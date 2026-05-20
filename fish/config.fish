@@ -12,7 +12,8 @@ set -gx DOTFILES $HOME/.config
 set -gx SHELL (command -s fish)
 set -gx CLAUDE_CONFIG_DIR $HOME/.config/claude
 set -gx CODEX_HOME $HOME/.config/codex
-set -gx NPM_TOKEN (security find-generic-password -a "$USER" -s "npm_token" -w)
+set -l npm_token (security find-generic-password -a "$USER" -s "npm_token" -w 2>/dev/null)
+test -n "$npm_token" && set -gx NPM_TOKEN $npm_token
 
 # @theme:start
 # FZF Catppuccin Frappe colors
