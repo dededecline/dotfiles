@@ -14,8 +14,8 @@ tap "spacelift-io/spacelift"
 # DevOps Tools
 # =============================================================================
 brew "agent-browser"                       # Agent Browser
-brew "auth0"                               # Auth0 CLI
 brew "argocd"                              # Kubernetes CD
+brew "auth0"                               # Auth0 CLI
 brew "awscli"                              # AWS CLI
 brew "azure-cli"                           # Azure CLI
 brew "bastionzero/tap/zli"                 # Secure access
@@ -49,8 +49,8 @@ cask "microsoft-teams"          # Team collaboration
 # Development
 cask "codex"                               # Codex CLI
 cask "mongodb-compass"                     # MongoDB GUI
-cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
 cask "powershell"                          # PowerShell
+cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
 
 # Internal Tools
 cask "akuity"                   # Akuity (lrl dependency)

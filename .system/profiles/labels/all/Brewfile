@@ -16,6 +16,7 @@ brew "starship"                 # Cross-shell prompt
 # Modern CLI Tools
 # =============================================================================
 brew "atuin"                    # Shell history
+cask "basictex"                 # Minimal TeX Live distribution (pdflatex engine for pandoc)
 brew "bat"                      # cat replacement
 brew "btop"                     # top replacement
 brew "dust"                     # du replacement
@@ -27,6 +28,7 @@ brew "glow"                     # Markdown renderer
 brew "gping"                    # ping replacement
 brew "jq"                       # JSON processor
 brew "lsd"                      # ls replacement
+brew "pandoc"                   # Universal document converter (md → PDF, etc.)
 brew "ripgrep"                  # grep replacement
 brew "watch"                    # Execute commands periodically
 brew "wget"                     # Download utility
@@ -36,9 +38,9 @@ brew "yq"                       # YAML processor
 # Language Tools
 # =============================================================================
 brew "go"                       # Go language
-brew "luarocks"                 # Lua package manager (for nvim image.nvim)
 brew "jsonlint"                 # JSON linter
 brew "jsonnet"                  # JSON templating
+brew "luarocks"                 # Lua package manager (for nvim image.nvim)
 brew "node"                     # Node.js
 brew "pipx"                     # Python package installer
 brew "pyenv"                    # Python version manager
@@ -74,8 +76,8 @@ cask "little-snitch"            # Network monitor
 cask "yubico-authenticator"     # YubiKey manager
 
 # Window Management
-cask "nikitabobko/tap/aerospace"      # Tiling window manager
 brew "felixkratz/formulae/sketchybar" # Custom macOS menu bar
+cask "nikitabobko/tap/aerospace"      # Tiling window manager
 
 # Terminals
 cask "kitty"                    # Terminal emulator

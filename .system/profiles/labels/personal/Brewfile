@@ -17,5 +17,5 @@ cask "signal"                   # E2EE Communication
 # =============================================================================
 # Mac App Store
 # =============================================================================
-mas "Pixelmator Pro: Edit Images", id: 6746662575 # Image editor
 mas "Final Cut Pro: Create Video", id: 1631624924 # Video editor
+mas "Pixelmator Pro: Edit Images", id: 6746662575 # Image editor
