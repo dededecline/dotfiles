@@ -70,8 +70,10 @@ create_symlink "$DOTFILES/fish/hushlogin" "$HOME/.hushlogin"
 create_symlink "$DOTFILES/shellcheck/shellcheckrc" "$HOME/.shellcheckrc"
 
 # Global Claude Code instructions (applies to all repos)
+# Source lives in 1Password (<Personal Vault> > Private > claude-global-instructions),
+# materialized to .system/sensitive/CLAUDE.global.md by secrets.sh.
 mkdir -p "$HOME/.claude"
-create_symlink "$DOTFILES/claude/CLAUDE.global.md" "$HOME/.claude/CLAUDE.md"
+create_symlink "$SYSTEM_DIR/sensitive/CLAUDE.global.md" "$HOME/.claude/CLAUDE.md"
 
 # Global Codex instructions and prompts (applies to all repos)
 # CODEX_HOME is set to $HOME/.config/codex in fish/config.fish so that's the

@@ -327,6 +327,16 @@ inject_secrets() {
   fi
 }
 
+# Refresh global Claude instructions from 1Password (subset of inject_secrets,
+# safe to call from --brew and --macos paths)
+refresh_claude_global() {
+  if ! ensure_1password_auth; then
+    print_warning "CLAUDE.global.md not refreshed (1Password unavailable)"
+    return 0
+  fi
+  bash "$SYSTEM_DIR/setup/secrets.sh" --claude-global
+}
+
 # =============================================================================
 # Homebrew Sync (Declarative)
 # =============================================================================
@@ -974,6 +984,8 @@ run_brew() {
     fi
   fi
 
+  refresh_claude_global
+
   homebrew_phase
 
   print_header "Homebrew Sync Complete!"
@@ -985,6 +997,8 @@ run_macos() {
   bootstrap_common
 
   apply_macos_defaults
+
+  refresh_claude_global
 
   print_header "macOS Preferences Applied!"
   echo "Note: Some changes require a logout/restart to take effect."

@@ -49,7 +49,8 @@ cask "spotify"                  # Music streaming
 cask "vlc"                      # Media player
 
 # Productivity
-cask "linear-linear"            # Project management
+cask "linear"                   # Project management
+cask "morgen"                   # Daily planner
 cask "notion"                   # Notes & docs
 cask "sunsama"                  # Daily planner
 

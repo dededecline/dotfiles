@@ -314,9 +314,19 @@
 
   ### Global Claude Instructions
 
-  `claude/CLAUDE.global.md` is symlinked to `~/.claude/CLAUDE.md` and applies
-  to all repos. It contains git workflow rules (no AI attribution, conventional
-  commits for work repos, feature branch enforcement).
+  Source of truth lives in 1Password (<Personal Vault> > Private vault, Document
+  `claude-global-instructions`), not in the repo. On every `setup.sh` run
+  (including `--brew` and `--macos`), `secrets.sh` materializes the document
+  to `.system/sensitive/CLAUDE.global.md` (mode 600), and `symlinks.sh`
+  links it into `~/.claude/CLAUDE.md` so it applies to all repos.
+
+  Drift between local and remote is handled bi-directionally (mirroring the
+  claude-skills pattern): on a diff, the script prompts `[l/r]`. Choosing
+  `l` pushes the local copy back to 1Password via `op document edit`;
+  choosing `r` overwrites local with the 1Password copy.
+
+  To refresh on demand without a full setup run: `secrets --claude-global`
+  (or `bash .system/setup/secrets.sh --claude-global`).
 
   ### Agent Hooks
 

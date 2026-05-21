@@ -247,6 +247,63 @@ inject_claude_skill_archive() {
   fi
 }
 
+# Retrieve global Claude instructions from 1Password
+# Single-file equivalent of the inject_claude_skills loop body
+inject_claude_global() {
+  local doc_title="claude-global-instructions"
+  local output_file="$SENSITIVE_DIR/CLAUDE.global.md"
+  local temp_file
+
+  temp_file=$(mktemp)
+
+  if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null; then
+    rm -f "$temp_file"
+    print_warning "  CLAUDE.global.md not found in 1Password (document: $doc_title)"
+    return 1
+  fi
+
+  if [[ ! -f "$output_file" ]]; then
+    mv "$temp_file" "$output_file"
+    chmod 600 "$output_file"
+    print_status "  CLAUDE.global.md retrieved (new)"
+    return 0
+  fi
+
+  if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
+    rm -f "$temp_file"
+    print_status "  CLAUDE.global.md unchanged"
+    return 0
+  fi
+
+  echo ""
+  print_warning "CLAUDE.global.md has changed:"
+  echo "─────────────────────────────────────────"
+  diff --color=auto -u "$output_file" "$temp_file" | head -50 || true
+  echo "─────────────────────────────────────────"
+  echo ""
+  echo "Choose action:"
+  echo "  [l] Keep local version (push to 1Password)"
+  echo "  [r] Use remote (1Password) version"
+  echo ""
+  read -rp "Action [l/r]: " choice
+
+  case "$choice" in
+  r | R)
+    mv "$temp_file" "$output_file"
+    chmod 600 "$output_file"
+    print_status "  CLAUDE.global.md updated from 1Password"
+    ;;
+  l | L | *)
+    rm -f "$temp_file"
+    if op document edit "$doc_title" --file-path "$output_file" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null; then
+      print_status "  CLAUDE.global.md: local version pushed to 1Password"
+    else
+      print_warning "  CLAUDE.global.md: kept local (failed to push to 1Password)"
+    fi
+    ;;
+  esac
+}
+
 # Check which secrets are configured
 check_secrets() {
   echo ""
@@ -394,6 +451,14 @@ check_secrets() {
     all_configured=false
   fi
 
+  # Check global Claude instructions
+  if [[ -f "$SENSITIVE_DIR/CLAUDE.global.md" ]]; then
+    print_status "CLAUDE.global.md: configured"
+  else
+    print_warning "CLAUDE.global.md: not configured"
+    all_configured=false
+  fi
+
   # Check Atuin sync status
   if command -v atuin &>/dev/null; then
     if atuin status 2>/dev/null | grep -q "^Username:"; then
@@ -500,6 +565,9 @@ HELPER
     print_status "Claude API key helper script created"
   fi
 
+  # Refresh global Claude instructions from 1Password
+  inject_claude_global
+
   # Inject npm token from Keychain
   local npm_token
   npm_token=$(security find-generic-password -a "$USER" -s "npm_token" -w 2>/dev/null || true)
@@ -551,12 +619,18 @@ case "${1:-}" in
 --check | -c)
   check_secrets
   ;;
+--claude-global)
+  check_op
+  mkdir -p "$SENSITIVE_DIR"
+  inject_claude_global
+  ;;
 --help | -h)
-  echo "Usage: $0 [--check|--help]"
+  echo "Usage: $0 [--check|--claude-global|--help]"
   echo ""
   echo "Options:"
-  echo "  --check, -c    Check which secrets are configured"
-  echo "  --help, -h     Show this help message"
+  echo "  --check, -c       Check which secrets are configured"
+  echo "  --claude-global   Refresh CLAUDE.global.md only (from 1Password)"
+  echo "  --help, -h        Show this help message"
   echo ""
   echo "Without arguments, injects all secrets from 1Password."
   ;;

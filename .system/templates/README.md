@@ -126,6 +126,31 @@ To create:
 op item create --category=login --title="RustDesk" --vault="Private" password="your_secure_password"
 ```
 
+### Global Claude Instructions (1Password Document)
+
+The contents of `~/.claude/CLAUDE.md` (the global instructions Claude Code
+applies to every repo) are stored as a 1Password Document so they can sync
+between machines without being committed to the repo.
+
+- **Account:** <Personal> (`my.1password.com`)
+- **Vault:** Private
+- **Document title:** `claude-global-instructions`
+
+On every `setup.sh` run (including `--brew` and `--macos`), `secrets.sh`
+materializes the document to `.system/sensitive/CLAUDE.global.md` (mode
+600), and `symlinks.sh` links it into `~/.claude/CLAUDE.md`.
+
+Drift is handled with the same bi-directional `[l/r]` prompt the
+claude-skills loop uses: choosing `l` pushes local back via `op document
+edit`; choosing `r` overwrites local with the remote copy.
+
+Refresh on demand without a full setup run:
+```bash
+secrets --claude-global
+# or
+bash ~/.config/.system/setup/secrets.sh --claude-global
+```
+
 ### Work-Specific Claude Skills (1Password Documents)
 
 Work-specific Claude Code skills are stored as 1Password documents (not templates)
