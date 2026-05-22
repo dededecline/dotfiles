@@ -34,6 +34,7 @@ brew "stencil"                             # Template management
 brew "terraform-docs"                      # Terraform documentation
 brew "tflint"                              # Terraform linter
 brew "trivy"                               # Security scanner
+brew "vercel"                              # Vercel CLI
 
 # =============================================================================
 # Applications (Casks)
