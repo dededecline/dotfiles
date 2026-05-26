@@ -103,3 +103,4 @@ codex/cache/
 observe.yaml
 ldcli/
 auth0/
+vercel-plugin/
