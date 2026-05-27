@@ -19,23 +19,26 @@ brew "auth0"                               # Auth0 CLI
 brew "awscli"                              # AWS CLI
 brew "azure-cli"                           # Azure CLI
 brew "bastionzero/tap/zli"                 # Secure access
+brew "black"                               # Python linting
 brew "circleci"                            # CI runner
 brew "docker-compose"                      # Docker CLI
 brew "fairwindsops/tap/pluto"              # Kubernetes API deprecation finder
+brew "flake8"                              # Python linting
 brew "incident-io/taps/catalog-importer"   # Incident management
 brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments
 brew "opa"                                 # Open Policy Agent
-brew "openjdk"                             # Java
+brew "openjdk@21"                          # Java
 brew "oxfmt"                               # Formatting
 brew "oxlint"                              # Linting
 brew "pnpm"                                # NPM package manager
+brew "pytest"                              # Python testing framework
 brew "signadot/tap/signadot-cli"           # Sandbox Environments
 brew "stencil"                             # Template management
 brew "terraform-docs"                      # Terraform documentation
 brew "tflint"                              # Terraform linter
 brew "trivy"                               # Security scanner
-brew "vercel"                              # Vercel CLI
+brew "vercel-cli"                          # Vercel CLI
 
 # =============================================================================
 # Applications (Casks)
