@@ -30,6 +30,7 @@ brew "jq"                       # JSON processor
 brew "lsd"                      # ls replacement
 brew "pandoc"                   # Universal document converter (md → PDF, etc.)
 brew "ripgrep"                  # grep replacement
+brew "semgrep"                  # detect bugs and anti-patterns
 brew "watch"                    # Execute commands periodically
 brew "wget"                     # Download utility
 brew "yq"                       # YAML processor

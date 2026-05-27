@@ -128,7 +128,10 @@
     the server (nyx) doesn't install a GUI app it can't use.
   • Claude Code CLI is installed via the native installer (curl
     `claude.ai/install.sh`), not Homebrew. See `install_claude_code` in
-    `setup.sh`.
+    `setup.sh`. Every `setup.sh` run also refreshes the plugin
+    marketplaces and updates all installed user-scope plugins to their
+    latest versions via `update_claude_plugins` (uses `claude plugin
+    list --json` + `claude plugin update`; restart Claude Code to apply).
 
   Keep entries alphabetized within each subsection of every
   `labels/*/Brewfile`. A subsection is the contiguous block under a `#`

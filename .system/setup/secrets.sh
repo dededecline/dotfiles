@@ -443,6 +443,13 @@ check_secrets() {
     all_configured=false
   fi
 
+  if [[ -f "$SENSITIVE_DIR/github-pat" ]]; then
+    print_status "GitHub PAT: configured"
+  else
+    print_warning "GitHub PAT: not configured"
+    all_configured=false
+  fi
+
   # Check Claude API key helper script
   if [[ -x "$SENSITIVE_DIR/claude-api-key-helper.sh" ]]; then
     print_status "Claude API key helper: configured"
@@ -563,6 +570,10 @@ cat ~/.config/.system/sensitive/anthropic-api-key
 HELPER
     chmod 700 "$SENSITIVE_DIR/claude-api-key-helper.sh"
     print_status "Claude API key helper script created"
+  fi
+
+  if [[ -f "$TEMPLATES_DIR/github-pat.tpl" ]]; then
+    inject_template "$TEMPLATES_DIR/github-pat.tpl" "$SENSITIVE_DIR/github-pat" "GitHub PAT" "$OP_PERSONAL_ACCOUNT"
   fi
 
   # Refresh global Claude instructions from 1Password

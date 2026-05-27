@@ -233,30 +233,61 @@
       }
     ]
   },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true,
-    // @machine:hera
-    "Laurel@Laurel": true,
-    // @end:hera
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
-    // @machine:athena
-    "Notion@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
-    // @end:athena
-    "hookify@claude-plugins-official": true,
-    "slack@claude-plugins-official": true
-  },
-  "alwaysThinkingEnabled": true,
+  // @machine:work
   "apiKeyHelper": "$HOME/.config/.system/sensitive/claude-api-key-helper.sh",
   "mcpServers": {
     "signadot": {
       "command": "signadot",
       "args": ["mcp"]
     }
-  }
+  },
+  // @end:work
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    // @machine:work
+    "Laurel@Laurel": true,
+    "slack@claude-plugins-official": true,
+    // @end:work
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    // @machine:personal
+    "notion@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    // @end:personal
+    "hookify@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "serena@@claude-plugins-official": true,
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "firecrawl@claude-plugins-official": true,
+    "coderabbit@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true,
+    "kotlin-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true,
+    "semgrep@claude-plugins-official": true,
+    "data-engineering@claude-plugins-official": true,
+    "sourcegraphg@claude-plugins-official": true,
+    "deploy-on-awsg@claude-plugins-official": true,
+    "ruby-lspg@claude-plugins-official": true,
+    "sonatype-guideg@claude-plugins-official": true,
+    "datag@claude-plugins-official": true,
+    "mongodbg@claude-plugins-official": true,
+    "databases-on-aws@claude-plugins-official": true,
+    "aws-dev-toolkit@claude-plugins-official": true,
+    "jdtls-lsp@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true
 }

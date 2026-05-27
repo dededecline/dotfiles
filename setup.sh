@@ -581,12 +581,43 @@ install_claude_code() {
     print_info "Updating Claude Code..."
     "$claude_bin" update &>/dev/null || true
     print_status "Claude Code: $("$claude_bin" --version 2>/dev/null || echo installed)"
+    update_claude_plugins
     return 0
   fi
 
   print_info "Installing Claude Code..."
   curl -fsSL https://claude.ai/install.sh | sh
   print_status "Claude Code: installed"
+  update_claude_plugins
+}
+
+update_claude_plugins() {
+  local claude_bin="$HOME/.local/bin/claude"
+  [[ -x "$claude_bin" ]] || return 0
+  if ! command -v jq >/dev/null 2>&1; then
+    print_warning "jq not found; skipping Claude plugin updates"
+    return 0
+  fi
+
+  print_info "Refreshing Claude plugin marketplaces..."
+  "$claude_bin" plugin marketplace update >/dev/null 2>&1 || true
+
+  local ids
+  ids=$("$claude_bin" plugin list --json 2>/dev/null |
+    jq -r '.[] | select(.scope == "user") | .id')
+
+  if [[ -z "$ids" ]]; then
+    print_status "Claude plugins: none installed yet"
+    return 0
+  fi
+
+  local count=0
+  while IFS= read -r id; do
+    [[ -z "$id" ]] && continue
+    "$claude_bin" plugin update "$id" >/dev/null 2>&1 || true
+    count=$((count + 1))
+  done <<<"$ids"
+  print_status "Claude plugins: updated $count plugin(s) (restart to apply)"
 }
 
 create_symlinks() {
