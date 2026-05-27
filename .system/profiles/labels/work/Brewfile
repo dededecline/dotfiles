@@ -26,6 +26,7 @@ brew "incident-io/taps/catalog-importer"   # Incident management
 brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments
 brew "opa"                                 # Open Policy Agent
+brew "openjdk"                             # Java
 brew "oxfmt"                               # Formatting
 brew "oxlint"                              # Linting
 brew "pnpm"                                # NPM package manager
