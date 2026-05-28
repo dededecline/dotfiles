@@ -1,22 +1,33 @@
 [
   {
     "label": "Ruff+Basedpyright check",
-    "command": "echo 'Running ruff check and basedpyright...' && echo '\n' && echo 'Ruff check:' && ruff check . && echo '\n' && echo 'Basedpyright check:' && basedpyright src",
+    "command": "echo 'Running ruff check and basedpyright...' && echo '\n' && echo 'Ruff check:' && uvx ruff check . && echo '\n' && echo 'Basedpyright check:' && uvx basedpyright .",
     "reveal_target": "dock"
   },
   {
     "label": "Ruff check",
-    "command": "ruff check .",
+    "command": "uvx ruff check .",
     "reveal_target": "dock"
   },
   {
     "label": "Ruff format",
-    "command": "ruff format .",
+    "command": "uvx ruff format .",
     "reveal_target": "dock"
   },
   {
     "label": "Basedpyright check",
-    "command": "basedpyright src",
+    "command": "uvx basedpyright .",
+    "reveal_target": "dock"
+  },
+  {
+    "label": "Pytest",
+    "command": "uv run pytest",
+    "reveal_target": "dock"
+  },
+  {
+    "label": "Pytest (current file)",
+    "command": "uv run pytest",
+    "args": ["$ZED_FILE"],
     "reveal_target": "dock"
   },
   {
