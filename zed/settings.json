@@ -34,6 +34,22 @@
   "file_types": {
     "Fish": ["*.fish.tpl"]
   },
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/.jj",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    "**/.ruff_cache",
+    "**/.ropeproject",
+    "**/.venv",
+    "**/venv",
+    "**/__pycache__"
+  ],
   "languages": {
     "JSONC": {
       "prettier": {
@@ -47,12 +63,38 @@
         }
       }
     },
+    "Python": {
+      "language_servers": ["basedpyright", "ruff", "!pyright"],
+      "format_on_save": "on",
+      "formatter": [
+        {
+          "external": {
+            "command": "ruff",
+            "arguments": ["format", "-"]
+          }
+        },
+        { "code_action": "source.fixAll.ruff" }
+      ]
+    },
     "Shell Script": {
       "format_on_save": "on",
       "formatter": {
         "external": {
           "command": "shfmt",
           "arguments": ["--filename", "{buffer_path}"]
+        }
+      }
+    }
+  },
+  "lsp": {
+    "basedpyright": {
+      "settings": {
+        "python.analysis": {
+          "diagnosticMode": "workspace",
+          "exclude": ["**/__pycache__", "**/.venv", "tests/"]
+        },
+        "python": {
+          "pythonPath": ".venv/bin/python"
         }
       }
     }
@@ -118,6 +160,7 @@
     "log": true,
     "lua": true,
     "make": true,
+    "markdown-oxide": true,
     "nix": true,
     "nextjs-react-snippets": true,
     "python-requirements": true,
