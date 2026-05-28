@@ -102,7 +102,7 @@
   ├── labels/                  # Edit these — source of truth
   │   ├── all/Brewfile         # All machines
   │   ├── laptop/Brewfile      # Laptop machines (athena, hera)
-  │   ├── personal/Brewfile    # Personal machines (athena, nyx)
+  │   ├── personal/Brewfile    # Personal machines (athena only)
   │   ├── creative/Brewfile    # Gaming / DAWs (athena only)
   │   ├── infra/Brewfile       # Infrastructure machines (hera, nyx)
   │   ├── server/Brewfile      # Server machines (nyx only)
@@ -132,6 +132,13 @@
     marketplaces and updates all installed user-scope plugins to their
     latest versions via `update_claude_plugins` (uses `claude plugin
     list --json` + `claude plugin update`; restart Claude Code to apply).
+  • Python version management is split by group: `uv` lives in `personal`
+    (athena), `mise` in `work` (hera). `pyenv` was removed. The shared `all`
+    group keeps the editor-agnostic toolchain (`ruff`, `basedpyright`,
+    `pipx`). `nyx` (server) intentionally gets no version manager. Fish sets
+    `UV_PYTHON=3.14` (config.fish) so uv defaults to a stable interpreter;
+    the `mise.fish` activation is guarded by `type -q mise`, so it no-ops on
+    non-work machines.
 
   Keep entries alphabetized within each subsection of every
   `labels/*/Brewfile`. A subsection is the contiguous block under a `#`
@@ -229,7 +236,17 @@
   / `@end:<name>` markers. Markers accept hostnames or group names:
   • `// @machine:hera` — only on hera
   • `// @machine:laptop` — on hera + athena
-  • `// @machine:personal` — on athena + nyx
+  • `// @machine:personal` — on athena
+
+  Python type-checking in Claude Code uses **basedpyright** (matching Zed), via
+  a local in-repo plugin: `claude/local-plugins/` is a small marketplace
+  (`dotfiles`) whose `basedpyright-lsp` plugin points the LSP at
+  `basedpyright-langserver`. `setup.sh` registers the marketplace and installs
+  the plugin idempotently (see `update_claude_plugins`); `settings.jsonc`
+  enables `basedpyright-lsp@dotfiles` and disables the stock
+  `pyright-lsp@claude-plugins-official`. The marketplace path is declared in
+  `settings.jsonc` under `extraKnownMarketplaces` (`$HOME` expands at
+  generation).
 
   To modify settings: edit `claude/settings.jsonc`, then run `./setup.sh`.
 
@@ -334,10 +351,15 @@
   ### Agent Hooks
 
   Hook scripts live at `.system/hooks/` (tool-neutral) and are referenced by
-  both Claude (`claude/settings.jsonc`) and Codex (`codex/config.source.toml`):
+  both Claude (`claude/settings.jsonc`) and Codex (`codex/hooks.json`):
 
   • `.system/hooks/git-guard.sh` — PreToolUse hook enforcing git workflow rules
   • `.system/hooks/check-shell.sh` — PostToolUse hook for shell-script lint
+    (shellcheck + shfmt)
+  • `.system/hooks/check-python.sh` — PostToolUse hook for `.py`/`.pyi` files:
+    auto-applies `ruff format` and `ruff check --fix`, then blocks on remaining
+    lint violations or basedpyright **errors** (warnings do not block, so
+    loosely-typed scratch code is not nagged)
   • `.system/hooks/session-start.sh` — SessionStart hook
 
   `git-guard.sh` enforces:

@@ -45,19 +45,16 @@ brew "jsonnet"                  # JSON templating
 brew "luarocks"                 # Lua package manager (for nvim image.nvim)
 brew "node"                     # Node.js
 brew "pipx"                     # Python package installer
-brew "pyenv"                    # Python version manager
 brew "pyrefly"                  # Python type checking
 brew "ruff"                     # Python linter
 brew "shellcheck"               # Shell script linter
 brew "shfmt"                    # Shell script formatter
-brew "uv"                       # Python package manager
 
 # =============================================================================
 # Development Tools
 # =============================================================================
 brew "certbot"                  # Let's Encrypt client
 brew "neovim"                   # Editor
-brew "mise"                     # Dev tool version manager
 brew "tmux"                     # Terminal multiplexer
 
 # =============================================================================

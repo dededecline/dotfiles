@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "dotfiles",
+  "owner": {
+    "name": "dani"
+  },
+  "description": "Local plugins maintained in this dotfiles repository.",
+  "plugins": [
+    {
+      "name": "basedpyright-lsp",
+      "description": "Python language server (basedpyright) for type checking and code intelligence.",
+      "version": "1.0.0",
+      "source": "./plugins/basedpyright-lsp",
+      "category": "development",
+      "strict": false,
+      "lspServers": {
+        "basedpyright": {
+          "command": "basedpyright-langserver",
+          "args": ["--stdio"],
+          "extensionToLanguage": {
+            ".py": "python",
+            ".pyi": "python"
+          }
+        }
+      }
+    }
+  ]
+}

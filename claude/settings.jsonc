@@ -217,6 +217,10 @@
           {
             "type": "command",
             "command": "~/.config/.system/hooks/check-shell.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.config/.system/hooks/check-python.sh"
           }
         ]
       }
@@ -266,7 +270,7 @@
     "typescript-lsp@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": false,
     "serena@@claude-plugins-official": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": true,
@@ -287,7 +291,16 @@
     "mongodbg@claude-plugins-official": true,
     "databases-on-aws@claude-plugins-official": true,
     "aws-dev-toolkit@claude-plugins-official": true,
-    "jdtls-lsp@claude-plugins-official": true
+    "jdtls-lsp@claude-plugins-official": true,
+    "basedpyright-lsp@dotfiles": true
+  },
+  "extraKnownMarketplaces": {
+    "dotfiles": {
+      "source": {
+        "source": "directory",
+        "path": "$HOME/.config/claude/local-plugins"
+      }
+    }
   },
   "alwaysThinkingEnabled": true
 }

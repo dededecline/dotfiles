@@ -602,6 +602,15 @@ update_claude_plugins() {
   print_info "Refreshing Claude plugin marketplaces..."
   "$claude_bin" plugin marketplace update >/dev/null 2>&1 || true
 
+  # Register and install local dotfiles plugins (idempotent)
+  local local_mkt="$DOTFILES/claude/local-plugins"
+  if [[ -d "$local_mkt" ]]; then
+    "$claude_bin" plugin marketplace list 2>/dev/null | grep -q "dotfiles" ||
+      "$claude_bin" plugin marketplace add "$local_mkt" >/dev/null 2>&1 || true
+    "$claude_bin" plugin list 2>/dev/null | grep -q "basedpyright-lsp@dotfiles" ||
+      "$claude_bin" plugin install basedpyright-lsp@dotfiles --scope user >/dev/null 2>&1 || true
+  fi
+
   local ids
   ids=$("$claude_bin" plugin list --json 2>/dev/null |
     jq -r '.[] | select(.scope == "user") | .id')

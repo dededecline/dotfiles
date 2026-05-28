@@ -1,0 +1,9 @@
+# User-level ruff config (XDG fallback). Applies to any project that does not
+# define its own pyproject.toml / ruff.toml, e.g. scratch and practice repos.
+target-version = "py314"
+line-length = 88
+
+[lint]
+# E/W pycodestyle, F pyflakes, I import sorting, UP pyupgrade,
+# B bugbear, SIM simplify, C4 comprehensions.
+select = ["E", "F", "I", "UP", "B", "SIM", "C4"]

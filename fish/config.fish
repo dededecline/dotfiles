@@ -12,6 +12,7 @@ set -gx DOTFILES $HOME/.config
 set -gx SHELL (command -s fish)
 set -gx CLAUDE_CONFIG_DIR $HOME/.config/claude
 set -gx CODEX_HOME $HOME/.config/codex
+set -gx UV_PYTHON 3.14
 set -l npm_token (security find-generic-password -a "$USER" -s "npm_token" -w 2>/dev/null)
 test -n "$npm_token" && set -gx NPM_TOKEN $npm_token
 set -l github_pat (cat $HOME/.config/.system/sensitive/github-pat 2>/dev/null)

@@ -11,6 +11,10 @@
 !skills/
 !skills/**
 
+# Local plugins (in-repo marketplace; runtime install state lives under plugins/)
+!local-plugins/
+!local-plugins/**
+
 # Work-specific skills (sensitive, symlinked from 1Password via symlinks.sh)
 skills/argocd
 skills/astro
