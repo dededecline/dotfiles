@@ -149,12 +149,6 @@
     "break",
     { "type": "custom", "format": "{#1;38;2;140;170;238}󰤨 Network{#}" },
     {
-      "type": "publicip",
-      "key": "├ Public IP",
-      "keyColor": "38;2;140;170;238",
-      "timeout": 1000
-    },
-    {
       "type": "localip",
       "key": "├ Local IP ",
       "keyColor": "38;2;140;170;238"

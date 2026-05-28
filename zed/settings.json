@@ -89,12 +89,9 @@
   "lsp": {
     "basedpyright": {
       "settings": {
-        "python.analysis": {
+        "basedpyright.analysis": {
           "diagnosticMode": "workspace",
-          "exclude": ["**/__pycache__", "**/.venv", "tests/"]
-        },
-        "python": {
-          "pythonPath": ".venv/bin/python"
+          "exclude": ["**/__pycache__", "**/.venv"]
         }
       }
     }
