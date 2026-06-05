@@ -15,6 +15,7 @@ brew "pre-commit"               # Git hooks
 brew "prettier"                 # Code formatter
 brew "python-argcomplete"       # Python argument completion
 brew "reviewdog/tap/reviewdog"  # Code review automation
+brew "uv"                       # Python package & version manager
 brew "yamllint"                 # YAML linter
 
 # =============================================================================
@@ -28,7 +29,6 @@ cask "tailscale-app"            # Mesh VPN
 cask "ungoogled-chromium"       # Chromium with Google integration removed
 
 # Communication
-cask "proton-mail-bridge"       # Email bridge
 cask "slack"                    # Team communication
 cask "zoom"                     # Video conferencing
 
@@ -61,6 +61,3 @@ cask "wifiman"                  # Network scanner
 # Mac App Store
 # =============================================================================
 mas "1Password for Safari", id: 1569813296  # Browser extension
-mas "Infuse", id: 1136220934                # Media player
-mas "Parcel", id: 375589283                 # Delivery tracking
-mas "Reeder Classic", id: 1529448980        # RSS reader

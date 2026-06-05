@@ -130,7 +130,7 @@ inject_claude_skills() {
   echo "  Retrieving work-specific Claude skills from 1Password..."
 
   # Work skills: skill_name:doc_title pairs
-  local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro bastion_zero:claude-skill-bastion_zero lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe signadot:claude-skill-signadot spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
+  local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe signadot:claude-skill-signadot spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
 
   for pair in $work_skills; do
     local skill_name="${pair%%:*}"
@@ -138,6 +138,7 @@ inject_claude_skills() {
     local output_dir="$CLAUDE_SKILLS_OUTPUT/$skill_name"
     local output_file="$output_dir/SKILL.md"
     local temp_file
+    local err
 
     mkdir -p "$output_dir"
     temp_file=$(mktemp)
@@ -187,10 +188,11 @@ inject_claude_skills() {
     l | L | *)
       rm -f "$temp_file"
       # Push local version back to 1Password
-      if op document edit "$doc_title" --file-path "$output_file" --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
+      if err=$(op document edit "$doc_title" "$output_file" --account "$OP_WORK_ACCOUNT" 2>&1); then
         print_status "  $skill_name skill: local version pushed to 1Password"
       else
         print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
+        printf '%s\n' "$err" | sed 's/^/      /'
       fi
       ;;
     esac
@@ -253,6 +255,7 @@ inject_claude_global() {
   local doc_title="claude-global-instructions"
   local output_file="$SENSITIVE_DIR/CLAUDE.global.md"
   local temp_file
+  local err
 
   temp_file=$(mktemp)
 
@@ -295,10 +298,11 @@ inject_claude_global() {
     ;;
   l | L | *)
     rm -f "$temp_file"
-    if op document edit "$doc_title" --file-path "$output_file" --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null; then
+    if err=$(op document edit "$doc_title" "$output_file" --account "$OP_PERSONAL_ACCOUNT" 2>&1); then
       print_status "  CLAUDE.global.md: local version pushed to 1Password"
     else
       print_warning "  CLAUDE.global.md: kept local (failed to push to 1Password)"
+      printf '%s\n' "$err" | sed 's/^/      /'
     fi
     ;;
   esac
@@ -321,14 +325,6 @@ check_secrets() {
 
   # Work-only secrets (work group machines)
   if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
-    # Check ZLI command
-    if [[ -f "$SENSITIVE_DIR/zli-command" ]]; then
-      print_status "ZLI connect: configured"
-    else
-      print_warning "ZLI connect: not configured"
-      all_configured=false
-    fi
-
     # Check CI identity
     if [[ -f "$SENSITIVE_DIR/ci-identity" ]]; then
       print_status "CI identity: configured"
@@ -346,7 +342,7 @@ check_secrets() {
     fi
 
     # Check work-specific Claude skills
-    local work_skills=("argocd" "astro" "bastion_zero" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
+    local work_skills=("argocd" "astro" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
     for skill in "${work_skills[@]}"; do
       if [[ -d "$DOTFILES/claude/skills/$skill" ]] || [[ -d "$SENSITIVE_DIR/claude-skills/$skill" ]]; then
         print_status "Claude skill: $skill configured"
@@ -364,7 +360,7 @@ check_secrets() {
       all_configured=false
     fi
   else
-    print_info "$MACHINE_HOSTNAME: work-only secrets not checked (zli, ci-identity, clone, claude skills)"
+    print_info "$MACHINE_HOSTNAME: work-only secrets not checked"
   fi
 
   # Secrets for all machines
@@ -518,11 +514,6 @@ inject_secrets() {
 
   # Work-only secrets (work group machines)
   if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
-    # Inject ZLI connect command
-    if [[ -f "$TEMPLATES_DIR/zli.tpl" ]]; then
-      inject_template "$TEMPLATES_DIR/zli.tpl" "$SENSITIVE_DIR/zli-command" "ZLI connect command" "$OP_PERSONAL_ACCOUNT"
-    fi
-
     # Inject CI identity for empty commits
     if [[ -f "$TEMPLATES_DIR/ci-identity.tpl" ]]; then
       inject_template "$TEMPLATES_DIR/ci-identity.tpl" "$SENSITIVE_DIR/ci-identity" "CI identity" "$OP_PERSONAL_ACCOUNT"
@@ -548,7 +539,7 @@ inject_secrets() {
       "Claude Code telemetry" \
       "$OP_WORK_ACCOUNT"
   else
-    print_info "$MACHINE_HOSTNAME: skipping work-only secrets (zli, ci-identity, clone, claude skills)"
+    print_info "$MACHINE_HOSTNAME: skipping work-only secrets"
   fi
 
   # RustDesk permanent password (server machines)

@@ -2,7 +2,6 @@
 # Taps
 # =============================================================================
 tap "auth0/auth0-cli"
-tap "bastionzero/tap"
 tap "fairwindsops/tap"
 tap "incident-io/taps"
 tap "namespacelabs/namespace"
@@ -18,7 +17,6 @@ brew "argocd"                              # Kubernetes CD
 brew "auth0"                               # Auth0 CLI
 brew "awscli"                              # AWS CLI
 brew "azure-cli"                           # Azure CLI
-brew "bastionzero/tap/zli"                 # Secure access
 brew "black"                               # Python linting
 brew "circleci"                            # CI runner
 brew "docker-compose"                      # Docker CLI

@@ -179,8 +179,8 @@ detect_and_validate_hostname() {
   export MACHINE_HOSTNAME
 }
 
-# Preprocess files with machine markers, e.g. `// @machine:hera` / `// @end:hera`
-# (JSONC) or `# @machine:hera` / `# @end:hera` (TOML / shell).
+# Preprocess files with machine markers, e.g. `// @machine:Naomi-Klein-MacBook-Pro` / `// @end:Naomi-Klein-MacBook-Pro`
+# (JSONC) or `# @machine:Naomi-Klein-MacBook-Pro` / `# @end:Naomi-Klein-MacBook-Pro` (TOML / shell).
 # Tags accept hostnames or group names (laptop, work, server, ...).
 #
 # Filters the input by the current machine's group membership and writes the
@@ -491,7 +491,7 @@ run_brew_sync() {
   # Show warning about cleanup
   echo ""
   print_warning "Homebrew will install packages from Brewfile and remove unlisted packages"
-  print_info "Packages not in Brewfile will be uninstalled (--cleanup)"
+  print_info "Packages not in Brewfile will be uninstalled (--force-cleanup)"
   echo ""
 
   # Update and sync (brew bundle handles taps + mas apps natively in a single pass)
@@ -499,7 +499,7 @@ run_brew_sync() {
   brew update
 
   print_info "Installing packages and cleaning up..."
-  if brew bundle --file="$brewfile" --cleanup --verbose; then
+  if brew bundle --file="$brewfile" --force-cleanup --verbose; then
     print_status "Homebrew packages synced"
   else
     print_warning "Some packages may have failed to install"
@@ -1080,7 +1080,7 @@ Full Setup:
   - Installs Xcode CLT and Homebrew (if missing)
   - Clones dotfiles repository (if missing)
   - Injects secrets from 1Password (work group machines)
-  - Syncs Homebrew packages (declarative with --cleanup)
+  - Syncs Homebrew packages (declarative with --force-cleanup)
   - Creates symlinks
   - Configures Fish shell as default
   - Installs Fisher and TPM
@@ -1089,7 +1089,7 @@ Full Setup:
 Homebrew Sync (--brew):
   Generates .system/profiles/machines/<hostname>/Brewfile by concatenating
   the label Brewfiles for the host's groups (labels/ is the sole source of
-  truth), then runs brew bundle --cleanup to install packages and remove
+  truth), then runs brew bundle --force-cleanup to install packages and remove
   unlisted ones.
 
 macOS Preferences (--macos):

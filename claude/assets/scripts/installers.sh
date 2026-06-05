@@ -69,18 +69,6 @@ if [ -f "Brewfile" ]; then
       echo "✓ lrl already installed"
     fi
 
-    # Try to install zli separately
-    if ! command -v zli &>/dev/null; then
-      echo "Installing zli from bastionzero/tap..."
-      if brew install bastionzero/tap/zli 2>&1; then
-        echo "✓ zli installed"
-      else
-        echo "⚠️  Failed to install zli"
-      fi
-    else
-      echo "✓ zli already installed"
-    fi
-
     # Try to install 1password-cli cask separately
     if ! command -v op &>/dev/null; then
       echo "Installing 1password-cli..."

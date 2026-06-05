@@ -18,7 +18,6 @@
 # Work-specific skills (sensitive, symlinked from 1Password via symlinks.sh)
 skills/argocd
 skills/astro
-skills/bastion_zero
 skills/lrl-cli
 skills/observe
 skills/signadot
