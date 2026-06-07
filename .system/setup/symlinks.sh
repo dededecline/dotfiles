@@ -81,6 +81,7 @@ create_symlink "$SYSTEM_DIR/sensitive/CLAUDE.global.md" "$HOME/.claude/CLAUDE.md
 # that read the default path.
 mkdir -p "$HOME/.codex"
 create_symlink "$DOTFILES/codex/config.toml" "$HOME/.codex/config.toml"
+create_symlink "$DOTFILES/codex/hooks.json" "$HOME/.codex/hooks.json"
 create_symlink "$DOTFILES/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 create_symlink "$DOTFILES/codex/prompts" "$HOME/.codex/prompts"
 

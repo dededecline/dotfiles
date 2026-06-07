@@ -563,6 +563,15 @@ configure_codex() {
   rm -f "$tmp"
   chmod 600 "$output"
   print_status "Codex config: configured ($MACHINE_HOSTNAME)"
+
+  local hooks_base="$DOTFILES/codex/hooks.source.json"
+  local hooks_out="$DOTFILES/codex/hooks.json"
+  if [[ -f "$hooks_base" ]]; then
+    # hook command paths use literal $HOME, expanded per-machine here
+    # shellcheck disable=SC2016
+    envsubst '$HOME' <"$hooks_base" >"$hooks_out"
+    print_status "Codex hooks: configured ($MACHINE_HOSTNAME)"
+  fi
 }
 
 install_claude_code() {

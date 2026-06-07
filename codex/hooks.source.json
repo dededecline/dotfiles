@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dani/.config/.system/hooks/git-guard.sh",
+            "command": "$HOME/.config/.system/hooks/git-guard.sh",
             "timeout": 10
           }
         ]
@@ -18,12 +18,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dani/.config/.system/hooks/check-shell.sh",
+            "command": "$HOME/.config/.system/hooks/check-shell.sh",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "/Users/dani/.config/.system/hooks/check-python.sh",
+            "command": "$HOME/.config/.system/hooks/check-python.sh",
             "timeout": 30
           }
         ]
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/dani/.config/.system/hooks/session-start.sh",
+            "command": "$HOME/.config/.system/hooks/session-start.sh",
             "timeout": 10
           }
         ]

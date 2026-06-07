@@ -5,6 +5,6 @@
 !.gitignore
 !config.source.toml
 !AGENTS.md
-!hooks.json
+!hooks.source.json
 !prompts/
 !prompts/**

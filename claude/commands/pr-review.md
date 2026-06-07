@@ -81,7 +81,7 @@ Tone rules, hard:
 - **Never use em dashes or en dashes anywhere.** Use a period, comma, parens, colon, or semicolon. This applies even when quoting prior comments. If a sample on disk contains one, rewrite around it before reusing the phrasing.
 - Lowercase continuations after a colon are fine (`Cheap fix: \`[ -n "${BEFORE_SHA:-}" ]\``).
 - Reference precedent from the diff when relevant ("while every other env read in this block uses `${VAR:-}`", "Every sibling in `s3-regional.tf` sets `aws_s3_bucket_versioning` to `Enabled`"). Comparing against existing code in the same repo lands harder than abstract advice.
-- For pinginc terraform/opentofu PRs, cite the specific underlying module and version when the wrapper's behavior is the load-bearing detail (e.g. `spacelift.io/laurel/v2-aws-aurora` v4.4.0). Read the module source at `/Users/dani/Documents/Repos/infra` before claiming an input is or isn't passed through.
+- For pinginc terraform/opentofu PRs, cite the specific underlying module and version when the wrapper's behavior is the load-bearing detail (e.g. `spacelift.io/laurel/v2-aws-aurora` v4.4.0). Read the module source at `/Users/<current user>/Documents/Repos/infra` before claiming an input is or isn't passed through.
 - Severity calibration is in the framing word, not in `**HIGH**` tags. "Silently breaks", "aborts the moment", "balloons on every rebased push", "apps reading the secret start hitting `FATAL: password authentication failed`" carry the weight. Don't add severity prefixes to the comment body.
 
 Reference samples the user has actually posted (read these before drafting; mirror cadence and shape):

@@ -92,14 +92,14 @@ url = "https://mcp.granola.ai/mcp"
 [projects."/private/tmp"]
 trust_level = "trusted"
 
-[projects."/Users/dani/.config"]
+[projects."$HOME/.config"]
 trust_level = "trusted"
 
-[projects."/Users/dani/Documents/Repos/webapps"]
+[projects."$HOME/Documents/Repos/webapps"]
 trust_level = "trusted"
 
-[projects."/Users/dani/Documents/Repos/test-tmp"]
+[projects."$HOME/Documents/Repos/test-tmp"]
 trust_level = "trusted"
 
-[projects."/Users/dani/Documents/Repos/test-tmp/homebrew-lrl"]
+[projects."$HOME/Documents/Repos/test-tmp/homebrew-lrl"]
 trust_level = "trusted"
