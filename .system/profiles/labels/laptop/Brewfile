@@ -46,7 +46,6 @@ cask "vial"                     # Keyboard configurator
 
 # Media
 cask "spotify"                  # Music streaming
-cask "vlc"                      # Media player
 
 # Productivity
 cask "linear"                   # Project management
