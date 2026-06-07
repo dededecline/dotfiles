@@ -51,15 +51,29 @@
     "**/__pycache__"
   ],
   "languages": {
+    "Fish": {
+      "formatter": {
+        "external": {
+          "command": "fish_indent"
+        }
+      }
+    },
     "JSONC": {
       "prettier": {
         "trailingComma": "none"
       }
     },
-    "Fish": {
+    "Markdown": {
+      "format_on_save": "on",
       "formatter": {
         "external": {
-          "command": "fish_indent"
+          "command": "prettier",
+          "arguments": [
+            "--prose-wrap",
+            "always",
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
         }
       }
     },
@@ -93,6 +107,38 @@
           "diagnosticMode": "workspace",
           "exclude": ["**/__pycache__", "**/.venv"]
         }
+      }
+    },
+    "markdownlint": {
+      "settings": {
+        "default": true,
+        "blanks-around-fences": false,
+        "blanks-around-headings": false,
+        "blanks-around-lists": false,
+        "code-fence-style": false,
+        "emphasis-style": false,
+        "heading-start-left": false,
+        "heading-style": false,
+        "hr-style": false,
+        "line-length": {
+          "line_length": 160,
+          "code_block_line_length": 120,
+          "tables": false
+        },
+        "list-indent": false,
+        "list-marker-space": false,
+        "no-blanks-blockquote": false,
+        "no-hard-tabs": false,
+        "no-missing-space-atx": false,
+        "no-missing-space-closed-atx": false,
+        "no-multiple-blanks": false,
+        "no-multiple-space-atx": false,
+        "no-multiple-space-blockquote": false,
+        "no-multiple-space-closed-atx": false,
+        "no-trailing-spaces": false,
+        "ol-prefix": false,
+        "strong-style": false,
+        "ul-indent": false
       }
     }
   },
@@ -157,6 +203,7 @@
     "log": true,
     "lua": true,
     "make": true,
+    "markdownlint": true,
     "markdown-oxide": true,
     "nix": true,
     "nextjs-react-snippets": true,

@@ -4,5 +4,8 @@
 # Run `bat cache --build` after changes
 --theme="Catppuccin Frappe"
 
+# Disable line numbers
+--style=-numbers
+
 # Disable pager and output full file directly
 --paging=never
