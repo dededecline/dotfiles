@@ -796,6 +796,8 @@ setup_spotlight_shortcuts() {
   fi
 }
 
+WALLPAPER_OVERRIDE=false
+
 setup_wallpaper() {
   local theme_file="$SYSTEM_DIR/themes/theme.toml"
   if [[ ! -f "$theme_file" ]]; then
@@ -979,7 +981,9 @@ run_setup() {
   fi
 
   # Set wallpaper
-  setup_wallpaper
+  if [[ "$WALLPAPER_OVERRIDE" == "true" ]]; then
+    setup_wallpaper
+  fi
 
   # Reload window manager configs
   if command -v aerospace &>/dev/null; then
@@ -1061,6 +1065,7 @@ Dotfiles Setup Script (Idempotent, Multi-Machine)
 Usage:
   ./setup.sh                        Run full setup (auto-detect hostname)
   ./setup.sh --hostname <hostname>  Override hostname
+  ./setup.sh --wallpaper            Override wallpaper
   ./setup.sh --brew                 Sync Homebrew packages only
   ./setup.sh --macos                Apply macOS preferences only
   ./setup.sh --help                 Show this help message
@@ -1132,6 +1137,10 @@ main() {
         exit 1
       fi
       HOSTNAME_OVERRIDE="$1"
+      ;;
+    --wallpaper | -w)
+      shift
+      WALLPAPER_OVERRIDE=true
       ;;
     --brew | -b)
       mode="brew"
