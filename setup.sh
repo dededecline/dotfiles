@@ -467,6 +467,52 @@ cleanup_undeclared_taps() {
   fi
 }
 
+trust_declared_taps() {
+  local brewfile="$1"
+
+  if [[ ! -f "$brewfile" ]]; then
+    return 0
+  fi
+
+  if ! brew trust --help &>/dev/null; then
+    return 0
+  fi
+
+  local taps=()
+  local line
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^tap[[:space:]]+\"([^\"]+)\" ]]; then
+      taps+=("${BASH_REMATCH[1]}")
+    elif [[ "$line" =~ ^(brew|cask)[[:space:]]+\"([^\"/]+/[^\"/]+)/ ]]; then
+      taps+=("${BASH_REMATCH[2]}")
+    fi
+  done <"$brewfile"
+
+  if [[ ${#taps[@]} -eq 0 ]]; then
+    return 0
+  fi
+
+  print_info "Trusting declared third-party taps..."
+
+  local count=0
+  local seen=" "
+  local tap normalized
+  for tap in "${taps[@]}"; do
+    normalized=$(normalize_tap_name "$tap")
+    if [[ "$seen" == *" $normalized "* ]]; then
+      continue
+    fi
+    seen+="$normalized "
+
+    brew tap "$normalized" &>/dev/null || true
+    if brew trust "$normalized" &>/dev/null; then
+      count=$((count + 1))
+    fi
+  done
+
+  print_status "Trusted $count third-party tap(s)"
+}
+
 run_brew_sync() {
   print_header "Syncing Homebrew Packages ($MACHINE_HOSTNAME)"
 
@@ -497,6 +543,8 @@ run_brew_sync() {
   # Update and sync (brew bundle handles taps + mas apps natively in a single pass)
   print_info "Updating Homebrew..."
   brew update
+
+  trust_declared_taps "$brewfile"
 
   print_info "Installing packages and cleaning up..."
   if brew bundle --file="$brewfile" --force-cleanup --verbose; then

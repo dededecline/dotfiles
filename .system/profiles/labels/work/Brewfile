@@ -3,7 +3,7 @@
 # =============================================================================
 tap "auth0/auth0-cli"
 tap "fairwindsops/tap"
-tap "incident-io/taps"
+tap "incident-io/tap"
 tap "namespacelabs/namespace"
 tap "pinginc/homebrew-lrl"
 tap "signadot/tap"
@@ -22,7 +22,7 @@ brew "circleci"                            # CI runner
 brew "docker-compose"                      # Docker CLI
 brew "fairwindsops/tap/pluto"              # Kubernetes API deprecation finder
 brew "flake8"                              # Python linting
-brew "incident-io/taps/catalog-importer"   # Incident management
+brew "incident-io/tap/catalog-importer"    # Incident management
 brew "mise"                                # Dev tool version manager
 brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments

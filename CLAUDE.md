@@ -135,6 +135,16 @@ keeps the editor-agnostic toolchain (`ruff`, `basedpyright`, `pipx`). `nyx`
 (config.fish) so uv defaults to a stable interpreter; the `mise.fish` activation
 is guarded by `type -q mise`, so it no-ops on non-work machines.
 
+Tap trust: recent Homebrew refuses to load formulae/casks from non-official taps
+until they are trusted (https://docs.brew.sh/Tap-Trust). `setup.sh` handles this
+in `trust_declared_taps`, which runs `brew trust` on every declared tap right
+before `brew bundle` (trust persists in `trust.json`, so it is effectively
+one-time per tap). Two implications when editing Brewfiles: (1) always use a
+tap's **canonical** name (e.g. `incident-io/tap`, not the `incident-io/taps`
+alias that only resolves via a GitHub rename redirect) so `cleanup_undeclared_taps`
+does not churn it untap/retap every run; (2) new non-official taps are trusted
+automatically on the next sync, no manual `brew trust` needed.
+
 Keep entries alphabetized within each subsection of every `labels/*/Brewfile`. A
 subsection is the contiguous block under a `#` comment header (both the
 `# ===...===` major sections and the minor `# Category` headers inside
