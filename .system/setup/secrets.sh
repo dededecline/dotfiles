@@ -570,15 +570,9 @@ HELPER
   # Refresh global Claude instructions from 1Password
   inject_claude_global
 
-  # Inject npm token from Keychain
-  local npm_token
-  npm_token=$(security find-generic-password -a "$USER" -s "npm_token" -w 2>/dev/null || true)
-  if [[ -n "$npm_token" ]]; then
-    printf '//registry.npmjs.org/:_authToken=%s\n' "$npm_token" >"$SENSITIVE_DIR/.npmrc"
-    chmod 600 "$SENSITIVE_DIR/.npmrc"
-    print_status "npm token → .npmrc"
-  else
-    print_warning "npm_token not found in Keychain — skipping .npmrc"
+  # Inject npm token from 1Password
+  if [[ -f "$TEMPLATES_DIR/npmrc.tpl" ]]; then
+    inject_template "$TEMPLATES_DIR/npmrc.tpl" "$SENSITIVE_DIR/.npmrc" "npm token" "$OP_PERSONAL_ACCOUNT"
   fi
 
   # Symlink fastfetch logo based on hostname

@@ -11,6 +11,15 @@ with actual values from 1Password.
 3. Add injection logic to `.system/setup/secrets.sh`
 4. Update this README with setup instructions
 
+### npm Token
+
+`npmrc.tpl` injects the npm registry auth token into `.system/sensitive/.npmrc`
+(symlinked to `~/.npmrc`). It reads `op://Private/Npmjs/authToken`, so the
+`Npmjs` item in the Private vault must have a field named `authToken` holding an
+npm access token (create one at npmjs.com > Access Tokens, or `npm token create`).
+The token was previously stored in the macOS Keychain, which does not survive a
+machine reset; 1Password does.
+
 ### Adding New Claude Skills (Work-Specific)
 
 For work-specific Claude skills:

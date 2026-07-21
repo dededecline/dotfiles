@@ -28,10 +28,6 @@ cask "tailscale-app"            # Mesh VPN
 # Browsers
 cask "ungoogled-chromium"       # Chromium with Google integration removed
 
-# Communication
-cask "slack"                    # Team communication
-cask "zoom"                     # Video conferencing
-
 # Development
 cask "claude"                   # Claude Desktop
 cask "codex"                    # OpenAI Codex CLI

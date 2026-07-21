@@ -844,8 +844,6 @@ setup_spotlight_shortcuts() {
   fi
 }
 
-WALLPAPER_OVERRIDE=false
-
 setup_wallpaper() {
   local theme_file="$SYSTEM_DIR/themes/theme.toml"
   if [[ ! -f "$theme_file" ]]; then
@@ -889,8 +887,14 @@ setup_wallpaper() {
   fi
 
   print_info "Setting wallpaper..."
-  osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$wallpaper\""
-  print_status "Wallpaper: $(basename "$wallpaper") applied to all desktops"
+
+  if command -v wallpaper &>/dev/null; then
+    wallpaper set "$wallpaper"
+    print_status "Wallpaper: $(basename "$wallpaper") applied to all desktops"
+  else
+    osascript -e "tell application \"System Events\" to tell every desktop to set picture to \"$wallpaper\"" 2>/dev/null || true
+    print_warning "wallpaper CLI not found (brew install wallpaper); used AppleScript fallback, which no-ops on macOS 26"
+  fi
 }
 
 setup_docker() {
@@ -1028,11 +1032,6 @@ run_setup() {
     source "$DOTFILES/.system/setup/tailscale.sh"
   fi
 
-  # Set wallpaper
-  if [[ "$WALLPAPER_OVERRIDE" == "true" ]]; then
-    setup_wallpaper
-  fi
-
   # Reload window manager configs
   if command -v aerospace &>/dev/null; then
     if pgrep -q AeroSpace; then
@@ -1092,6 +1091,16 @@ run_brew() {
   print_header "Homebrew Sync Complete!"
 }
 
+run_wallpaper() {
+  print_header "Wallpaper"
+
+  bootstrap_common
+
+  setup_wallpaper
+
+  print_header "Wallpaper Applied!"
+}
+
 run_macos() {
   print_header "macOS Preferences"
 
@@ -1113,7 +1122,7 @@ Dotfiles Setup Script (Idempotent, Multi-Machine)
 Usage:
   ./setup.sh                        Run full setup (auto-detect hostname)
   ./setup.sh --hostname <hostname>  Override hostname
-  ./setup.sh --wallpaper            Override wallpaper
+  ./setup.sh --wallpaper            Set desktop wallpaper only
   ./setup.sh --brew                 Sync Homebrew packages only
   ./setup.sh --macos                Apply macOS preferences only
   ./setup.sh --help                 Show this help message
@@ -1187,8 +1196,7 @@ main() {
       HOSTNAME_OVERRIDE="$1"
       ;;
     --wallpaper | -w)
-      shift
-      WALLPAPER_OVERRIDE=true
+      mode="wallpaper"
       ;;
     --brew | -b)
       mode="brew"
@@ -1219,6 +1227,9 @@ main() {
     ;;
   macos)
     run_macos
+    ;;
+  wallpaper)
+    run_wallpaper
     ;;
   esac
 }

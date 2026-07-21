@@ -8,6 +8,7 @@ tap "namespacelabs/namespace"
 tap "pinginc/homebrew-lrl"
 tap "signadot/tap"
 tap "spacelift-io/spacelift"
+tap "terraform-linters/tap"
 
 # =============================================================================
 # DevOps Tools
@@ -31,21 +32,17 @@ brew "openjdk@21"                          # Java
 brew "oxfmt"                               # Formatting
 brew "oxlint"                              # Linting
 brew "pnpm"                                # NPM package manager
+brew "powershell"                          # PowerShell
 brew "pytest"                              # Python testing framework
 brew "signadot/tap/signadot-cli"           # Sandbox Environments
 brew "stencil"                             # Template management
 brew "terraform-docs"                      # Terraform documentation
-brew "tflint"                              # Terraform linter
 brew "trivy"                               # Security scanner
 brew "vercel-cli"                          # Vercel CLI
 
 # =============================================================================
 # Applications (Casks)
 # =============================================================================
-
-# Cloud Storage
-cask "google-drive"             # Google Drive sync
-
 # Communication
 cask "granola"                  # Meeting notes
 cask "microsoft-teams"          # Team collaboration
@@ -53,14 +50,10 @@ cask "microsoft-teams"          # Team collaboration
 # Development
 cask "codex"                               # Codex CLI
 cask "mongodb-compass"                     # MongoDB GUI
-cask "powershell"                          # PowerShell
 cask "spacelift-io/spacelift/spacectl"     # Infrastructure CD
+cask "terraform-linters/tap/tflint"        # Terraform linter
 
 # Internal Tools
 cask "akuity"                   # Akuity (lrl dependency)
 cask "lrl"                      # Internal CLI
 cask "sdm"                      # StrongDM (lrl dependency)
-
-# Productivity
-cask "microsoft-excel"          # Spreadsheets
-cask "microsoft-word"           # Word processor
