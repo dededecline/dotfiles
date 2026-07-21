@@ -1,7 +1,7 @@
 # Secret Templates
 
-This directory contains template files with 1Password references.
-The `.system/setup/secrets.sh` script uses `op inject` to populate these templates
+This directory contains template files with 1Password references. The
+`.system/setup/secrets.sh` script uses `op inject` to populate these templates
 with actual values from 1Password.
 
 ## Adding New Secrets
@@ -14,18 +14,21 @@ with actual values from 1Password.
 ### npm Token
 
 `npmrc.tpl` injects the npm registry auth token into `.system/sensitive/.npmrc`
-(symlinked to `~/.npmrc`). It reads `op://Private/Npmjs/authToken`, so the
-`Npmjs` item in the Private vault must have a field named `authToken` holding an
-npm access token (create one at npmjs.com > Access Tokens, or `npm token create`).
-The token was previously stored in the macOS Keychain, which does not survive a
-machine reset; 1Password does.
+(symlinked to `~/.npmrc`). It reads `op://Private/npm-local/credential`, so the
+`Npmjs` item in the Private vault must have a field named `credential` holding
+an npm access token (create one at npmjs.com > Access Tokens, or
+`npm token create`). The token was previously stored in the macOS Keychain,
+which does not survive a machine reset; 1Password does.
 
 ### Adding New Claude Skills (Work-Specific)
 
 For work-specific Claude skills:
+
 1. Create the SKILL.md file locally
-2. Upload to 1Password: `op document create SKILL.md --title "claude-skill-<name>" --vault "Private"`
-3. Add the skill name mapping to `inject_claude_skills()` in `.system/setup/secrets.sh`
+2. Upload to 1Password:
+   `op document create SKILL.md --title "claude-skill-<name>" --vault "Private"`
+3. Add the skill name mapping to `inject_claude_skills()` in
+   `.system/setup/secrets.sh`
 4. Add the skill to `.gitignore` under work-specific Claude skills
 
 ## Usage

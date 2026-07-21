@@ -1,14 +1,14 @@
 # =============================================================================
 # Taps
 # =============================================================================
-tap "auth0/auth0-cli"
-tap "fairwindsops/tap"
-tap "incident-io/tap"
-tap "namespacelabs/namespace"
-tap "pinginc/homebrew-lrl"
-tap "signadot/tap"
-tap "spacelift-io/spacelift"
-tap "terraform-linters/tap"
+tap "auth0/auth0-cli", trusted: true
+tap "fairwindsops/tap", trusted: true
+tap "incident-io/tap", trusted: true
+tap "namespacelabs/namespace", trusted: true
+tap "pinginc/homebrew-lrl", trusted: true
+tap "signadot/tap", trusted: true
+tap "spacelift-io/spacelift", trusted: true
+tap "terraform-linters/tap", trusted: true
 
 # =============================================================================
 # DevOps Tools

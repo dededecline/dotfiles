@@ -135,15 +135,23 @@ keeps the editor-agnostic toolchain (`ruff`, `basedpyright`, `pipx`). `nyx`
 (config.fish) so uv defaults to a stable interpreter; the `mise.fish` activation
 is guarded by `type -q mise`, so it no-ops on non-work machines.
 
-Tap trust: recent Homebrew refuses to load formulae/casks from non-official taps
-until they are trusted (https://docs.brew.sh/Tap-Trust). `setup.sh` handles this
-in `trust_declared_taps`, which runs `brew trust` on every declared tap right
-before `brew bundle` (trust persists in `trust.json`, so it is effectively
-one-time per tap). Two implications when editing Brewfiles: (1) always use a
-tap's **canonical** name (e.g. `incident-io/tap`, not the `incident-io/taps`
-alias that only resolves via a GitHub rename redirect) so `cleanup_undeclared_taps`
-does not churn it untap/retap every run; (2) new non-official taps are trusted
-automatically on the next sync, no manual `brew trust` needed.
+Tap trust: recent Homebrew refuses to load formulae/casks from non-official
+taps until they are trusted (https://docs.brew.sh/Tap-Trust);
+`HOMEBREW_REQUIRE_TAP_TRUST` defaults to on. Trust is declared **natively in
+the Brewfiles** via the bundle `trusted:` option: every third-party `tap` line
+carries `, trusted: true` (e.g. `tap "nikitabobko/tap", trusted: true`), which
+trusts the whole tap and covers any qualified `brew`/`cask` ref under it.
+`brew bundle` owns trust end-to-end: it applies `trusted:` options before it
+loads anything (so a cold, untrusted machine still installs), and its
+`--force-cleanup` pass rewrites the trust store to exactly the Brewfile-declared
+set on every run (idempotent). Do **not** re-add a custom `brew trust` step in
+`setup.sh`: `brew bundle --force-cleanup` calls `Homebrew::Trust.replace!` with
+only the Brewfile's `trusted:` entries, so anything trusted outside the Brewfile
+is wiped every sync (this was the old `trust_declared_taps` bug). When editing
+Brewfiles: (1) add `, trusted: true` to any new third-party `tap` line;
+(2) always use a tap's **canonical** name (e.g. `incident-io/tap`, not the
+`incident-io/taps` alias that only resolves via a GitHub rename redirect) so
+`cleanup_undeclared_taps` does not churn it untap/retap every run.
 
 Keep entries alphabetized within each subsection of every `labels/*/Brewfile`. A
 subsection is the contiguous block under a `#` comment header (both the
