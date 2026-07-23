@@ -7,7 +7,6 @@ brew "yt-dlp"                   # Video downloader
 # =============================================================================
 # Applications (Casks)
 # =============================================================================
-cask "1password"                # Password manager
 cask "discord"                  # Chat platform
 cask "element"                  # Matrix client
 cask "handbrake-app"            # Video encoder
@@ -15,7 +14,6 @@ cask "obs"                      # Streaming/recording
 cask "proton-mail"              # Encrypted email
 cask "proton-mail-bridge"       # Email bridge
 cask "signal"                   # E2EE Communication
-cask "slack"                    # Team communication
 cask "zoom"                     # Video conferencing
 
 # =============================================================================
