@@ -179,8 +179,8 @@ detect_and_validate_hostname() {
   export MACHINE_HOSTNAME
 }
 
-# Preprocess files with machine markers, e.g. `// @machine:Naomi-Klein-MacBook-Pro` / `// @end:Naomi-Klein-MacBook-Pro`
-# (JSONC) or `# @machine:Naomi-Klein-MacBook-Pro` / `# @end:Naomi-Klein-MacBook-Pro` (TOML / shell).
+# Preprocess files with machine markers, e.g. `// @machine:Naomi-Klein-HF7C7K3WJX` / `// @end:Naomi-Klein-HF7C7K3WJX`
+# (JSONC) or `# @machine:Naomi-Klein-HF7C7K3WJX` / `# @end:Naomi-Klein-HF7C7K3WJX` (TOML / shell).
 # Tags accept hostnames or group names (laptop, work, server, ...).
 #
 # Filters the input by the current machine's group membership and writes the

@@ -341,6 +341,13 @@ check_secrets() {
       all_configured=false
     fi
 
+    if [[ -f "$SENSITIVE_DIR/spacelift-api-key.fish" ]]; then
+      print_status "Spacelift API key: configured"
+    else
+      print_warning "Spacelift API key: not configured"
+      all_configured=false
+    fi
+
     # Check work-specific Claude skills
     local work_skills=("argocd" "astro" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
     for skill in "${work_skills[@]}"; do
@@ -522,6 +529,10 @@ inject_secrets() {
     # Inject clone.fish with work org
     if [[ -f "$TEMPLATES_DIR/clone.fish.tpl" ]]; then
       inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function" "$OP_PERSONAL_ACCOUNT"
+    fi
+
+    if [[ -f "$TEMPLATES_DIR/spacelift-api-key.tpl" ]]; then
+      inject_template "$TEMPLATES_DIR/spacelift-api-key.tpl" "$SENSITIVE_DIR/spacelift-api-key.fish" "Spacelift API key" "$OP_WORK_ACCOUNT"
     fi
 
     # Retrieve work-specific Claude skills from 1Password
