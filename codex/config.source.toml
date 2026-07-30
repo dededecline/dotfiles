@@ -2,7 +2,7 @@
 #
 # Generated to codex/config.toml by setup.sh per machine, with
 # `# @machine:<tag>` / `# @end:<tag>` blocks filtered for the host.
-# Tags accept hostnames or group names (Naomi-Klein-HF7C7K3WJX, athena, nyx, laptop,
+# Tags accept hostnames or group names (MacBook-Pro-HF7C7K3WJX, athena, nyx, laptop,
 # personal, work, infra, server, creative, all).
 #
 # Codex reads this from $CODEX_HOME/config.toml. CODEX_HOME is set to
@@ -57,7 +57,7 @@ args = ["mcp"]
 # url = "https://mcp.notion.com/mcp"
 # @end:athena
 
-# @machine:Naomi-Klein-HF7C7K3WJX
+# @machine:MacBook-Pro-HF7C7K3WJX
 # Claude's Laurel plugin uses Linear's SSE endpoint; Codex uses Linear's
 # streamable HTTP endpoint.
 [mcp_servers.linear-server]
@@ -84,7 +84,7 @@ url = "https://mcp.figma.com/mcp"
 [mcp_servers.granola]
 url = "https://mcp.granola.ai/mcp"
 
-# @end:Naomi-Klein-HF7C7K3WJX
+# @end:MacBook-Pro-HF7C7K3WJX
 
 # -----------------------------------------------------------------------------
 # Trusted projects

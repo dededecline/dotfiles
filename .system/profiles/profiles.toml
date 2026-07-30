@@ -1,7 +1,7 @@
 [athena]
 groups = ["all", "laptop", "personal", "creative"]
 
-[Naomi-Klein-HF7C7K3WJX]
+[MacBook-Pro-HF7C7K3WJX]
 groups = ["all", "infra", "laptop", "work"]
 
 [nyx]

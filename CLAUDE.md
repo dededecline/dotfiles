@@ -1,13 +1,13 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working  
- with code in this repository.
+with code in this repository.
 
 ## Overview
 
 This is a macOS dotfiles repository managed as a git repo in ~/.config. It  
- uses Fish shell as the primary shell with Starship prompt and Catppuccin  
- Frappe theming throughout.
+uses Fish shell as the primary shell with Starship prompt and Catppuccin  
+Frappe theming throughout.
 
 ## Key Commands
 
@@ -57,17 +57,17 @@ during full setup.
 ### Setup Script
 
 The setup.sh script is fully idempotent - run it anytime to ensure  
- everything  
- is configured:
+everything  
+is configured:
 
 • Installs Xcode CLT and Homebrew (if missing)  
- • Clones dotfiles repository (if missing)  
- • Injects secrets from 1Password (if authenticated)  
- • Syncs Homebrew packages (declarative with --force-cleanup) • Syncs theme
+• Clones dotfiles repository (if missing)  
+• Injects secrets from 1Password (if authenticated)  
+• Syncs Homebrew packages (declarative with --force-cleanup) • Syncs theme
 colors to all tool configs • Generates Claude settings from machine-filtered
 JSONC • Creates symlinks • Configures Fish shell as default  
- • Installs Fisher and TPM  
- • Applies macOS system preferences
+• Installs Fisher and TPM  
+• Applies macOS system preferences
 
 Use --brew or --macos flags to run only those specific tasks.
 
@@ -77,13 +77,13 @@ The .system/macos/.macos script sets system defaults via defaults write
 commands:
 
 • **UI**: Dark mode, auto-hide menu bar, expanded save panels  
- • **Input**: Key repeat enabled, smart punctuation disabled, auto-correct  
- disabled  
- • **Finder**: POSIX path in title, hidden files visible, no desktop icons  
- • **Screenshots**: PNG format, no shadow, saves to clipboard  
- • **Sound**: System beep disabled  
- • **Trackpad**: Tap to click disabled  
- • **Security**: Touch ID for sudo authentication
+• **Input**: Key repeat enabled, smart punctuation disabled, auto-correct  
+disabled  
+• **Finder**: POSIX path in title, hidden files visible, no desktop icons  
+• **Screenshots**: PNG format, no shadow, saves to clipboard  
+• **Sound**: System beep disabled  
+• **Trackpad**: Tap to click disabled  
+• **Security**: Touch ID for sudo authentication
 
 Run standalone with ./setup.sh --macos.
 
@@ -99,12 +99,12 @@ belongs to, then fed to `brew bundle`.
 ├── profiles.toml            # Machine-to-group membership (sole source of truth)
 ├── labels/                  # Edit these — source of truth
 │   ├── all/Brewfile         # All machines
-│   ├── laptop/Brewfile      # Laptop machines (athena, Naomi-Klein-HF7C7K3WJX)
+│   ├── laptop/Brewfile      # Laptop machines (athena, MacBook-Pro-HF7C7K3WJX)
 │   ├── personal/Brewfile    # Personal machines (athena only)
 │   ├── creative/Brewfile    # Gaming / DAWs (athena only)
-│   ├── infra/Brewfile       # Infrastructure machines (Naomi-Klein-HF7C7K3WJX, nyx)
+│   ├── infra/Brewfile       # Infrastructure machines (MacBook-Pro-HF7C7K3WJX, nyx)
 │   ├── server/Brewfile      # Server machines (nyx only)
-│   └── work/Brewfile        # Work group (Naomi-Klein-HF7C7K3WJX only)
+│   └── work/Brewfile        # Work group (MacBook-Pro-HF7C7K3WJX only)
 └── machines/                # Generated output — gitignored
     └── <hostname>/Brewfile  # Written by setup.sh prepare_brewfile()
 ```
@@ -120,7 +120,7 @@ groups. The `work` group gates 1Password work-account integration and work
 secrets.
 
 Notes on label assignments worth remembering: • `creative` is athena-only
-(gaming + DAW content that shouldn't reach Naomi-Klein-HF7C7K3WJX or nyx). •
+(gaming + DAW content that shouldn't reach MacBook-Pro-HF7C7K3WJX or nyx). •
 Claude Desktop (`cask "claude"`) lives in `laptop` — not `all` — so the server
 (nyx) doesn't install a GUI app it can't use. • Claude Code CLI is installed via
 the native installer (curl `claude.ai/install.sh`), not Homebrew. See
@@ -129,16 +129,16 @@ plugin marketplaces and updates all installed user-scope plugins to their latest
 versions via `update_claude_plugins` (uses `claude plugin     list --json` +
 `claude plugin update`; restart Claude Code to apply). • Python version
 management is split by group: `uv` lives in `personal` (athena), `mise` in
-`work` (Naomi-Klein-HF7C7K3WJX). `pyenv` was removed. The shared `all` group
+`work` (MacBook-Pro-HF7C7K3WJX). `pyenv` was removed. The shared `all` group
 keeps the editor-agnostic toolchain (`ruff`, `basedpyright`, `pipx`). `nyx`
 (server) intentionally gets no version manager. Fish sets `UV_PYTHON=3.14`
 (config.fish) so uv defaults to a stable interpreter; the `mise.fish` activation
 is guarded by `type -q mise`, so it no-ops on non-work machines.
 
-Tap trust: recent Homebrew refuses to load formulae/casks from non-official
-taps until they are trusted (https://docs.brew.sh/Tap-Trust);
-`HOMEBREW_REQUIRE_TAP_TRUST` defaults to on. Trust is declared **natively in
-the Brewfiles** via the bundle `trusted:` option: every third-party `tap` line
+Tap trust: recent Homebrew refuses to load formulae/casks from non-official taps
+until they are trusted (https://docs.brew.sh/Tap-Trust);
+`HOMEBREW_REQUIRE_TAP_TRUST` defaults to on. Trust is declared **natively in the
+Brewfiles** via the bundle `trusted:` option: every third-party `tap` line
 carries `, trusted: true` (e.g. `tap "nikitabobko/tap", trusted: true`), which
 trusts the whole tap and covers any qualified `brew`/`cask` ref under it.
 `brew bundle` owns trust end-to-end: it applies `trusted:` options before it
@@ -148,8 +148,8 @@ set on every run (idempotent). Do **not** re-add a custom `brew trust` step in
 `setup.sh`: `brew bundle --force-cleanup` calls `Homebrew::Trust.replace!` with
 only the Brewfile's `trusted:` entries, so anything trusted outside the Brewfile
 is wiped every sync (this was the old `trust_declared_taps` bug). When editing
-Brewfiles: (1) add `, trusted: true` to any new third-party `tap` line;
-(2) always use a tap's **canonical** name (e.g. `incident-io/tap`, not the
+Brewfiles: (1) add `, trusted: true` to any new third-party `tap` line; (2)
+always use a tap's **canonical** name (e.g. `incident-io/tap`, not the
 `incident-io/taps` alias that only resolves via a GitHub rename redirect) so
 `cleanup_undeclared_taps` does not churn it untap/retap every run.
 
@@ -165,7 +165,7 @@ pre-group by type.
 ### Secrets System
 
 The secrets system uses 1Password CLI (op inject) to populate sensitive  
- values:
+values:
 
 1. **Templates** (.system/templates/\*.tpl) - Files with
    {{ op://Vault/Item/Field }} references
@@ -184,7 +184,7 @@ To add a new secret:
 Traditional dotfiles that expect ~/. are symlinked:
 
 • git/config → ~/.gitconfig  
- • .system/sensitive/.npmrc → ~/.npmrc
+• .system/sensitive/.npmrc → ~/.npmrc
 
 ### Display Monitor System
 
@@ -245,8 +245,8 @@ To change themes: edit `.system/themes/theme.toml`, run
 `claude/settings.jsonc` is the source of truth for Claude Code settings.
 `claude/settings.json` is generated by `setup.sh` using `@machine:<name>` /
 `@end:<name>` markers. Markers accept hostnames or group names: •
-`// @machine:Naomi-Klein-HF7C7K3WJX` — only on Naomi-Klein-HF7C7K3WJX •
-`// @machine:laptop` — on Naomi-Klein-HF7C7K3WJX + athena •
+`// @machine:MacBook-Pro-HF7C7K3WJX` — only on MacBook-Pro-HF7C7K3WJX •
+`// @machine:laptop` — on MacBook-Pro-HF7C7K3WJX + athena •
 `// @machine:personal` — on athena
 
 Python type-checking in Claude Code uses **basedpyright** (matching Zed), via a
@@ -265,9 +265,9 @@ To modify settings: edit `claude/settings.jsonc`, then run `./setup.sh`.
 `codex/config.source.toml` is the source of truth for OpenAI Codex CLI settings.
 `codex/config.toml` is generated by `setup.sh` using the same `@machine:<name>`
 / `@end:<name>` markers as Claude, with `#` comment prefixes (TOML-native)
-instead of `//`: • `# @machine:Naomi-Klein-HF7C7K3WJX` — only on
-Naomi-Klein-HF7C7K3WJX • `# @machine:athena` — only on athena •
-`# @machine:laptop` — on Naomi-Klein-HF7C7K3WJX + athena
+instead of `//`: • `# @machine:MacBook-Pro-HF7C7K3WJX` — only on
+MacBook-Pro-HF7C7K3WJX • `# @machine:athena` — only on athena •
+`# @machine:laptop` — on MacBook-Pro-HF7C7K3WJX + athena
 
 `CODEX_HOME=$HOME/.config/codex` is exported in `fish/config.fish` so Codex
 reads the generated config directly from this dir (mirrors `CLAUDE_CONFIG_DIR`).
@@ -315,7 +315,7 @@ To change kitty's font:
 
 ### Remote Access
 
-Remote desktop and SSH access from laptops (Naomi-Klein-HF7C7K3WJX, athena) to
+Remote desktop and SSH access from laptops (MacBook-Pro-HF7C7K3WJX, athena) to
 server (nyx) via RustDesk over Tailscale.
 
 **Server (nyx):**
@@ -326,7 +326,7 @@ server (nyx) via RustDesk over Tailscale.
 - SSH restricted to Tailscale interface (`ListenAddress` set by `tailscale.sh`)
 - macOS Application Firewall enabled in stealth mode
 
-**Laptops (Naomi-Klein-HF7C7K3WJX, athena):**
+**Laptops (MacBook-Pro-HF7C7K3WJX, athena):**
 
 - `cask "tailscale-app"` (GUI) — one-time manual step: Settings > Install CLI
   integration
@@ -344,20 +344,33 @@ server (nyx) via RustDesk over Tailscale.
   Privacy & Security)
 - Tailscale: `tailscale up` to authenticate, disable key expiry in admin console
 
-**Manual steps — laptops (Naomi-Klein-HF7C7K3WJX, athena):**
+**Manual steps — laptops (MacBook-Pro-HF7C7K3WJX, athena):**
 
 - Tailscale: Allow Network Extension when prompted, Settings > Install CLI
   integration
 
-**Claude Code auth:** Uses `apiKeyHelper` in `~/.claude/settings.json` to read
-the API key via a helper script. No env var or OAuth needed — works in both
-local and SSH sessions without Keychain access.
+**Claude Code auth:** API-key auth is a **server-only (nyx) concept**. Laptops
+(athena, MacBook-Pro-HF7C7K3WJX) use claude.ai login auth: run `claude` and log
+in once per machine.
 
+nyx runs headless over SSH with no Keychain access, so it cannot complete a
+login flow. It alone uses `apiKeyHelper`, which reads the key via a helper
+script (no env var or OAuth needed).
+
+- Gating: `"apiKeyHelper"` sits in a `// @machine:server` block in
+  `claude/settings.jsonc`, and `secrets.sh` injects the key and generates the
+  helper only for the `server` group. `secrets --check` reports on both only
+  for server machines.
 - Helper script: `~/.config/.system/sensitive/claude-api-key-helper.sh` (reads
-  `anthropic-api-key` from the same sensitive directory)
-- Config: `"apiKeyHelper"` in `claude/settings.jsonc` (source of truth;
-  `setup.sh` generates `claude/settings.json` from it; does NOT work in
-  `~/.claude.json`)
+  `anthropic-api-key` from the same sensitive directory, from
+  `op://Private/anthropic-claude-api`)
+- `claude/settings.jsonc` is the source of truth; `setup.sh` generates
+  `claude/settings.json` from it. `apiKeyHelper` does NOT work in
+  `~/.claude.json`.
+
+Do **not** add `apiKeyHelper` to a laptop. When Claude Code resolves auth from
+an API key it stops loading claude.ai connectors entirely, so every org
+connector (Gmail, Drive, Calendar, Slack, ...) silently disappears.
 
 ### Global Claude Instructions
 
@@ -403,18 +416,18 @@ Custom functions in fish/functions/:
 
 • refresh - Reload configured processes (aerospace, sketchybar, fish, tmux) •
 secrets - Wrapper for secrets.sh  
- • gitdone - Switch to default branch and pull  
- • clone - Clone work repos with archive detection  
- • empty - Create empty commit with CI identity for triggering pipelines  
- • awsall - Run AWS CLI command across all profiles
+• gitdone - Switch to default branch and pull  
+• clone - Clone work repos with archive detection  
+• empty - Create empty commit with CI identity for triggering pipelines  
+• awsall - Run AWS CLI command across all profiles
 
 ### Key Aliases
 
 Modern CLI replacements (in fish/conf.d/aliases.fish):
 
 • ls → lsd, cat → bat, find → fd, diff → difft, top → btop  
- • k → kubectl, tf → tofu, vim → nvim  
- • dotfiles - cd to ~/.config
+• k → kubectl, tf → tofu, vim → nvim  
+• dotfiles - cd to ~/.config
 
 ### Local Overrides
 
@@ -425,18 +438,52 @@ Untracked files for machine-specific config:
 ### Development Instructions
 
 • Always protect the user's name, email address, place of work, and other  
- sensitive data behind templates and 1Password  
- • Always check if CLAUDE.md, README.md, and/or Commands.md need updating  
- after making changes/updates  
- • Always make package/application changes programatically via homebrew  
- (ideally) or mas (if necessary)  
- • ALways develop idempotently  
- • Always add theming if possible. Currently, everything is themed to  
- Catppuccin Frappe with Lavender Accents  
- • Always attempt the simplest possible coding output solutions to a problem
+sensitive data behind templates and 1Password  
+• Always check if CLAUDE.md, README.md, and/or Commands.md need updating  
+after making changes/updates  
+• Always make package/application changes programatically via homebrew  
+(ideally) or mas (if necessary)  
+• ALways develop idempotently  
+• Always add theming if possible. Currently, everything is themed to  
+Catppuccin Frappe with Lavender Accents  
+• Always attempt the simplest possible coding output solutions to a problem
 
 • Always ensure that templated/protected files' generated output are excluded
 from commit in the gitignore
+
+### Tests
+
+    bash .system/tests/test-profiles.sh
+    bash .system/tests/test-settings-generation.sh
+
+Plain bash, no framework: each check prints a line and the suite exits non-zero
+if any fail.
+
+`test-profiles.sh` unit-tests `.system/setup/lib/profiles.sh` against a fixture
+`profiles.toml` in a temp dir (`PROFILES_TOML` is overridable for exactly this
+reason).
+
+`test-settings-generation.sh` covers `setup.sh` marker filtering against the
+real `claude/settings.jsonc`, pinning which machine gets which gated block
+(notably that `apiKeyHelper` reaches nyx and neither laptop), that every
+machine's output is valid JSON, and that a failed generation leaves the
+existing `settings.json` intact. It sources `setup.sh` with its trailing
+`main "$@"` line stripped, then `set +e` to re-enable failure assertions.
+
+Two traps that section guards against: `configure_claude` redirects with `>`,
+which truncates on open, so an unchecked `jq` failure wipes `settings.json`;
+and `settings.jsonc` may only contain `@machine`/`@end` marker comments, since
+any other `//` line survives preprocessing and then breaks `jq`.
+
+`get_machine_groups` **errors to stderr and returns 1 for a hostname with no
+section in profiles.toml**, rather than defaulting to `all <hostname>`. The old
+silent default meant a renamed machine quietly lost every group-gated block
+(`@machine:work` and friends) from its generated config instead of failing.
+
+Callers must check it explicitly (`groups=$(get_machine_groups "$h") || return 1`).
+Do not rely on `set -e` to propagate the failure: it is suppressed inside
+`if`/`&&` conditions and that suppression extends into the called function's
+body, and `symlinks.sh` does not set `-e` at all.
 
 ### Shell Script Quality (shellcheck)
 
