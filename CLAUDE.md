@@ -240,6 +240,34 @@ script (`.system/setup/sync-theme.sh`) propagates colors to all tool configs:
 To change themes: edit `.system/themes/theme.toml`, run
 `.system/setup/sync-theme.sh`.
 
+### Fastfetch Logos
+
+One ASCII logo per machine: `fastfetch/logo_<hostname>.txt`.
+`fastfetch/logo.txt` is a **gitignored symlink** created from `$MACHINE_HOSTNAME`
+by `secrets.sh` (`inject_secrets`), so never edit `logo.txt` directly. Edit the
+`logo_<hostname>.txt` file.
+
+Logos render as horizontal colour stripes. Because `logo.type` is `"file"`
+("printed with color code replacement"), fastfetch substitutes `$1`…`$9` in the
+art with the matching `logo.color.N` from `config.jsonc`; the placeholders are
+excluded from the computed logo width, so they do not shift the info column.
+Every art line therefore starts with a `$N` prefix.
+
+Stripe order (`logo.color.1`→`7`) mirrors the module list bottom-to-top, led by
+the accent: lavender, blue, mauve, red, maroon, flamingo, rosewater. So the logo
+runs cool-to-warm downward while the modules run warm-to-cool.
+
+Stripe widths are as even as possible (max 1 row apart) and mirrored about the
+centre, since the 16-row logos are vertically symmetric: 16 rows →
+`2,2,3,2,3,2,2`; athena's 25 visible rows → `4,3,4,3,4,3,4`. Leading blank lines
+ride along with stripe 1 rather than consuming one of its rows.
+
+When adding a machine logo, prefix every line with `$1`…`$7` in order.
+`sync_fastfetch` in `sync-theme.sh` keeps colours 1-7 (and the separator) in step
+with the palette. Note it does **not** rewrite the module `keyColor` values,
+which are hardcoded in the `modules` array; a flavour change leaves those stale
+and they surface as `unknown color pattern` warnings.
+
 ### Claude Settings
 
 `claude/settings.jsonc` is the source of truth for Claude Code settings.

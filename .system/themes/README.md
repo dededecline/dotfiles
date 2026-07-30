@@ -29,6 +29,12 @@ This directory contains the centralized theme configuration.
 | Flavor string | `nvim`, `tmux`, `bat`, `atuin/config.toml`, `kitty` | Flavor name updated via sed |
 | Upstream | `kitty.conf`, `bat.tmTheme`, `glow/*.json`, `zed/themes/*.json` | Not auto-synced (manual download for flavor changes) |
 
+For `fastfetch/config.jsonc`, `sync_fastfetch` also rewrites the seven
+`logo.color` stripe values and the separator via sed, on top of the marker
+section. The module `keyColor` values are not rewritten and go stale on a flavor
+change (reported as `unknown color pattern` warnings). See the Fastfetch Logos
+section in the root `CLAUDE.md` for the `$1`…`$7` striping contract.
+
 ## Changing the Theme
 
 1. Edit `.system/themes/theme.toml` (set flavor and accent)

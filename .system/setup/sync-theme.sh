@@ -366,8 +366,13 @@ sync_fastfetch() {
   content="  // Lavender: ${lavender_rgb} | Rosewater: ${rosewater_rgb} | Flamingo: ${flamingo_rgb} | Maroon: ${maroon_rgb} | Red: ${red_rgb} | Mauve: ${mauve_rgb} | Blue: ${blue_rgb}"
   replace_theme_section "$file" "$content"
 
-  # Update logo color (lavender)
-  sed -i '' "s|\"1\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"1\": \"${lavender_rgb}\"|" "$file"
+  # Update logo stripe colors, mirroring the module list bottom-to-top
+  local stripes i n
+  stripes=("$lavender_rgb" "$blue_rgb" "$mauve_rgb" "$red_rgb" "$maroon_rgb" "$flamingo_rgb" "$rosewater_rgb")
+  for i in "${!stripes[@]}"; do
+    n=$((i + 1))
+    sed -i '' "s|\"${n}\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"${n}\": \"${stripes[$i]}\"|" "$file"
+  done
 
   # Update separator color (overlay2)
   sed -i '' "s|\"separator\": \"38;2;[0-9]*;[0-9]*;[0-9]*\"|\"separator\": \"${overlay2_rgb}\"|" "$file"
