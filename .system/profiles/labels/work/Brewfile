@@ -4,6 +4,7 @@
 tap "auth0/auth0-cli", trusted: true
 tap "fairwindsops/tap", trusted: true
 tap "incident-io/tap", trusted: true
+tap "launchdarkly/homebrew-tap", trusted: true
 tap "namespacelabs/namespace", trusted: true
 tap "pinginc/homebrew-lrl", trusted: true
 tap "signadot/tap", trusted: true
@@ -24,6 +25,7 @@ brew "docker-compose"                      # Docker CLI
 brew "fairwindsops/tap/pluto"              # Kubernetes API deprecation finder
 brew "flake8"                              # Python linting
 brew "incident-io/tap/catalog-importer"    # Incident management
+brew "launchdarkly/homebrew-tap/ldcli"     # LaunchDarkly CLI
 brew "mise"                                # Dev tool version manager
 brew "mongodb-atlas-cli"                   # Database CLI
 brew "namespacelabs/namespace/nsc"         # Ephemeral environments

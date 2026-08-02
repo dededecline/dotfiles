@@ -72,6 +72,7 @@ brew "wallpaper"                # Set desktop wallpaper
 # =============================================================================
 
 # Password & Security
+cask "1password"                # Password manager
 cask "1password-cli"            # Password manager CLI
 cask "little-snitch"            # Network monitor
 cask "yubico-authenticator"     # YubiKey manager

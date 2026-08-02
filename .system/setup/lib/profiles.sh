@@ -8,14 +8,10 @@ DOTFILES="${DOTFILES:-$HOME/.config}"
 SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
 PROFILES_TOML="${PROFILES_TOML:-$SYSTEM_DIR/profiles/profiles.toml}"
 
-# Validate a hostname is known (exists as a section header in profiles.toml)
 is_known_hostname() {
   [[ -n "$1" ]] && grep -qxF "[$1]" "$PROFILES_TOML"
 }
 
-# Get known hostnames (section headers from profiles.toml)
-# Usage: get_known_hosts         → one per line
-#        get_known_hosts --csv   → comma-separated
 get_known_hosts() {
   local hosts=()
   local line
@@ -31,13 +27,16 @@ get_known_hosts() {
   fi
 }
 
-# Get machine groups for a hostname
-# Parses profiles.toml (TOML: [hostname]\ngroups = ["a", "b"])
-# Returns space-separated list: groups + the hostname itself
 get_machine_groups() {
   local hostname="$1"
   local groups=()
   local in_host=false
+
+  if ! is_known_hostname "$hostname"; then
+    echo "ERROR: unknown hostname '${hostname}': no [${hostname}] section in ${PROFILES_TOML}" >&2
+    echo "       Add it to profiles.toml, or pass ./setup.sh --hostname <name>." >&2
+    return 1
+  fi
 
   while IFS= read -r line; do
     # Section header
@@ -76,6 +75,6 @@ get_machine_groups() {
 is_machine_in_group() {
   local hostname="$1" group="$2"
   local groups
-  groups=$(get_machine_groups "$hostname")
+  groups=$(get_machine_groups "$hostname") || return 1
   [[ " $groups " == *" $group "* ]]
 }

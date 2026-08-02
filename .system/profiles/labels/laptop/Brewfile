@@ -22,11 +22,11 @@ brew "yamllint"                 # YAML linter
 # Applications (Casks)
 # =============================================================================
 
-# Remote Access
-cask "tailscale-app"            # Mesh VPN
-
 # Browsers
 cask "ungoogled-chromium"       # Chromium with Google integration removed
+
+# Communication
+cask "slack"                    # Team communication
 
 # Development
 cask "claude"                   # Claude Desktop
@@ -50,6 +50,7 @@ cask "notion"                   # Notes & docs
 cask "sunsama"                  # Daily planner
 
 # Utilities
+cask "tailscale-app"            # Mesh VPN
 cask "wifiman"                  # Network scanner
 
 # =============================================================================

@@ -341,6 +341,13 @@ check_secrets() {
       all_configured=false
     fi
 
+    if [[ -f "$SENSITIVE_DIR/spacelift-api-key.fish" ]]; then
+      print_status "Spacelift API key: configured"
+    else
+      print_warning "Spacelift API key: not configured"
+      all_configured=false
+    fi
+
     # Check work-specific Claude skills
     local work_skills=("argocd" "astro" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
     for skill in "${work_skills[@]}"; do
@@ -431,26 +438,26 @@ check_secrets() {
     all_configured=false
   fi
 
-  # Check Anthropic API key
-  if [[ -f "$SENSITIVE_DIR/anthropic-api-key" ]]; then
-    print_status "Anthropic API key: configured"
-  else
-    print_warning "Anthropic API key: not configured"
-    all_configured=false
+  if is_machine_in_group "$MACHINE_HOSTNAME" "server"; then
+    if [[ -f "$SENSITIVE_DIR/anthropic-api-key" ]]; then
+      print_status "Anthropic API key: configured"
+    else
+      print_warning "Anthropic API key: not configured"
+      all_configured=false
+    fi
+
+    if [[ -x "$SENSITIVE_DIR/claude-api-key-helper.sh" ]]; then
+      print_status "Claude API key helper: configured"
+    else
+      print_warning "Claude API key helper: not configured"
+      all_configured=false
+    fi
   fi
 
   if [[ -f "$SENSITIVE_DIR/github-pat" ]]; then
     print_status "GitHub PAT: configured"
   else
     print_warning "GitHub PAT: not configured"
-    all_configured=false
-  fi
-
-  # Check Claude API key helper script
-  if [[ -x "$SENSITIVE_DIR/claude-api-key-helper.sh" ]]; then
-    print_status "Claude API key helper: configured"
-  else
-    print_warning "Claude API key helper: not configured"
     all_configured=false
   fi
 
@@ -524,6 +531,10 @@ inject_secrets() {
       inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function" "$OP_PERSONAL_ACCOUNT"
     fi
 
+    if [[ -f "$TEMPLATES_DIR/spacelift-api-key.tpl" ]]; then
+      inject_template "$TEMPLATES_DIR/spacelift-api-key.tpl" "$SENSITIVE_DIR/spacelift-api-key.fish" "Spacelift API key" "$OP_WORK_ACCOUNT"
+    fi
+
     # Retrieve work-specific Claude skills from 1Password
     inject_claude_skills
 
@@ -542,25 +553,22 @@ inject_secrets() {
     print_info "$MACHINE_HOSTNAME: skipping work-only secrets"
   fi
 
-  # RustDesk permanent password (server machines)
+  # Server-only secrets
   if is_machine_in_group "$MACHINE_HOSTNAME" "server"; then
     if [[ -f "$TEMPLATES_DIR/rustdesk-password.tpl" ]]; then
       inject_template "$TEMPLATES_DIR/rustdesk-password.tpl" "$SENSITIVE_DIR/rustdesk-password" "RustDesk password" "$OP_PERSONAL_ACCOUNT"
     fi
-  fi
 
-  # Secrets for all machines
-  # Inject Anthropic API key
-  if [[ -f "$TEMPLATES_DIR/anthropic-api-key.tpl" ]]; then
-    inject_template "$TEMPLATES_DIR/anthropic-api-key.tpl" "$SENSITIVE_DIR/anthropic-api-key" "Anthropic API key" "$OP_PERSONAL_ACCOUNT"
+    if [[ -f "$TEMPLATES_DIR/anthropic-api-key.tpl" ]]; then
+      inject_template "$TEMPLATES_DIR/anthropic-api-key.tpl" "$SENSITIVE_DIR/anthropic-api-key" "Anthropic API key" "$OP_PERSONAL_ACCOUNT"
 
-    # Create API key helper script for Claude Code
-    cat >"$SENSITIVE_DIR/claude-api-key-helper.sh" <<'HELPER'
+      cat >"$SENSITIVE_DIR/claude-api-key-helper.sh" <<'HELPER'
 #!/bin/bash
 cat ~/.config/.system/sensitive/anthropic-api-key
 HELPER
-    chmod 700 "$SENSITIVE_DIR/claude-api-key-helper.sh"
-    print_status "Claude API key helper script created"
+      chmod 700 "$SENSITIVE_DIR/claude-api-key-helper.sh"
+      print_status "Claude API key helper script created"
+    fi
   fi
 
   if [[ -f "$TEMPLATES_DIR/github-pat.tpl" ]]; then
