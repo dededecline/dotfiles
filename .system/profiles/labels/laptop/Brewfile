@@ -23,6 +23,7 @@ brew "yamllint"                 # YAML linter
 # =============================================================================
 
 # Browsers
+cask "google-chrome"            # Google Chrome
 cask "ungoogled-chromium"       # Chromium with Google integration removed
 
 # Communication
