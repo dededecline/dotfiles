@@ -1,8 +1,15 @@
 # =============================================================================
+# Taps
+# =============================================================================
+tap "macos-fuse-t/cask", trusted: true
+
+# =============================================================================
 # Media Utilities
 # =============================================================================
-brew "imagemagick"              # Image manipulation
-brew "yt-dlp"                   # Video downloader
+brew "imagemagick"                    # Image manipulation
+cask "macos-fuse-t/cask/fuse-t"       # FUSE without kernel extensions
+cask "macos-fuse-t/cask/fuse-t-sshfs" # Mount remote dirs over SSH
+brew "yt-dlp"                         # Video downloader
 
 # =============================================================================
 # Applications (Casks)
