@@ -8,23 +8,36 @@
 !agents/**
 !commands/
 !commands/**
+# Skills are deny-by-default, same shape as rules below. The previous
+# `!skills/**` was fail-open: a work skill symlinked in from 1Password was
+# tracked unless someone remembered to deny it by name, and a new skill
+# documenting internal infrastructure became committable silently.
 !skills/
-!skills/**
+skills/*
+!skills/1password/
+!skills/1password/**
+!skills/context7-mcp/
+!skills/context7-mcp/**
+!skills/gh-cli/
+!skills/gh-cli/**
+!skills/pdf-generation/
+!skills/pdf-generation/**
+!skills/python-pro/
+!skills/python-pro/**
+!skills/security-review/
+!skills/security-review/**
+
+# Rules load as global instructions in every session. Generic ones are tracked
+# so they exist on a fresh clone; work-specific ones come from 1Password and are
+# symlinked in, so anything not named here stays ignored by default.
+!rules/
+rules/*
+!rules/code-comments.md
+!rules/context7.md
 
 # Local plugins (in-repo marketplace; runtime install state lives under plugins/)
 !local-plugins/
 !local-plugins/**
-
-# Work-specific skills (sensitive, symlinked from 1Password via symlinks.sh)
-skills/argocd
-skills/astro
-skills/lrl-cli
-skills/observe
-skills/signadot
-skills/spacectl
-skills/prod-release
-skills/prod-version
-skills/notion-research-documentation
 
 !assets/
 !assets/**

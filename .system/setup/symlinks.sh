@@ -128,8 +128,21 @@ if type -t is_machine_in_group &>/dev/null && is_machine_in_group "$MACHINE_HOST
     echo "  Work skills directory not found: $WORK_SKILLS_DIR"
     echo "  Run 'secrets' to retrieve skills from 1Password"
   fi
+
+  echo "Linking work-specific Claude rules..."
+  WORK_RULES_DIR="$SYSTEM_DIR/sensitive/claude-rules"
+  if [[ -d "$WORK_RULES_DIR" ]]; then
+    for rule_file in "$WORK_RULES_DIR"/*.md; do
+      if [[ -f "$rule_file" ]]; then
+        create_symlink "$rule_file" "$DOTFILES/claude/rules/$(basename "$rule_file")"
+      fi
+    done
+  else
+    echo "  Work rules directory not found: $WORK_RULES_DIR"
+    echo "  Run 'secrets' to retrieve rules from 1Password"
+  fi
 else
-  echo "$MACHINE_HOSTNAME detected, skipping work-specific Claude skills"
+  echo "$MACHINE_HOSTNAME detected, skipping work-specific Claude skills and rules"
 fi
 
 echo "Symlinks complete!"

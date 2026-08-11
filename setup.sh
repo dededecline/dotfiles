@@ -343,6 +343,22 @@ refresh_claude_global() {
 # Homebrew Sync (Declarative)
 # =============================================================================
 
+# Echoes an opaque `stty -g` snapshot of the controlling terminal's modes, or
+# nothing when there is no tty (curl installs, CI, launchd).
+save_tty_state() {
+  [[ -r /dev/tty ]] || return 0
+  stty -g </dev/tty 2>/dev/null || true
+}
+
+# Restores a save_tty_state snapshot. No-op on an empty snapshot, so callers can
+# pass it through unconditionally.
+restore_tty_state() {
+  local state="${1:-}"
+  [[ -n "$state" ]] || return 0
+  [[ -r /dev/tty ]] || return 0
+  stty "$state" </dev/tty 2>/dev/null || true
+}
+
 prepare_brewfile() {
   # Generate machines/<hostname>/Brewfile by concatenating all label Brewfiles
   # the machine belongs to. This file is the sole input to `brew bundle` and
@@ -501,7 +517,18 @@ run_brew_sync() {
   brew update
 
   print_info "Installing packages and cleaning up..."
-  if brew bundle --file="$brewfile" --force-cleanup --verbose; then
+
+  # Interactive cask and pkg installers can exit leaving the tty with ONLCR
+  # disabled, after which a bare newline no longer returns to column 0 and every
+  # later line staircases. Snapshot and restore rather than `stty sane`, which
+  # would also discard deliberate settings such as -ixon.
+  local tty_state bundle_rc=0
+  tty_state=$(save_tty_state)
+
+  brew bundle --file="$brewfile" --force-cleanup || bundle_rc=$?
+  restore_tty_state "$tty_state"
+
+  if ((bundle_rc == 0)); then
     print_status "Homebrew packages synced"
   else
     print_warning "Some packages may have failed to install"

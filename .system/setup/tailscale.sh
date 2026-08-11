@@ -5,12 +5,15 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.config}"
 SYSTEM_DIR="${SYSTEM_DIR:-$DOTFILES/.system}"
+SENSITIVE_DIR="${SENSITIVE_DIR:-$SYSTEM_DIR/sensitive}"
 
 # Source output utilities
 source "$SYSTEM_DIR/setup/lib/output.sh"
+source "$SYSTEM_DIR/setup/lib/tailnet.sh"
 
 if ! command -v tailscale &>/dev/null; then
   print_warning "Tailscale not installed, skipping"
+  # shellcheck disable=SC2317
   return 0 2>/dev/null || exit 0
 fi
 
@@ -19,20 +22,29 @@ if ! tailscale status &>/dev/null; then
   print_info "Starting tailscaled service..."
   sudo brew services start tailscale
   print_warning "Run 'tailscale up' to authenticate (SSH will be enabled on next setup run)"
+  # shellcheck disable=SC2317
   return 0 2>/dev/null || exit 0
 fi
 
-# Enable Tailscale SSH server (idempotent)
-# Security: Access is governed by Tailscale ACLs (managed in Tailscale admin console).
-# Ensure ACLs restrict SSH access to authorized users/devices only.
-# Default tailnet policy (allow-all) would grant SSH to any tailnet member.
-# Configure ACLs at: https://login.tailscale.com/admin/acls
+EXPECTED_TAILNET="$(tailnet_expected_name "$SENSITIVE_DIR/tailscale-tailnet" || true)"
+if [[ -z "$EXPECTED_TAILNET" ]]; then
+  print_info "Tailnet: no expected tailnet configured (run 'secrets')"
+elif ! command -v jq &>/dev/null; then
+  print_warning "Tailnet: cannot verify without jq"
+else
+  CURRENT_TAILNET=$(tailscale status --json 2>/dev/null | jq -r '.CurrentTailnet.Name // empty')
+  if tailnet_name_matches "$EXPECTED_TAILNET" "$CURRENT_TAILNET"; then
+    print_status "Tailnet: $CURRENT_TAILNET"
+  else
+    print_warning "Tailnet drift: on '${CURRENT_TAILNET:-unknown}', expected '$EXPECTED_TAILNET'"
+    print_info "Move with: bash $SYSTEM_DIR/setup/tailnet-switch.sh"
+  fi
+fi
+
 tailscale set --ssh
 
-print_status "Tailscale SSH: enabled (verify ACLs at https://login.tailscale.com/admin/acls)"
+print_status "Tailscale SSH: enabled (verify policy at https://login.tailscale.com/admin/acls)"
 
-# Restrict SSH to Tailscale interface only (idempotent via marker comment)
-# Comment out any pre-existing ListenAddress not managed by dotfiles
 sudo sed -i '' '/^ListenAddress/{ /# managed by dotfiles$/!s/^/# /; }' /etc/ssh/sshd_config
 TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || true)
 if [[ -n "$TAILSCALE_IP" ]] && [[ "$TAILSCALE_IP" =~ ^100\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

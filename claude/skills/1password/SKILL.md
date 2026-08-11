@@ -7,25 +7,89 @@ description: Complete 1Password CLI (op) for managing secrets, credentials, and 
 
 Complete 1Password operations for secure secret management and automation.
 
-## Authentication
+## Multi-Account Model (read this first)
 
-Before using any `op` commands, you must authenticate:
+**This machine has two 1Password accounts configured, so every `op` call must name the account explicitly with `--account`.** Every `op` call in the dotfiles secrets system passes it.
+
+- An unqualified `op read` or `op item get` can resolve against the wrong account and fail confusingly (item or vault "not found") even though the item exists in the other account.
+- **Treat an unqualified `op` reference as a bug**, in scripts, in templates, and in one-off commands alike.
+- Use `op account list` to see which accounts are configured and to get the identifier to pass.
 
 ```bash
-# Interactive sign-in (opens browser)
-op signin
-
-# Check authentication status
+# See which accounts are configured
 op account list
 
-# Get current account info
+# Always qualify
+op --account <account> read "op://<vault>/<item>/<field>"
+op --account <account> item get "<item>" --fields <field>
+op --account <account> vault list
+```
+
+The examples further down this file omit `--account` for brevity. Add it.
+
+## Authentication
+
+**On this machine `op` authenticates through the 1Password desktop app (system auth), not a CLI session.** There is an op-daemon socket and the CLI config holds no stored accounts.
+
+- If an `op` command fails with an auth error, the fix is normally to **unlock the 1Password desktop app**.
+- `op signin` is the wrong first move here. It applies to machines that use a CLI-managed session or a service account, not to desktop-app system auth.
+- **Do not run `op signout` on this machine.** There is no CLI session to clear, and it can break the working desktop integration.
+
+```bash
+# Check which accounts are configured (safe, start here when diagnosing)
+op account list
+
+# Current account context
 op whoami
 
-# Sign out
+# CLI-session sign-in: only on machines WITHOUT desktop app integration
+op signin
+
+# Sign out: harmful on this machine, see the warning above
 op signout
 ```
 
-Once signed in, your session remains active for CLI operations.
+### Claude's subprocesses do not inherit the approval
+
+Desktop-app system auth is approved per interactive session, usually by
+biometric prompt. A Bash tool call is a separate non-interactive process with no
+way to answer that prompt, so `op` behaves differently for Claude than it does
+in the user's terminal:
+
+- It may **hang until the tool times out** rather than failing fast, because it
+  is waiting on an approval that will never arrive.
+- Or it reports `account is not signed in` even while the same command succeeds
+  immediately in the user's own shell.
+
+Approval can lapse mid-session, so `op` working earlier is not evidence it still
+works. Treat every `op` call as able to fail this way.
+
+**Practical rules:**
+
+1. Prefer checks that need no `op` at all. `secrets check` is entirely local
+   file existence and reports most credential state without touching 1Password.
+2. Set an explicit timeout on any `op` call, and probe with a fast
+   `op whoami` first so a failure is quick and legible rather than a 2-minute
+   hang.
+3. When `op` is needed and unavailable, **ask the user to run it** with the `!`
+   prefix so the output lands in the conversation. Do not report the result as
+   unverified-but-probably-fine, and do not keep retrying.
+4. Never infer that a 1Password operation succeeded because the user said they
+   ran it. Verify, or say plainly that it is unverified.
+
+## Write Commands Are Denied to Claude Code
+
+These `op` write commands sit in the Claude Code deny list and will be **blocked**. Claude must stop and ask the user to run them:
+
+- `op item create`, `op item edit`, `op item delete`
+- `op vault create`, `op vault delete`
+- `op document create`, `op document edit`, `op document delete`
+
+Reads are allowed (`op read`, `op item get`, `op item list`, `op vault list`, `op document get`, `op inject`, `op run`).
+
+### Consequence for skills stored as documents
+
+The dotfiles repo stores some Claude skills as 1Password documents. Because `op document edit` is denied, Claude can fix the local copy but cannot push it back. The user closes the loop by running `secrets` and choosing `[l]` at the diff prompt, which pushes the local copy to 1Password.
 
 ## Vault Management
 
@@ -494,9 +558,10 @@ if [ -z "$TOKEN" ]; then
 fi
 
 # Verify authentication before operations
-if ! op account list &>/dev/null; then
-  echo "Not signed in to 1Password"
-  op signin
+# On desktop-auth machines the remedy is unlocking the app, not `op signin`
+if ! op whoami &>/dev/null; then
+  echo "1Password unavailable: unlock the 1Password desktop app"
+  exit 1
 fi
 ```
 
@@ -521,7 +586,8 @@ op --version
 brew upgrade 1password-cli  # macOS
 # or download latest from 1password.com/downloads
 
-# Clear session
+# Clear session: only for CLI-session machines.
+# Do NOT run this where auth comes from the desktop app (this machine).
 op signout --all
 
 # Verbose output for debugging

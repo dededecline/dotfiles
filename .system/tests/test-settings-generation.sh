@@ -82,15 +82,13 @@ expect_has nyx "$API_KEY_HELPER"
 expect_lacks MacBook-Pro-HF7C7K3WJX "$API_KEY_HELPER"
 expect_lacks athena "$API_KEY_HELPER"
 
-# Match the mcpServers definition specifically: a bare "signadot" also appears
-# in the ungated permissions allow-list on every machine.
-SIGNADOT_SERVER='"command": "signadot"'
+WORK_PLUGIN='"Laurel@Laurel"'
 
 echo "work-gated blocks stay on the work machine"
-expect_has MacBook-Pro-HF7C7K3WJX "$SIGNADOT_SERVER"
+expect_has MacBook-Pro-HF7C7K3WJX "$WORK_PLUGIN"
 expect_has MacBook-Pro-HF7C7K3WJX 'slack@claude-plugins-official'
-expect_lacks nyx "$SIGNADOT_SERVER"
-expect_lacks athena "$SIGNADOT_SERVER"
+expect_lacks nyx "$WORK_PLUGIN"
+expect_lacks athena "$WORK_PLUGIN"
 
 # Removing a gated block can strand a trailing comma, and athena/nyx output
 # cannot be exercised any other way from this machine.

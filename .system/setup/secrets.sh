@@ -62,22 +62,30 @@ inject_template() {
 
   echo "  Injecting $description..."
 
-  # Create output directory if needed
-  mkdir -p "$(dirname "$output")"
+  # Staged through a temp file so a failed injection (renamed 1Password item,
+  # revoked session) leaves the previous credential intact rather than
+  # truncating it. mktemp is 0600, and the umask covers the envsubst pass, so
+  # the value is never briefly world-readable either.
+  local staged
+  staged=$(mktemp)
 
-  # Use op inject to replace op:// references with actual values
-  # --force allows overwriting existing files without prompting
-  local op_args=(-f -i "$template" -o "$output")
+  local op_args=(-f -i "$template" -o "$staged")
   if [[ -n "$account" ]]; then
     op_args+=(--account "$account")
   fi
 
-  if op inject "${op_args[@]}"; then
+  if (
+    umask 077
+    op inject "${op_args[@]}" || exit 1
     # shellcheck disable=SC2016
-    envsubst '$HOME' <"$output" >"${output}.tmp" && mv "${output}.tmp" "$output"
+    envsubst '$HOME' <"$staged" >"${staged}.env" && mv "${staged}.env" "$staged"
+  ); then
+    mkdir -p "$(dirname "$output")"
+    mv "$staged" "$output"
     chmod 600 "$output"
     print_status "$description configured"
   else
+    rm -f "$staged" "${staged}.env"
     print_error "Failed to inject $description"
     return 1
   fi
@@ -112,6 +120,9 @@ inject_atuin() {
     return 1
   }
 
+  # These land on argv and are briefly visible in ps. `atuin login` offers no
+  # stdin or key-file input, so this is unavoidable; it only runs on a machine
+  # that is not already logged in (guarded by the atuin status check above).
   if atuin login -u "$username" -p "$password" -k "$key" 2>/dev/null; then
     print_status "Atuin sync configured"
     # Trigger initial sync
@@ -122,80 +133,127 @@ inject_atuin() {
   fi
 }
 
+# Sync one 1Password document to a local file, resolving drift in both
+# directions.
+#
+# Every caller previously carried its own copy of this diff-and-prompt block.
+# The `l | L | *)` bug, where a bare Enter silently overwrote the remote
+# document, existed in two of those copies independently, so the semantics live
+# in one place now and .system/tests/test-secrets-invariants.sh pins them.
+#
+# Usage: sync_op_document <doc_title> <output_file> <label> <account>
+# Returns 1 only when the document does not exist in 1Password.
+sync_op_document() {
+  local doc_title="$1"
+  local output_file="$2"
+  local label="$3"
+  local account="$4"
+  local temp_file err choice
+
+  temp_file=$(mktemp)
+
+  # --force avoids op's own overwrite prompt
+  if ! op document get "$doc_title" --output "$temp_file" --force --account "$account" 2>/dev/null; then
+    rm -f "$temp_file"
+    print_warning "  $label not found in 1Password (document: $doc_title)"
+    return 1
+  fi
+
+  mkdir -p "$(dirname "$output_file")"
+
+  if [[ ! -f "$output_file" ]]; then
+    mv "$temp_file" "$output_file"
+    chmod 600 "$output_file"
+    print_status "  $label retrieved (new)"
+    return 0
+  fi
+
+  if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
+    rm -f "$temp_file"
+    print_status "  $label unchanged"
+    return 0
+  fi
+
+  echo ""
+  print_warning "$label has changed:"
+  echo "─────────────────────────────────────────"
+  diff --color=auto -u "$output_file" "$temp_file" | head -50 || true
+  echo "─────────────────────────────────────────"
+  echo ""
+  echo "Choose action:"
+  echo "  [l] Keep local version and push it to 1Password (overwrites remote)"
+  echo "  [r] Use remote (1Password) version (overwrites local)"
+  echo "  [anything else] Keep local, change nothing"
+  echo ""
+  read -rp "Action [l/r]: " choice
+
+  case "$choice" in
+  r | R)
+    mv "$temp_file" "$output_file"
+    chmod 600 "$output_file"
+    print_status "  $label updated from 1Password"
+    ;;
+  l | L)
+    rm -f "$temp_file"
+    if err=$(op document edit "$doc_title" "$output_file" --account "$account" 2>&1); then
+      print_status "  $label: local version pushed to 1Password"
+    else
+      print_warning "  $label: kept local (failed to push to 1Password)"
+      printf '%s\n' "$err" | sed 's/^/      /'
+    fi
+    ;;
+  *)
+    rm -f "$temp_file"
+    print_warning "  $label: no choice made, kept local and pushed nothing"
+    ;;
+  esac
+}
+
 # Retrieve work-specific Claude skills from 1Password
-# Uses diff-based comparison to avoid unnecessary prompts
 inject_claude_skills() {
   local CLAUDE_SKILLS_OUTPUT="$SENSITIVE_DIR/claude-skills"
 
   echo "  Retrieving work-specific Claude skills from 1Password..."
 
-  # Work skills: skill_name:doc_title pairs
-  local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe signadot:claude-skill-signadot spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
+  # skill_name:doc_title pairs
+  local work_skills="argocd:claude-skill-argocd astro:claude-skill-astro aws:claude-skill-aws lrl-cli:claude-skill-lrl-cli observe:claude-skill-observe signadot:claude-skill-signadot spacectl:claude-skill-spacectl prod-release:claude-skill-prod-release prod-version:claude-skill-prod-version"
 
   for pair in $work_skills; do
     local skill_name="${pair%%:*}"
     local doc_title="${pair#*:}"
     local output_dir="$CLAUDE_SKILLS_OUTPUT/$skill_name"
-    local output_file="$output_dir/SKILL.md"
-    local temp_file
-    local err
 
     mkdir -p "$output_dir"
-    temp_file=$(mktemp)
+    chmod 700 "$output_dir"
 
-    # Download from 1Password to temp file (--force avoids op's built-in prompt)
-    if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
-      rm -f "$temp_file"
-      print_warning "  $skill_name skill not found in 1Password (document: $doc_title)"
-      continue
-    fi
+    sync_op_document "$doc_title" "$output_dir/SKILL.md" \
+      "$skill_name skill" "$OP_WORK_ACCOUNT" || true
+  done
+}
 
-    # If local file doesn't exist, just move temp to output
-    if [[ ! -f "$output_file" ]]; then
-      mv "$temp_file" "$output_file"
-      chmod 600 "$output_file"
-      print_status "  $skill_name skill retrieved (new)"
-      continue
-    fi
+# Retrieve work-specific Claude rules from 1Password.
+#
+# Rules load as global instructions in every session, so unlike a skill they are
+# always in context. They live in 1Password rather than the repo when their
+# content is work-specific: pr-lint names real ticket prefixes and internal
+# service names, and this repo is public.
+inject_claude_rules() {
+  local CLAUDE_RULES_OUTPUT="$SENSITIVE_DIR/claude-rules"
 
-    # Compare files
-    if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
-      # Files are identical, skip
-      rm -f "$temp_file"
-      print_status "  $skill_name skill unchanged"
-      continue
-    fi
+  echo "  Retrieving work-specific Claude rules from 1Password..."
 
-    # Files differ, show diff and prompt
-    echo ""
-    print_warning "$skill_name skill has changed:"
-    echo "─────────────────────────────────────────"
-    diff --color=auto -u "$output_file" "$temp_file" | head -50 || true
-    echo "─────────────────────────────────────────"
-    echo ""
-    echo "Choose action:"
-    echo "  [l] Keep local version"
-    echo "  [r] Use remote (1Password) version"
-    echo ""
-    read -rp "Action [l/r]: " choice
+  # rule_name:doc_title pairs
+  local work_rules="pr-lint:claude-rule-pr-lint"
 
-    case "$choice" in
-    r | R)
-      mv "$temp_file" "$output_file"
-      chmod 600 "$output_file"
-      print_status "  $skill_name skill updated from 1Password"
-      ;;
-    l | L | *)
-      rm -f "$temp_file"
-      # Push local version back to 1Password
-      if err=$(op document edit "$doc_title" "$output_file" --account "$OP_WORK_ACCOUNT" 2>&1); then
-        print_status "  $skill_name skill: local version pushed to 1Password"
-      else
-        print_warning "  $skill_name skill: kept local (failed to push to 1Password)"
-        printf '%s\n' "$err" | sed 's/^/      /'
-      fi
-      ;;
-    esac
+  mkdir -p "$CLAUDE_RULES_OUTPUT"
+  chmod 700 "$CLAUDE_RULES_OUTPUT"
+
+  for pair in $work_rules; do
+    local rule_name="${pair%%:*}"
+    local doc_title="${pair#*:}"
+
+    sync_op_document "$doc_title" "$CLAUDE_RULES_OUTPUT/$rule_name.md" \
+      "$rule_name rule" "$OP_WORK_ACCOUNT" || true
   done
 }
 
@@ -234,78 +292,101 @@ inject_claude_skill_archive() {
     fi
   fi
 
-  # Extract tarball to output directory (clean first to remove stale files)
-  rm -rf "$output_dir"
-  mkdir -p "$output_dir"
-  if tar xf "$temp_file" -C "$output_dir" 2>/dev/null; then
-    find "$output_dir" -type d -exec chmod 700 {} \;
-    find "$output_dir" -type f -exec chmod 600 {} \;
-    rm -f "$temp_file"
-    print_status "  $skill_name skill archive extracted"
-  else
+  # Extract into a sibling staging dir and swap, so a failed tar cannot destroy
+  # the existing skill. Sibling, not $TMPDIR, keeps the swap on one filesystem.
+  local staging="${output_dir}.incoming"
+  rm -rf "$staging"
+  mkdir -p "$staging"
+  chmod 700 "$staging"
+
+  if ! tar xf "$temp_file" -C "$staging" 2>/dev/null; then
+    rm -rf "$staging"
     rm -f "$temp_file"
     print_error "  Failed to extract $skill_name skill archive"
     return 1
   fi
+
+  find "$staging" -type d -exec chmod 700 {} \;
+  find "$staging" -type f -exec chmod 600 {} \;
+
+  rm -rf "$output_dir"
+  mv "$staging" "$output_dir"
+  rm -f "$temp_file"
+  print_status "  $skill_name skill archive extracted"
 }
 
 # Retrieve global Claude instructions from 1Password
-# Single-file equivalent of the inject_claude_skills loop body
 inject_claude_global() {
-  local doc_title="claude-global-instructions"
-  local output_file="$SENSITIVE_DIR/CLAUDE.global.md"
-  local temp_file
-  local err
+  sync_op_document "claude-global-instructions" \
+    "$SENSITIVE_DIR/CLAUDE.global.md" "CLAUDE.global.md" "$OP_PERSONAL_ACCOUNT"
+}
 
-  temp_file=$(mktemp)
+# Materialize ~/.aws/config from 1Password.
+#
+# Bidirectional like inject_claude_global, because the file is hand-maintained:
+# its comment header records the dev-admin/prod-readonly asymmetry, the reason
+# the SSO session must stay named "laurel", and the `lrl init --force` hazard.
+# `lrl init` strips those comments, so local edits have to be able to win.
+inject_aws_config() {
+  local doc_title="aws-config"
+  local output_file="$HOME/.aws/config"
 
-  if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null; then
-    rm -f "$temp_file"
-    print_warning "  CLAUDE.global.md not found in 1Password (document: $doc_title)"
+  mkdir -p "$HOME/.aws"
+  chmod 700 "$HOME/.aws"
+
+  if sync_op_document "$doc_title" "$output_file" "AWS config" "$OP_WORK_ACCOUNT"; then
+    return 0
+  fi
+
+  # Only reachable when the document is absent. Worth spelling out, because
+  # until it is seeded the local file is the single copy of a hand-built config.
+  if [[ -f "$output_file" ]]; then
+    print_info "    $output_file is currently the only copy. Seed 1Password with:"
+    print_info "    op document create \"$output_file\" --title $doc_title --vault Employee --account \"\$OP_WORK_ACCOUNT\""
+  fi
+  return 1
+}
+
+read_work_account() {
+  op read "op://Private/1password-work-account/domain" --account "$OP_PERSONAL_ACCOUNT"
+}
+
+inject_spacelift() {
+  local account="$1"
+  local key_id key_secret token
+
+  if [[ -f "$TEMPLATES_DIR/spacelift-api-key.tpl" ]]; then
+    inject_template "$TEMPLATES_DIR/spacelift-api-key.tpl" \
+      "$SENSITIVE_DIR/spacelift-api-key.fish" "Spacelift API key" "$account"
+  fi
+
+  if [[ -f "$TEMPLATES_DIR/spacelift-profile.json.tpl" ]]; then
+    inject_template "$TEMPLATES_DIR/spacelift-profile.json.tpl" \
+      "$HOME/.spacelift/config.json" "Spacelift spacectl profile" "$account"
+  fi
+
+  echo "  Injecting Spacelift registry token..."
+
+  key_id=$(op read --account "$account" "op://Employee/spacelift-api-key/api_key_id") || {
+    print_error "Failed to read Spacelift API key ID"
     return 1
-  fi
+  }
+  key_secret=$(op read --account "$account" "op://Employee/spacelift-api-key/api_key_secret") || {
+    print_error "Failed to read Spacelift API key secret"
+    return 1
+  }
 
-  if [[ ! -f "$output_file" ]]; then
-    mv "$temp_file" "$output_file"
-    chmod 600 "$output_file"
-    print_status "  CLAUDE.global.md retrieved (new)"
-    return 0
-  fi
+  token=$(printf 'api:%s:%s' "$key_id" "$key_secret" | base64 | tr -d '\n=')
 
-  if diff -q "$output_file" "$temp_file" >/dev/null 2>&1; then
-    rm -f "$temp_file"
-    print_status "  CLAUDE.global.md unchanged"
-    return 0
-  fi
-
-  echo ""
-  print_warning "CLAUDE.global.md has changed:"
-  echo "─────────────────────────────────────────"
-  diff --color=auto -u "$output_file" "$temp_file" | head -50 || true
-  echo "─────────────────────────────────────────"
-  echo ""
-  echo "Choose action:"
-  echo "  [l] Keep local version (push to 1Password)"
-  echo "  [r] Use remote (1Password) version"
-  echo ""
-  read -rp "Action [l/r]: " choice
-
-  case "$choice" in
-  r | R)
-    mv "$temp_file" "$output_file"
-    chmod 600 "$output_file"
-    print_status "  CLAUDE.global.md updated from 1Password"
-    ;;
-  l | L | *)
-    rm -f "$temp_file"
-    if err=$(op document edit "$doc_title" "$output_file" --account "$OP_PERSONAL_ACCOUNT" 2>&1); then
-      print_status "  CLAUDE.global.md: local version pushed to 1Password"
-    else
-      print_warning "  CLAUDE.global.md: kept local (failed to push to 1Password)"
-      printf '%s\n' "$err" | sed 's/^/      /'
-    fi
-    ;;
-  esac
+  mkdir -p "$HOME/.terraform.d"
+  chmod 700 "$HOME/.terraform.d"
+  (
+    umask 077
+    printf '{\n  "credentials": {\n    "spacelift.io": {\n      "token": "%s"\n    }\n  }\n}\n' \
+      "$token" >"$HOME/.terraform.d/credentials.tfrc.json"
+  )
+  chmod 600 "$HOME/.terraform.d/credentials.tfrc.json"
+  print_status "Spacelift registry token configured"
 }
 
 # Check which secrets are configured
@@ -348,13 +429,112 @@ check_secrets() {
       all_configured=false
     fi
 
+    if [[ -f "$HOME/.spacelift/config.json" ]]; then
+      print_status "Spacelift spacectl profile: configured"
+    else
+      print_warning "Spacelift spacectl profile: not configured"
+      all_configured=false
+    fi
+
+    if grep -q '"spacelift.io"' "$HOME/.terraform.d/credentials.tfrc.json" 2>/dev/null; then
+      print_status "Spacelift registry token: configured"
+    else
+      print_warning "Spacelift registry token: not configured"
+      all_configured=false
+    fi
+
+    if [[ -f "$HOME/.aws/config" ]]; then
+      local aws_profiles
+      aws_profiles=$(grep -c '^\[profile ' "$HOME/.aws/config" 2>/dev/null || true)
+      print_status "AWS config: configured (${aws_profiles:-0} named profiles)"
+    else
+      print_warning "AWS config: not configured"
+      all_configured=false
+    fi
+
+    # For SSO there is no stored key, so expiry is the only thing that decides
+    # whether any aws command works. Checked locally, no API call.
+    local sso_expiry
+    sso_expiry=$(jq -r 'select(.expiresAt) | .expiresAt' "$HOME"/.aws/sso/cache/*.json 2>/dev/null | sort -r | head -1)
+    if [[ -n "$sso_expiry" ]]; then
+      local norm expiry_epoch
+      norm="${sso_expiry%Z}"
+      norm="${norm%%.*}"
+      expiry_epoch=$(date -u -j -f '%Y-%m-%dT%H:%M:%S' "$norm" +%s 2>/dev/null || echo 0)
+      if [[ "$expiry_epoch" -gt "$(date -u +%s)" ]]; then
+        print_status "AWS SSO session: valid until $sso_expiry"
+      else
+        print_warning "AWS SSO session: expired $sso_expiry (run 'aws sso login --sso-session laurel')"
+      fi
+    else
+      print_warning "AWS SSO session: no cached token (run 'aws sso login --sso-session laurel')"
+    fi
+
+    if [[ -s "$SENSITIVE_DIR/context7-api-key" ]]; then
+      print_status "Context7 API key: configured"
+    else
+      print_warning "Context7 API key: not configured"
+      all_configured=false
+    fi
+
+    # Static file with no template by design; see CLAUDE.md. Checked here so a
+    # missing or emptied file is visible rather than silently breaking the MCP.
+    if [[ -f "$SENSITIVE_DIR/warpstream.fish" ]]; then
+      local ws_missing=()
+      for var in WARPSTREAM_API_KEY WARPSTREAM_AGENT_KEY WARPSTREAM_MCP_API_KEY; do
+        grep -qE "^set -g[x]? $var " "$SENSITIVE_DIR/warpstream.fish" || ws_missing+=("$var")
+      done
+      if [[ ${#ws_missing[@]} -eq 0 ]]; then
+        print_status "WarpStream keys: configured"
+      else
+        print_warning "WarpStream keys: missing ${ws_missing[*]}"
+        all_configured=false
+      fi
+    else
+      print_warning "WarpStream keys: not configured (rotate by editing warpstream.fish in place)"
+      all_configured=false
+    fi
+
+    # Owned by `observe auth configure`, not by this script; reported so an
+    # expired token shows up here instead of as an MCP 401.
+    if jq -e '.profiles[.currentProfile] | select(.customerId and .token)' \
+      "$HOME/.observe/config.json" >/dev/null 2>&1; then
+      print_status "Observe token: configured"
+    else
+      print_warning "Observe token: not configured (run 'observe auth configure --token ...')"
+      all_configured=false
+    fi
+
+    if [[ -d "$HOME/.signadot" ]]; then
+      print_status "Signadot: authenticated"
+    else
+      print_warning "Signadot: not authenticated (run 'signadot auth login'; the MCP server shares this credential)"
+    fi
+
     # Check work-specific Claude skills
-    local work_skills=("argocd" "astro" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
+    local work_skills=("argocd" "astro" "aws" "lrl-cli" "observe" "signadot" "spacectl" "prod-release" "prod-version" "notion-research-documentation")
     for skill in "${work_skills[@]}"; do
       if [[ -d "$DOTFILES/claude/skills/$skill" ]] || [[ -d "$SENSITIVE_DIR/claude-skills/$skill" ]]; then
         print_status "Claude skill: $skill configured"
       else
         print_warning "Claude skill: $skill not configured"
+        all_configured=false
+      fi
+    done
+
+    # Check work-specific Claude rules. Unlike skills these are always in
+    # context, so a missing one silently removes a guardrail.
+    local work_rules=("pr-lint")
+    for rule in "${work_rules[@]}"; do
+      if [[ -f "$SENSITIVE_DIR/claude-rules/$rule.md" ]]; then
+        if [[ -L "$DOTFILES/claude/rules/$rule.md" ]]; then
+          print_status "Claude rule: $rule configured"
+        else
+          print_warning "Claude rule: $rule retrieved but not linked (run symlinks.sh)"
+          all_configured=false
+        fi
+      else
+        print_warning "Claude rule: $rule not configured"
         all_configured=false
       fi
     done
@@ -428,6 +608,20 @@ check_secrets() {
       print_warning "Tailscale: not authenticated (run 'tailscale up')"
       all_configured=false
     fi
+
+    if [[ -f "$SENSITIVE_DIR/tailscale-tailnet" ]]; then
+      print_status "Tailscale tailnet name: configured"
+    else
+      print_warning "Tailscale tailnet name: not configured"
+      all_configured=false
+    fi
+
+    if [[ -f "$SENSITIVE_DIR/tailscale-authkey" ]]; then
+      print_status "Tailscale OAuth client secret: configured"
+    else
+      print_warning "Tailscale OAuth client secret: not configured"
+      all_configured=false
+    fi
   fi
 
   # Check npm token
@@ -499,25 +693,33 @@ inject_secrets() {
 
   check_op
 
+  # An unknown hostname makes every is_machine_in_group test below fail, which
+  # silently skips all work and server secrets. macOS reverts hostnames to the
+  # Firstname-Lastname-Serial form after a Sharing or network change, so this is
+  # a live failure mode and must be loud rather than a passing no-op run.
+  if ! get_machine_groups "$MACHINE_HOSTNAME" >/dev/null 2>&1; then
+    print_error "Unknown hostname '$MACHINE_HOSTNAME': no [$MACHINE_HOSTNAME] section in profiles.toml"
+    print_info "Known hosts: $(get_known_hosts --csv)"
+    print_info "Add a section to .system/profiles/profiles.toml, or pass --hostname <name>."
+    print_info "Refusing to continue: every group-gated secret would be skipped."
+    exit 1
+  fi
+
   # Read work account domain from personal vault (work group machines only)
   OP_WORK_ACCOUNT=""
   if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
-    OP_WORK_ACCOUNT=$(op read "op://Private/1password-work-account/domain" \
-      --account "$OP_PERSONAL_ACCOUNT") || {
+    OP_WORK_ACCOUNT=$(read_work_account) || {
       print_error "Failed to read work 1Password account domain"
       print_info "Ensure '1password-work-account' item exists in Private vault"
       exit 1
     }
   fi
 
-  # Ensure directories exist
+  # Ensure directories exist. 0700 so other local users cannot enumerate which
+  # credentials exist; the files themselves are already 0600.
   mkdir -p "$SENSITIVE_DIR"
+  chmod 700 "$SENSITIVE_DIR"
   mkdir -p "$TEMPLATES_DIR"
-
-  # Inject GitHub hosts (optional, usually use gh auth login instead)
-  if [[ -f "$TEMPLATES_DIR/gh-hosts.tpl" ]]; then
-    inject_template "$TEMPLATES_DIR/gh-hosts.tpl" "$HOME/.config/gh/hosts.yml" "GitHub CLI credentials"
-  fi
 
   # Work-only secrets (work group machines)
   if is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
@@ -531,12 +733,22 @@ inject_secrets() {
       inject_template "$TEMPLATES_DIR/clone.fish.tpl" "$DOTFILES/fish/functions/clone.fish" "Clone function" "$OP_PERSONAL_ACCOUNT"
     fi
 
-    if [[ -f "$TEMPLATES_DIR/spacelift-api-key.tpl" ]]; then
-      inject_template "$TEMPLATES_DIR/spacelift-api-key.tpl" "$SENSITIVE_DIR/spacelift-api-key.fish" "Spacelift API key" "$OP_WORK_ACCOUNT"
+    inject_spacelift "$OP_WORK_ACCOUNT"
+
+    # AWS SSO profile config (hand-maintained, bidirectional)
+    inject_aws_config || true
+
+    # Context7 MCP API key, read by .system/mcp/context7-header.sh
+    if [[ -f "$TEMPLATES_DIR/context7-api-key.tpl" ]]; then
+      inject_template "$TEMPLATES_DIR/context7-api-key.tpl" \
+        "$SENSITIVE_DIR/context7-api-key" "Context7 API key" "$OP_PERSONAL_ACCOUNT" || true
     fi
 
     # Retrieve work-specific Claude skills from 1Password
     inject_claude_skills
+
+    # Retrieve work-specific Claude rules from 1Password
+    inject_claude_rules
 
     # Retrieve multi-file skill archives from 1Password
     inject_claude_skill_archive "claude-skill-notion-research-documentation" "notion-research-documentation"
@@ -568,6 +780,15 @@ cat ~/.config/.system/sensitive/anthropic-api-key
 HELPER
       chmod 700 "$SENSITIVE_DIR/claude-api-key-helper.sh"
       print_status "Claude API key helper script created"
+    fi
+
+    if [[ -f "$TEMPLATES_DIR/tailscale-tailnet.tpl" ]]; then
+      inject_template "$TEMPLATES_DIR/tailscale-tailnet.tpl" "$SENSITIVE_DIR/tailscale-tailnet" "Tailscale tailnet name" "$OP_PERSONAL_ACCOUNT"
+    fi
+
+    if [[ -f "$TEMPLATES_DIR/tailscale-authkey.tpl" ]]; then
+      inject_template "$TEMPLATES_DIR/tailscale-authkey.tpl" "$SENSITIVE_DIR/tailscale-authkey" "Tailscale OAuth client secret" "$OP_PERSONAL_ACCOUNT"
+      chmod 600 "$SENSITIVE_DIR/tailscale-authkey"
     fi
   fi
 
@@ -628,12 +849,26 @@ case "${1:-}" in
   mkdir -p "$SENSITIVE_DIR"
   inject_claude_global
   ;;
+--spacelift)
+  check_op
+  if ! is_machine_in_group "$MACHINE_HOSTNAME" "work"; then
+    print_error "Spacelift credentials are work-only ($MACHINE_HOSTNAME is not in the 'work' group)"
+    exit 1
+  fi
+  mkdir -p "$SENSITIVE_DIR"
+  OP_WORK_ACCOUNT=$(read_work_account) || {
+    print_error "Failed to read work 1Password account domain"
+    exit 1
+  }
+  inject_spacelift "$OP_WORK_ACCOUNT"
+  ;;
 --help | -h)
-  echo "Usage: $0 [--check|--claude-global|--help]"
+  echo "Usage: $0 [--check|--claude-global|--spacelift|--help]"
   echo ""
   echo "Options:"
   echo "  --check, -c       Check which secrets are configured"
   echo "  --claude-global   Refresh CLAUDE.global.md only (from 1Password)"
+  echo "  --spacelift       Refresh Spacelift credentials only (from 1Password)"
   echo "  --help, -h        Show this help message"
   echo ""
   echo "Without arguments, injects all secrets from 1Password."

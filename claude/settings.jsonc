@@ -8,12 +8,28 @@
       "Fetch(domain:*)",
       "WebFetch(domain:*)",
       "WebSearch",
-      "mcp__spacectl",
-      "mcp__launchdarkly",
-      "mcp__linear-server",
-      "mcp__aws-knowledge-mcp-server",
-      "mcp__Notion",
+      "mcp__context7",
       "mcp__signadot",
+      "mcp__warpstream",
+      "mcp__warpstream-docs",
+      "mcp__plugin_linear_linear",
+      "mcp__plugin_Notion_notion",
+      "mcp__plugin_databases-on-aws_awsknowledge",
+      "mcp__observe__observe-correlation-tag-key-search",
+      "mcp__observe__observe-correlation-tag-value-search",
+      "mcp__observe__observe-dataset-search",
+      "mcp__observe__observe-documentation-search",
+      "mcp__observe__observe-generate-query-card",
+      "mcp__observe__observe-get-apm-invocation-graph",
+      "mcp__observe__observe-get-monitor",
+      "mcp__observe__observe-get-monitor-mute",
+      "mcp__observe__observe-list-apm-environments",
+      "mcp__observe__observe-list-apm-services",
+      "mcp__observe__observe-list-monitor-mutes",
+      "mcp__observe__observe-list-monitors",
+      "mcp__observe__observe-metric-search",
+      "mcp__observe__observe-search-monitor-alerts",
+      "mcp__observe__observe-skill",
       "Bash(mkdir:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
@@ -56,6 +72,21 @@
       "Bash(terraform:*)",
       "Bash(aws:*)",
       "Bash(op:*)",
+      "Bash(warpstream version:*)",
+      "Bash(warpstream cli api-versions:*)",
+      "Bash(warpstream cli broker-metadata:*)",
+      "Bash(warpstream cli certificate-to-dn:*)",
+      "Bash(warpstream cli consumer-group-lag:*)",
+      "Bash(warpstream cli describe-acls:*)",
+      "Bash(warpstream cli describe-broker-configs:*)",
+      "Bash(warpstream cli describe-groups:*)",
+      "Bash(warpstream cli describe-log-dirs:*)",
+      "Bash(warpstream cli describe-topic-configs:*)",
+      "Bash(warpstream cli diagnose-connection:*)",
+      "Bash(warpstream cli diagnose-record:*)",
+      "Bash(warpstream cli file-reader:*)",
+      "Bash(warpstream cli validate-pipeline-config:*)",
+      "Bash(warpstream srcmd diagnose-connection:*)",
       "Bash(fish --version:*)",
       "Bash(fish --help:*)",
       "Bash(fish -n:*)",
@@ -172,6 +203,16 @@
       "Bash(tofu apply:*)",
       "Bash(tofu destroy:*)",
       "Bash(tofu import:*)",
+      "Bash(aws --profile prod-admin:*)",
+      "Bash(aws --profile lrl-prd-admin:*)",
+      "Bash(aws --profile lrl-prd-dbwrite:*)",
+      "Bash(aws --profile lrl-prd-oncall:*)",
+      "Bash(env AWS_PROFILE=prod-admin:*)",
+      "Bash(env AWS_PROFILE=lrl-prd-admin:*)",
+      "Bash(env AWS_PROFILE=lrl-prd-dbwrite:*)",
+      "Bash(AWS_PROFILE=prod-admin:*)",
+      "Bash(AWS_PROFILE=lrl-prd-admin:*)",
+      "Bash(AWS_PROFILE=lrl-prd-dbwrite:*)",
       "Bash(op item create:*)",
       "Bash(op item edit:*)",
       "Bash(op item delete:*)",
@@ -179,13 +220,25 @@
       "Bash(op vault delete:*)",
       "Bash(op document create:*)",
       "Bash(op document edit:*)",
-      "Bash(op document delete:*)"
+      "Bash(op document delete:*)",
+      "Bash(warpstream cli delete-acls:*)",
+      "Bash(warpstream cli delete-broker-config:*)",
+      "Bash(warpstream cli delete-topics:*)",
+      "Bash(warpstream cli-old delete-acls:*)",
+      "Bash(warpstream cli-old delete-broker-config:*)",
+      "Bash(warpstream cli-old delete-topics:*)",
+      "Bash(warpstream cli-beta delete-acls:*)",
+      "Bash(warpstream cli-beta delete-broker-config:*)",
+      "Bash(warpstream cli-beta delete-topics:*)"
     ],
     "defaultMode": "plan"
   },
   "model": "claude-opus-5",
   "effortLevel": "xhigh",
   "enableAllProjectMcpServers": true,
+  "env": {
+    "AWS_PAGER": ""
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -240,14 +293,6 @@
   // @machine:server
   "apiKeyHelper": "$HOME/.config/.system/sensitive/claude-api-key-helper.sh",
   // @end:server
-  // @machine:work
-  "mcpServers": {
-    "signadot": {
-      "command": "signadot",
-      "args": ["mcp"]
-    }
-  },
-  // @end:work
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     // @machine:work
