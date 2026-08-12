@@ -255,8 +255,10 @@ as `~/.warpstream/warpstream cli delete-topics` does not match them.
 ### Claude Skills Are Deny-by-Default
 
 `claude/.gitignore` ignores `skills/*` and re-includes the **generic** skills by
-name (`1password`, `context7-mcp`, `gh-cli`, `pdf-generation`, `python-pro`,
-`security-review`). Everything else, including every 1Password-backed work
+name, one `!skills/<name>/` + `!skills/<name>/**` pair per skill, alphabetized.
+The tracked set is the hand-written six (`1password`, `context7-mcp`, `gh-cli`,
+`pdf-generation`, `python-pro`, `security-review`) plus the vendored third-party
+sets described below. Everything else, including every 1Password-backed work
 skill, stays hidden without anyone having to remember to deny it.
 
 This replaced a `!skills/**` allowlist that was fail-open, where a work skill
@@ -267,6 +269,36 @@ with the others, not in the repo.
 
 The test for whether a skill is work-specific is simple: **would it make sense
 on a machine that has never touched work?** `python-pro` yes, `aws` no.
+
+#### Vendored third-party skills
+
+Generic third-party skills are vendored verbatim as real directories under
+`claude/skills/` (the python-pro pattern: snapshot, commit, keep upstream
+frontmatter). `tile.json` and `evals/` files are inert upstream metadata kept
+for provenance. Current sets and pinned sources:
+
+- **mcollina/skills** (MIT, Matteo Collina), commit `a88a866`: `agents-md`,
+  `documentation`, `node`, `nodejs-core`, `skill-optimizer`,
+  `typescript-magician`. One local deviation: upstream `skills/init` is vendored
+  as `agents-md` (directory and frontmatter `name` changed together) so it does
+  not shadow Claude Code's bundled `/init`; a personal skill with the same name
+  overrides a bundled one. Re-apply the rename on every refresh.
+- **antonbabenko/terraform-skill** (Apache-2.0), v1.17.1: `terraform-skill`.
+- **samber/cc-skills-golang** (MIT), snapshot 2026-08-12: the 46 `golang-*`
+  skills. Quirk: `golang-project-layout/assets/.gitignore` is a template asset,
+  but once tracked git honors it for future files under that `assets/` dir;
+  nothing currently matches it.
+- **vercel-labs/skills** (find-skills helper): `find-skills`.
+
+**The `npx skills add` installer does not propagate.** It writes real skill
+directories to `~/.agents/skills/` (user scope) or `<repo>/.agents/skills/`
+(project scope) and drops symlinks into `claude/skills/`, which stay gitignored
+by `skills/*` and invisible to `git status`. To make an installed skill
+permanent, copy the real directory into `claude/skills/` (replacing the
+symlink), add its allowlist pair to `claude/.gitignore`, and record its source
+here. Refresh works the same way in reverse: re-fetch upstream, `diff -r`
+against the vendored directory, re-copy, re-apply any deviation noted above,
+and update the pinned ref in this list.
 
 ### Claude Rules
 
