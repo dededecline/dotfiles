@@ -229,7 +229,7 @@
     ],
     "defaultMode": "plan"
   },
-  "model": "claude-opus-5",
+  "model": "claude-fable-5",
   "effortLevel": "xhigh",
   "enableAllProjectMcpServers": true,
   "env": {
