@@ -225,5 +225,6 @@ Prefix: `Ctrl+B`
 | `sketchybar restart` | Full restart via launchctl |
 | `sketchybar stop/start` | Stop or start sketchybar |
 | `gitdone` | Switch to default branch and pull |
-| `clone <repo>` | Clone work repo with archive detection |
+| `clone <repo>...` | Clone one or more work repos: checks each name exists, warns on archived, offers to open in zed if only one was cloned |
+| `clone -s <repo>...` | Same, non-interactive: clones archived repos without asking, does not open zed |
 | `empty` | Empty commit to trigger CI pipelines |

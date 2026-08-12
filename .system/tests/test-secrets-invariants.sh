@@ -178,6 +178,7 @@ for p in \
   .system/sensitive/context7-api-key \
   git/config \
   gh/hosts.yml \
+  fish/functions/clone.fish \
   claude/settings.json \
   context7/credentials.json \
   somenewtool/token.json; do

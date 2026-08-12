@@ -811,7 +811,7 @@ Custom functions in fish/functions/:
 • refresh - Reload configured processes (aerospace, sketchybar, fish, tmux) •
 secrets - Wrapper for secrets.sh  
 • gitdone - Switch to default branch and pull  
-• clone - Clone work repos with archive detection  
+• clone - Clone one or more work repos, checking each name resolves (`-s`: no prompts)  
 • empty - Create empty commit with CI identity for triggering pipelines  
 • awsp - Switch the active AWS profile (`awsp` alone lists them; `awsp -` clears)  
 • awsall - Run an AWS CLI command across all **regions** (not profiles)  
@@ -826,7 +826,33 @@ the production account, refusing outright when non-interactive unless passed
 public; an unreadable config yields an empty value, which forces the prompt
 rather than silently disabling it.
 
-Completions for `awsp` live in `fish/completions/awsp.fish`, and
+`clone` takes one or more repo names and resolves every one with `gh repo view`
+before cloning anything, because the old single-repo version never read gh's
+exit status: a typo produced an empty archived flag and fell through to a raw
+`git clone` ssh error. Resolution is a separate pass so every bad name is
+reported before verbose clone output starts scrolling. It tells a missing repo
+apart from a rejected token by matching gh's own stderr, since both exit 1, and
+it skips a name whose directory already exists rather than letting git fail on
+it mid-batch. Names are accepted bare, as `<org>/name`, or with a trailing
+`.git`, and are deduplicated before validation rather than after, so a repeated
+bad name is reported once instead of twice. Every distinct requested repo then
+ends up either cloned or reported as failed, which is what makes the
+`cloned N of M` total trustworthy, and the exit status is non-zero if any
+failed, including repos skipped because they are archived and consent was not
+given. `-s`/`--silent` answers the
+archived prompt and also skips the offer to open the result in zed, since a flag
+meant for unattended runs should not launch a GUI; non-interactively without it,
+archived repos are skipped while the rest still clone. That editor prompt is
+offered only when exactly one repo was cloned, which is both the case where
+opening it is unambiguous and the condition that subsumes the "anything cloned
+at all" check. A batch that ends with one survivor therefore still offers it.
+`clone` is the one
+function here that uses fish's `argparse` builtin: two spellings of one flag
+plus variadic positionals is where the manual `contains --` extraction used by
+`awsall` stops paying off, and argparse rejects a typo'd flag instead of
+treating it as a repo name.
+
+Completions for `awsp` and `clone` live in `fish/completions/`, and
 `fish/conf.d/aws.fish` sets `AWS_PAGER` empty.
 
 ### Key Aliases
