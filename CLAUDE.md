@@ -510,9 +510,9 @@ To change themes: edit `.system/themes/theme.toml`, run
 ### Fastfetch Logos
 
 One ASCII logo per machine: `fastfetch/logo_<hostname>.txt`.
-`fastfetch/logo.txt` is a **gitignored symlink** created from `$MACHINE_HOSTNAME`
-by `secrets.sh` (`inject_secrets`), so never edit `logo.txt` directly. Edit the
-`logo_<hostname>.txt` file.
+`fastfetch/logo.txt` is a **gitignored symlink** created from
+`$MACHINE_HOSTNAME` by `secrets.sh` (`inject_secrets`), so never edit `logo.txt`
+directly. Edit the `logo_<hostname>.txt` file.
 
 Logos render as horizontal colour stripes. Because `logo.type` is `"file"`
 ("printed with color code replacement"), fastfetch substitutes `$1`…`$9` in the
@@ -530,10 +530,10 @@ centre, since the 16-row logos are vertically symmetric: 16 rows →
 ride along with stripe 1 rather than consuming one of its rows.
 
 When adding a machine logo, prefix every line with `$1`…`$7` in order.
-`sync_fastfetch` in `sync-theme.sh` keeps colours 1-7 (and the separator) in step
-with the palette. Note it does **not** rewrite the module `keyColor` values,
-which are hardcoded in the `modules` array; a flavour change leaves those stale
-and they surface as `unknown color pattern` warnings.
+`sync_fastfetch` in `sync-theme.sh` keeps colours 1-7 (and the separator) in
+step with the palette. Note it does **not** rewrite the module `keyColor`
+values, which are hardcoded in the `modules` array; a flavour change leaves
+those stale and they surface as `unknown color pattern` warnings.
 
 ### Claude Settings
 
@@ -785,8 +785,8 @@ script (no env var or OAuth needed).
 
 - Gating: `"apiKeyHelper"` sits in a `// @machine:server` block in
   `claude/settings.jsonc`, and `secrets.sh` injects the key and generates the
-  helper only for the `server` group. `secrets --check` reports on both only
-  for server machines.
+  helper only for the `server` group. `secrets --check` reports on both only for
+  server machines.
 - Helper script: `~/.config/.system/sensitive/claude-api-key-helper.sh` (reads
   `anthropic-api-key` from the same sensitive directory, from
   `op://Private/anthropic-claude-api`)
@@ -981,24 +981,25 @@ an empty expected tailnet name never matches, so a missing or blank
 `test-settings-generation.sh` covers `setup.sh` marker filtering against the
 real `claude/settings.jsonc`, pinning which machine gets which gated block
 (notably that `apiKeyHelper` reaches nyx and neither laptop), that every
-machine's output is valid JSON, and that a failed generation leaves the
-existing `settings.json` intact. It sources `setup.sh` with its trailing
-`main "$@"` line stripped, then `set +e` to re-enable failure assertions.
+machine's output is valid JSON, and that a failed generation leaves the existing
+`settings.json` intact. It sources `setup.sh` with its trailing `main "$@"` line
+stripped, then `set +e` to re-enable failure assertions.
 
 Two traps that section guards against: `configure_claude` redirects with `>`,
-which truncates on open, so an unchecked `jq` failure wipes `settings.json`;
-and `settings.jsonc` may only contain `@machine`/`@end` marker comments, since
-any other `//` line survives preprocessing and then breaks `jq`.
+which truncates on open, so an unchecked `jq` failure wipes `settings.json`; and
+`settings.jsonc` may only contain `@machine`/`@end` marker comments, since any
+other `//` line survives preprocessing and then breaks `jq`.
 
 `get_machine_groups` **errors to stderr and returns 1 for a hostname with no
 section in profiles.toml**, rather than defaulting to `all <hostname>`. The old
 silent default meant a renamed machine quietly lost every group-gated block
 (`@machine:work` and friends) from its generated config instead of failing.
 
-Callers must check it explicitly (`groups=$(get_machine_groups "$h") || return 1`).
-Do not rely on `set -e` to propagate the failure: it is suppressed inside
-`if`/`&&` conditions and that suppression extends into the called function's
-body, and `symlinks.sh` does not set `-e` at all.
+Callers must check it explicitly
+(`groups=$(get_machine_groups "$h") || return 1`). Do not rely on `set -e` to
+propagate the failure: it is suppressed inside `if`/`&&` conditions and that
+suppression extends into the called function's body, and `symlinks.sh` does not
+set `-e` at all.
 
 ### Shell Script Quality (shellcheck)
 

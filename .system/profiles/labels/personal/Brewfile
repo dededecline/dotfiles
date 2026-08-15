@@ -6,6 +6,7 @@ tap "macos-fuse-t/cask", trusted: true
 # =============================================================================
 # Media Utilities
 # =============================================================================
+brew "ffmpeg"                         # Audio/video transcoder
 brew "imagemagick"                    # Image manipulation
 cask "macos-fuse-t/cask/fuse-t"       # FUSE without kernel extensions
 cask "macos-fuse-t/cask/fuse-t-sshfs" # Mount remote dirs over SSH

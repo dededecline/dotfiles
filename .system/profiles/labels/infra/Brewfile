@@ -1,6 +1,9 @@
 # =============================================================================
 # DevOps Tools
 # =============================================================================
+brew "awscli"                    # AWS CLI v2
 brew "helm"                      # Kubernetes package manager
 brew "kubernetes-cli"            # kubectl
 brew "opentofu"                  # Terraform alternative
+brew "terraform-docs"            # Generate docs from terraform modules
+brew "trivy"                     # IaC & container security scanner
