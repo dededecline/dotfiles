@@ -132,6 +132,16 @@ while IFS= read -r tpl; do
 done < <(grep -rlE 'op://' "$TEMPLATES" --include='*.tpl' | sort)
 
 echo ""
+echo "every op:// token in a template is a full vault/item/field reference"
+bad_refs=$(grep -rnoE 'op://[^"}]*' "$TEMPLATES" --include='*.tpl' |
+  grep -vE ':op://[^/"}]+/[^/"}]+/[^/"}]+' || true)
+if [[ -z "$bad_refs" ]]; then
+  ok "no malformed op:// token in .system/templates"
+else
+  no "no malformed op:// token in .system/templates" "$(echo "$bad_refs" | tr '\n' ' ')"
+fi
+
+echo ""
 echo "no AWS account id is hardcoded in tracked shell or fish sources"
 # awsall.fish carried the production account id in a public repo.
 # Word boundaries, not [^0-9] on both sides: an id at end-of-line has no

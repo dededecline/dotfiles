@@ -222,6 +222,14 @@ To add a new secret:
 2. Add injection logic to .system/setup/secrets.sh
 3. Document the required 1Password item in .system/templates/README.md
 
+**`op inject` scans the whole template for bare `op://` tokens, comments
+included.** A mention of the scheme in prose (e.g. followed by punctuation)
+parses as a zero-segment reference and aborts injection of that entire file,
+so that credential silently stops regenerating. Never write the literal scheme
+in a template comment; `test-secrets-invariants.sh` asserts every token is a
+full vault/item/field reference. This killed `clone.fish` injection once
+(97770d9).
+
 **Deliberate exception: `.system/sensitive/warpstream.fish`.** It is a static
 file with no `.tpl` and no `secrets.sh` entry, sourced by
 `fish/conf.d/warpstream.fish`. It was populated once from

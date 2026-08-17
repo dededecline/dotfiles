@@ -76,7 +76,7 @@ inject_template() {
 
   if (
     umask 077
-    op inject "${op_args[@]}" || exit 1
+    op inject "${op_args[@]}" >/dev/null || exit 1
     # shellcheck disable=SC2016
     envsubst '$HOME' <"$staged" >"${staged}.env" && mv "${staged}.env" "$staged"
   ); then
@@ -153,7 +153,7 @@ sync_op_document() {
   temp_file=$(mktemp)
 
   # --force avoids op's own overwrite prompt
-  if ! op document get "$doc_title" --output "$temp_file" --force --account "$account" 2>/dev/null; then
+  if ! op document get "$doc_title" --output "$temp_file" --force --account "$account" >/dev/null 2>&1; then
     rm -f "$temp_file"
     print_warning "  $label not found in 1Password (document: $doc_title)"
     return 1
@@ -268,7 +268,7 @@ inject_claude_skill_archive() {
   temp_file=$(mktemp)
 
   # Download tarball from 1Password
-  if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" 2>/dev/null; then
+  if ! op document get "$doc_title" --output "$temp_file" --force --account "$OP_WORK_ACCOUNT" >/dev/null 2>&1; then
     rm -f "$temp_file"
     print_warning "  $skill_name skill archive not found in 1Password (document: $doc_title)"
     return 1

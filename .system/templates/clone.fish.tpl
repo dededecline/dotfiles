@@ -21,7 +21,7 @@ function clone --description "Clone work repos with archive and existence checks
         return 1
     end
 
-    # Rejects an uninjected template without matching on op://, which op inject scans for.
+    # Rejects an uninjected template without naming the reference scheme, which op inject scans even in comments.
     if not string match -qr -- '^[A-Za-z0-9._-]+$' "$org"
         echo "clone: work org is not configured, run 'secrets'" >&2
         return 1
